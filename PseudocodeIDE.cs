@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace pseudocode_ide
 {
-    public partial class Form1 : Form
+    public partial class PseudocodeIDE : Form
     {
-        public Form1()
+        public PseudocodeIDE()
         {
             InitializeComponent();
         }
