@@ -2,9 +2,9 @@
 
 namespace pseudocode_ide
 {
-    public partial class PseudocodeIDE : Form
+    public partial class RunForm : Form
     {
-        public PseudocodeIDE()
+        public RunForm()
         {
             InitializeComponent();
         }
