@@ -18,6 +18,11 @@ namespace pseudocode_ide
             codeTextBox.WordWrap = wordWrapMenuItem.Checked;
         }
 
+        private void EqualsIsOperatorMenuItem_Click(object sender, System.EventArgs e)
+        {
+            Tokens.setEqualOperatorForCompare(EqualsIsOperatorMenuItem.Checked);
+        }
+
         private void codeTextBox_TextChanged(object sender, System.EventArgs e)
         {
             interpreter.code = codeTextBox.Text;
