@@ -58,6 +58,7 @@
     <Compile Include="interpreter\sequences\Sequence.cs" />
     <Compile Include="interpreter\sequences\condition\SwitchCaseCondition.cs" />
     <Compile Include="interpreter\sequences\Variable.cs" />
+    <Compile Include="interpreter\Tokens.cs" />
     <Compile Include="PseudocodeIDE.cs">
       <SubType>Form</SubType>
     </Compile>
