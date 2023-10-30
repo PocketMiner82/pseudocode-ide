@@ -36,14 +36,14 @@
             this.editMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.wordWrapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runProgramMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.codeTextBox = new System.Windows.Forms.RichTextBox();
-            this.viewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.wordWrapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,19 +74,19 @@
             // newMenuItem
             // 
             this.newMenuItem.Name = "newMenuItem";
-            this.newMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newMenuItem.Size = new System.Drawing.Size(103, 22);
             this.newMenuItem.Text = "New";
             // 
             // openMenuItem
             // 
             this.openMenuItem.Name = "openMenuItem";
-            this.openMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openMenuItem.Text = "Open";
             // 
             // saveMenuItem
             // 
             this.saveMenuItem.Name = "saveMenuItem";
-            this.saveMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveMenuItem.Size = new System.Drawing.Size(103, 22);
             this.saveMenuItem.Text = "Save";
             // 
             // editMenuItem
@@ -101,14 +101,30 @@
             // searchMenuItem
             // 
             this.searchMenuItem.Name = "searchMenuItem";
-            this.searchMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.searchMenuItem.Size = new System.Drawing.Size(115, 22);
             this.searchMenuItem.Text = "Search";
             // 
             // replaceMenuItem
             // 
             this.replaceMenuItem.Name = "replaceMenuItem";
-            this.replaceMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.replaceMenuItem.Size = new System.Drawing.Size(115, 22);
             this.replaceMenuItem.Text = "Replace";
+            // 
+            // viewMenuItem
+            // 
+            this.viewMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.wordWrapMenuItem});
+            this.viewMenuItem.Name = "viewMenuItem";
+            this.viewMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.viewMenuItem.Text = "View";
+            // 
+            // wordWrapMenuItem
+            // 
+            this.wordWrapMenuItem.CheckOnClick = true;
+            this.wordWrapMenuItem.Name = "wordWrapMenuItem";
+            this.wordWrapMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.wordWrapMenuItem.Text = "Word Wrap";
+            this.wordWrapMenuItem.Click += new System.EventHandler(this.wordWrapMenuItem_Click);
             // 
             // runMenuItem
             // 
@@ -121,7 +137,7 @@
             // runProgramMenuItem
             // 
             this.runProgramMenuItem.Name = "runProgramMenuItem";
-            this.runProgramMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.runProgramMenuItem.Size = new System.Drawing.Size(144, 22);
             this.runProgramMenuItem.Text = "Run Program";
             // 
             // helpMenuItem
@@ -136,13 +152,13 @@
             // showHelpMenuItem
             // 
             this.showHelpMenuItem.Name = "showHelpMenuItem";
-            this.showHelpMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showHelpMenuItem.Size = new System.Drawing.Size(131, 22);
             this.showHelpMenuItem.Text = "Show Help";
             // 
             // aboutMenuItem
             // 
             this.aboutMenuItem.Name = "aboutMenuItem";
-            this.aboutMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutMenuItem.Size = new System.Drawing.Size(131, 22);
             this.aboutMenuItem.Text = "About";
             // 
             // codeTextBox
@@ -155,20 +171,6 @@
             this.codeTextBox.TabIndex = 1;
             this.codeTextBox.Text = "";
             this.codeTextBox.WordWrap = false;
-            // 
-            // viewMenuItem
-            // 
-            this.viewMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.wordWrapMenuItem});
-            this.viewMenuItem.Name = "viewMenuItem";
-            this.viewMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewMenuItem.Text = "View";
-            // 
-            // wordWrapMenuItem
-            // 
-            this.wordWrapMenuItem.Name = "wordWrapMenuItem";
-            this.wordWrapMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.wordWrapMenuItem.Text = "Word Wrap";
             // 
             // PseudocodeIDE
             // 
