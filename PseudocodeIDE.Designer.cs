@@ -36,6 +36,7 @@
             this.editMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.EqualsIsOperatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wordWrapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,7 +94,8 @@
             // 
             this.editMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.searchMenuItem,
-            this.replaceMenuItem});
+            this.replaceMenuItem,
+            this.EqualsIsOperatorMenuItem});
             this.editMenuItem.Name = "editMenuItem";
             this.editMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editMenuItem.Text = "Edit";
@@ -101,14 +103,22 @@
             // searchMenuItem
             // 
             this.searchMenuItem.Name = "searchMenuItem";
-            this.searchMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.searchMenuItem.Size = new System.Drawing.Size(180, 22);
             this.searchMenuItem.Text = "Search";
             // 
             // replaceMenuItem
             // 
             this.replaceMenuItem.Name = "replaceMenuItem";
-            this.replaceMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.replaceMenuItem.Size = new System.Drawing.Size(180, 22);
             this.replaceMenuItem.Text = "Replace";
+            // 
+            // EqualsIsOperatorMenuItem
+            // 
+            this.EqualsIsOperatorMenuItem.CheckOnClick = true;
+            this.EqualsIsOperatorMenuItem.Name = "EqualsIsOperatorMenuItem";
+            this.EqualsIsOperatorMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.EqualsIsOperatorMenuItem.Text = "\'=\' is operator";
+            this.EqualsIsOperatorMenuItem.Click += new System.EventHandler(this.EqualsIsOperatorMenuItem_Click);
             // 
             // viewMenuItem
             // 
@@ -209,6 +219,7 @@
         private System.Windows.Forms.ToolStripMenuItem aboutMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewMenuItem;
         private System.Windows.Forms.ToolStripMenuItem wordWrapMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem EqualsIsOperatorMenuItem;
     }
 }
 
