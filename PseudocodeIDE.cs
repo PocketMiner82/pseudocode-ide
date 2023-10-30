@@ -14,16 +14,9 @@ namespace pseudocode_ide
         }
         
         private void wordWrapMenuItem_Click(object sender, System.EventArgs e)
-        {   
-            
-            if (wordWrapMenuItem.Checked)
-            {
-               wordWrapMenuItem.Checked = true;
-               codeTextBox.WordWrap = true;
-                
-            } else { wordWrapMenuItem.Checked = false; codeTextBox.WordWrap = false; }
-              
-        }   
+        {
+            codeTextBox.WordWrap = wordWrapMenuItem.Checked;
+        }
 
         private void codeTextBox_TextChanged(object sender, System.EventArgs e)
         {
