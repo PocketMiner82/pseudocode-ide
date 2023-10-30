@@ -105,6 +105,7 @@ namespace pseudocode_ide
             codeTextBox.Clear();
             Text = "Pseudocode IDE";
             this.isSaved = true;
+            this.filePath = "";
         }
 
         private void openMenuItem_Click(object sender, System.EventArgs e)
