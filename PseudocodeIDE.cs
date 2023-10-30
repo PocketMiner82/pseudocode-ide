@@ -11,7 +11,10 @@ namespace pseudocode_ide
     public partial class PseudocodeIDE : Form
     {
         private Interpreter interpreter = new Interpreter();
-        private string filePath;
+        private string filePath { get; set; }
+
+
+        private bool isSaved = true;
 
         public PseudocodeIDE()
         {
@@ -31,6 +34,13 @@ namespace pseudocode_ide
         private void codeTextBox_TextChanged(object sender, System.EventArgs e)
         {
             interpreter.code = codeTextBox.Text;
+            this.isSaved = false;
+
+
+            if (!Text.EndsWith("*") && Text.Contains("-"))
+            {
+                Text += "*";
+            }
         }
         public bool saveNewFile()
         {
@@ -59,7 +69,7 @@ namespace pseudocode_ide
             }
         }
         
-        public bool openFile()
+        public void openFile()
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -71,20 +81,43 @@ namespace pseudocode_ide
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     this.filePath = openFileDialog.FileName;
-                    StreamReader file = new StreamReader(this.filePath);
-                    codeTextBox.Text = file.ReadToEnd();
-                    return true;
+
+                    using (StreamReader file = new StreamReader(this.filePath))
+                    {
+                        codeTextBox.Text = file.ReadToEnd();
+                    }
+                    this.isSaved = true;
+                    Text = "Pseudocode IDE - " + this.filePath;
                 }
             }
-            return false;
         }
         private void newMenuItem_Click(object sender, System.EventArgs e)
         {
+            if (!this.isSaved)
+            {
+                if (MessageBox.Show("Do you really want to create a new file?\nAll unsaved changes will be lost.", "Unsaved changes",
+                    MessageBoxButtons.YesNo) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+
             codeTextBox.Clear();
+            Text = "Pseudocode IDE";
+            this.isSaved = true;
         }
 
         private void openMenuItem_Click(object sender, System.EventArgs e)
         {
+            if (!this.isSaved)
+            {
+                if (MessageBox.Show("Do you really want to open a new file?\nAll unsaved changes will be lost.", "Unsaved changes",
+                    MessageBoxButtons.YesNo) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+
             this.openFile();
         }
 
@@ -106,6 +139,20 @@ namespace pseudocode_ide
             using (StreamWriter outputFile = new StreamWriter(this.filePath))
             {
                 outputFile.Write(codeTextBox.Text);
+            }
+            this.isSaved = true;
+
+            Text = "Pseudocode IDE - " + this.filePath;
+        }
+
+        private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!this.isSaved)
+            {
+                if (MessageBox.Show("Do you want to save them?", "Unsaved changes", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    this.saveMenuItem_Click(null, null);
+                }
             }
         }
     }

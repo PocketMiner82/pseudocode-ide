@@ -34,7 +34,7 @@
             this.openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.searchMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.findMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.EqualsIsOperatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,6 +75,7 @@
             // newMenuItem
             // 
             this.newMenuItem.Name = "newMenuItem";
+            this.newMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.newMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newMenuItem.Text = "New";
             this.newMenuItem.Click += new System.EventHandler(this.newMenuItem_Click);
@@ -82,6 +83,7 @@
             // openMenuItem
             // 
             this.openMenuItem.Name = "openMenuItem";
+            this.openMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.openMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openMenuItem.Text = "Open";
             this.openMenuItem.Click += new System.EventHandler(this.openMenuItem_Click);
@@ -89,6 +91,7 @@
             // saveMenuItem
             // 
             this.saveMenuItem.Name = "saveMenuItem";
+            this.saveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.saveMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveMenuItem.Text = "Save";
             this.saveMenuItem.Click += new System.EventHandler(this.saveMenuItem_Click);
@@ -96,22 +99,24 @@
             // editMenuItem
             // 
             this.editMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.searchMenuItem,
+            this.findMenuItem,
             this.replaceMenuItem,
             this.EqualsIsOperatorMenuItem});
             this.editMenuItem.Name = "editMenuItem";
             this.editMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editMenuItem.Text = "Edit";
             // 
-            // searchMenuItem
+            // findMenuItem
             // 
-            this.searchMenuItem.Name = "searchMenuItem";
-            this.searchMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.searchMenuItem.Text = "Search";
+            this.findMenuItem.Name = "findMenuItem";
+            this.findMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+            this.findMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.findMenuItem.Text = "Find";
             // 
             // replaceMenuItem
             // 
             this.replaceMenuItem.Name = "replaceMenuItem";
+            this.replaceMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
             this.replaceMenuItem.Size = new System.Drawing.Size(180, 22);
             this.replaceMenuItem.Text = "Replace";
             // 
@@ -150,7 +155,8 @@
             // runProgramMenuItem
             // 
             this.runProgramMenuItem.Name = "runProgramMenuItem";
-            this.runProgramMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.runProgramMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.runProgramMenuItem.Size = new System.Drawing.Size(180, 22);
             this.runProgramMenuItem.Text = "Run Program";
             // 
             // helpMenuItem
@@ -165,7 +171,8 @@
             // showHelpMenuItem
             // 
             this.showHelpMenuItem.Name = "showHelpMenuItem";
-            this.showHelpMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.showHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            this.showHelpMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showHelpMenuItem.Text = "Show Help";
             // 
             // aboutMenuItem
@@ -193,10 +200,12 @@
             this.ClientSize = new System.Drawing.Size(784, 461);
             this.Controls.Add(this.codeTextBox);
             this.Controls.Add(this.menuStrip);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.MinimumSize = new System.Drawing.Size(350, 250);
             this.Name = "PseudocodeIDE";
             this.Text = "Pseudocode IDE";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PseudocodeIDE_FormClosing);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -211,7 +220,7 @@
         private System.Windows.Forms.ToolStripMenuItem openMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem searchMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem findMenuItem;
         private System.Windows.Forms.ToolStripMenuItem replaceMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showHelpMenuItem;
