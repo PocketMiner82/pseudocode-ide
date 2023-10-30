@@ -12,12 +12,13 @@ namespace pseudocode_ide
         
         private void wordWrapMenuItem_Click(object sender, System.EventArgs e)
         {   
+            
             if (wordWrapMenuItem.Checked)
             {
                wordWrapMenuItem.Checked = true;
-                MessageBox.Show("Yes");
+               codeTextBox.WordWrap = true;
                 
-            } else { wordWrapMenuItem.Checked = false; MessageBox.Show("No"); }
+            } else { wordWrapMenuItem.Checked = false; codeTextBox.WordWrap = false; }
               
         }   
     }
