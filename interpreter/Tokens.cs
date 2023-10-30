@@ -29,12 +29,23 @@ namespace pseudocode_ide.interpreter
         public static readonly string[] LOOP_BREAK = { "ABBRUCH" };
 
         public static readonly string[] SEQUENCE = { "OPERATION" };
+        public static readonly string[] END_SEQUENCE = { "RÜCKGABE" };
 
         public static readonly string[] OPERATOR_SMALLER = { "<" };
         public static readonly string[] OPERATOR_SMALLER_OR_EQUAL = { "<=" };
         public static readonly string[] OPERATOR_GREATER = { ">" };
         public static readonly string[] OPERATOR_GREATER_OR_EQUAL = { ">=" };
         public static readonly string[] OPERATOR_EQUAL = { null, "==" };
+
+        public static readonly string[] TYPE_BOOL = { "Boolean", "boolean", "bool" };
+        public static readonly string[] TYPE_INT = { "GZ", "Integer", "int" };
+        public static readonly string[] TYPE_DOUBLE = { "FKZ", "Real", "double" };
+        public static readonly string[] TYPE_CHAR = { "Zeichen", "char" };
+        public static readonly string[] TYPE_STRING = { "Text", "String", "string" };
+        public static readonly string[] TYPE_NULL = { "NICHTS" };
+
+        //public static readonly string[] TYPE_LIST_PREFIX = { "Liste<", "[" };
+        //public static readonly string[] TYPE_LIST_SUFFIX = { ">", "]" };
 
         public static void setEqualOperatorForCompare(bool val)
         {
