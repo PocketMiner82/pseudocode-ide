@@ -120,9 +120,11 @@
             // 
             // wordWrapMenuItem
             // 
+            this.wordWrapMenuItem.CheckOnClick = true;
             this.wordWrapMenuItem.Name = "wordWrapMenuItem";
             this.wordWrapMenuItem.Size = new System.Drawing.Size(180, 22);
             this.wordWrapMenuItem.Text = "Word Wrap";
+            this.wordWrapMenuItem.Click += new System.EventHandler(this.wordWrapMenuItem_Click);
             // 
             // runMenuItem
             // 
