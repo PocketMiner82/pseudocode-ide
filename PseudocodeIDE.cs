@@ -5,16 +5,25 @@ using System.IO;
 using static System.Windows.Forms.LinkLabel;
 using System;
 using System.Data;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace pseudocode_ide
 {
     public partial class PseudocodeIDE : Form
     {
+        private Stack<string> undoStack = new Stack<string>();
+        private Stack<string> redoStack = new Stack<string>();
+
         private Interpreter interpreter = new Interpreter();
         private string filePath { get; set; }
 
 
         private bool isSaved = true;
+        private int lastCursorPosition = 0;
+        private bool ignoreTextChange = false;
 
         public PseudocodeIDE()
         {
@@ -28,7 +37,7 @@ namespace pseudocode_ide
 
         private void EqualsIsOperatorMenuItem_Click(object sender, System.EventArgs e)
         {
-            Tokens.setEqualOperatorForCompare(EqualsIsOperatorMenuItem.Checked);
+            Tokens.setEqualsIsCompareOperator(EqualsIsOperatorMenuItem.Checked);
         }
 
         private void codeTextBox_TextChanged(object sender, System.EventArgs e)
@@ -40,6 +49,15 @@ namespace pseudocode_ide
             if (!Text.EndsWith("*") && Text.Contains("-"))
             {
                 Text += "*";
+            }
+
+            if (this.ignoreTextChange)
+            {
+                this.ignoreTextChange = false;
+            }
+            else
+            {
+                this.updateUndoStack(false);
             }
         }
         public bool saveNewFile()
@@ -85,6 +103,9 @@ namespace pseudocode_ide
                     using (StreamReader file = new StreamReader(this.filePath))
                     {
                         codeTextBox.Text = file.ReadToEnd();
+                        this.undoStack.Clear();
+                        this.redoStack.Clear();
+                        this.undoStack.Push(codeTextBox.Text);
                     }
                     this.isSaved = true;
                     Text = "Pseudocode IDE - " + this.filePath;
@@ -154,6 +175,114 @@ namespace pseudocode_ide
                 {
                     this.saveMenuItem_Click(null, null);
                 }
+            }
+        }
+
+        private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            // ignore CTRL[+SHIFT]+(Z/Y/L/R/E)
+            if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E)
+                && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
+            {
+                e.SuppressKeyPress = true;
+            }
+
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
+            {
+                this.updateUndoStack(true);
+            }
+        }
+
+        private void updateUndoStack(bool forceUpdate)
+        {
+            if (this.redoStack.Count != 0)
+            {
+                forceUpdate = true;
+            }
+
+            Regex noUpdateAfter = new Regex(@"^[a-zA-Z0-9_]*$");
+            string undoText = codeTextBox.Text;
+
+            try
+            {
+                if (!forceUpdate)
+                {
+                    undoText = undoText.Remove(codeTextBox.SelectionStart - 1, 1);
+                }
+            }
+            catch (ArgumentOutOfRangeException) {
+                Debug.WriteLine("No update");
+                return;
+            }
+
+            if ((codeTextBox.TextLength > 1 && !forceUpdate && noUpdateAfter.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
+                || (this.undoStack.Count != 0 && this.undoStack.Peek().Equals(undoText)))
+            {
+                Debug.WriteLine("No update");
+                return;
+            }
+            
+
+            Debug.WriteLine("Update:\n\n" + undoText + "\n\n<EOF>");
+
+            this.redoStack.Clear();
+            this.undoStack.Push(undoText);
+            this.undoStack.Trim(100);
+            undoToolStripMenuItem.Enabled = true;
+        }
+
+        private void codeTextBox_SelectionChanged(object sender, EventArgs e)
+        {
+            if (this.redoStack.Count != 0)
+            {
+                return;
+            }
+
+            if (codeTextBox.SelectionLength != 0 || Math.Abs(this.lastCursorPosition - codeTextBox.SelectionStart) > 1)
+            {
+                this.updateUndoStack(true);
+            }
+            this.lastCursorPosition = codeTextBox.SelectionStart;
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.redoStack.Count == 0 || !this.redoStack.Peek().Equals(codeTextBox.Text))
+            {
+                this.redoStack.Push(codeTextBox.Text);
+                redoToolStripMenuItem.Enabled = true;
+            }
+
+            if (this.undoStack.Count <= 1)
+            {
+                this.ignoreTextChange = true;
+                codeTextBox.Text = this.undoStack.Peek();
+                undoToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                this.ignoreTextChange = true;
+                codeTextBox.Text = this.undoStack.Pop();
+            }
+        }
+
+        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            undoToolStripMenuItem.Enabled = true;
+            if (!this.undoStack.Peek().Equals(codeTextBox.Text))
+            {
+                this.undoStack.Push(codeTextBox.Text);
+            }
+
+            if (this.redoStack.Count > 0)
+            {
+                this.ignoreTextChange = true;
+                codeTextBox.Text = this.redoStack.Pop();
+            }
+
+            if (this.redoStack.Count == 0)
+            {
+                redoToolStripMenuItem.Enabled = false;
             }
         }
     }

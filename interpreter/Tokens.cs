@@ -47,7 +47,7 @@ namespace pseudocode_ide.interpreter
         //public static readonly string[] TYPE_LIST_PREFIX = { "Liste<", "[" };
         //public static readonly string[] TYPE_LIST_SUFFIX = { ">", "]" };
 
-        public static void setEqualOperatorForCompare(bool val)
+        public static void setEqualsIsCompareOperator(bool val)
         {
             if (val)
             {
