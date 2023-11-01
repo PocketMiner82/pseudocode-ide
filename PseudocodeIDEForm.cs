@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using pseudocode_ide.findReplace;
 
 namespace pseudocode_ide
 {
-    public partial class PseudocodeIDE : Form
+    public partial class PseudocodeIDEForm : Form
     {
         private readonly Regex NO_UPDATE_AFTER = new Regex(@"^[a-zA-Z0-9_]$", RegexOptions.Multiline);
 
@@ -23,8 +24,13 @@ namespace pseudocode_ide
         private int lastCursorPosition = 0;
         private bool ignoreTextChange = false;
 
-        public PseudocodeIDE()
+        private FindReplaceForm findReplaceForm;
+
+        public PseudocodeIDEForm()
         {
+            this.findReplaceForm = new FindReplaceForm(this);
+            this.findReplaceForm.Owner = this;
+
             InitializeComponent();
             this.resetUndoRedo();
         }
@@ -97,6 +103,14 @@ namespace pseudocode_ide
 
         private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // main form won't close if child form is not disposed
+            if (!this.findReplaceForm.IsDisposed)
+            {
+                this.findReplaceForm.Close();
+                this.Close();
+                return;
+            }
+
             if (!this.isSaved)
             {
                 if (MessageBox.Show("Do you want to save them?", "Unsaved changes", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -107,7 +121,7 @@ namespace pseudocode_ide
         }
 
         // ---------------------------------------------
-        // ´NEW/OPEN/SAVE
+        // NEW/OPEN/SAVE
         // ---------------------------------------------
 
         private void newMenuItem_Click(object sender, System.EventArgs e)
@@ -325,6 +339,20 @@ namespace pseudocode_ide
             {
                 redoToolStripMenuItem.Enabled = false;
             }
+        }
+
+        // ---------------------------------------------
+        // FIND/REPLACE
+        // ---------------------------------------------
+
+        private void findMenuItem_Click(object sender, EventArgs e)
+        {
+            this.findReplaceForm.Show(FindReplaceTabs.FIND);
+        }
+
+        private void replaceMenuItem_Click(object sender, EventArgs e)
+        {
+            this.findReplaceForm.Show(FindReplaceTabs.REPLACE);
         }
     }
 }

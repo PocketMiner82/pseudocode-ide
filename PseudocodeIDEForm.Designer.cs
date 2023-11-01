@@ -1,6 +1,6 @@
 ﻿namespace pseudocode_ide
 {
-    partial class PseudocodeIDE
+    partial class PseudocodeIDEForm
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -131,21 +131,23 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(155, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // findMenuItem
             // 
             this.findMenuItem.Name = "findMenuItem";
             this.findMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.findMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.findMenuItem.Size = new System.Drawing.Size(180, 22);
             this.findMenuItem.Text = "Find";
+            this.findMenuItem.Click += new System.EventHandler(this.findMenuItem_Click);
             // 
             // replaceMenuItem
             // 
             this.replaceMenuItem.Name = "replaceMenuItem";
             this.replaceMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
-            this.replaceMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.replaceMenuItem.Size = new System.Drawing.Size(180, 22);
             this.replaceMenuItem.Text = "Replace";
+            this.replaceMenuItem.Click += new System.EventHandler(this.replaceMenuItem_Click);
             // 
             // viewMenuItem
             // 
@@ -219,7 +221,7 @@
             this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
             this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
             // 
-            // PseudocodeIDE
+            // PseudocodeIDEForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -229,7 +231,7 @@
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.MinimumSize = new System.Drawing.Size(350, 250);
-            this.Name = "PseudocodeIDE";
+            this.Name = "PseudocodeIDEForm";
             this.Text = "Pseudocode IDE - New File";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PseudocodeIDE_FormClosing);
             this.menuStrip.ResumeLayout(false);

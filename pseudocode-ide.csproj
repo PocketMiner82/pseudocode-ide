@@ -47,6 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="findReplace\FindReplaceForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="findReplace\FindReplaceForm.Designer.cs">
+      <DependentUpon>FindReplaceForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="findReplace\FindReplaceTabs.cs" />
     <Compile Include="interpreter\Interpreter.cs" />
     <Compile Include="interpreter\sequences\condition\Condition.cs" />
     <Compile Include="interpreter\sequences\condition\IfCondition.cs" />
@@ -60,11 +67,11 @@
     <Compile Include="interpreter\sequences\condition\SwitchCaseCondition.cs" />
     <Compile Include="interpreter\sequences\Variable.cs" />
     <Compile Include="interpreter\Tokens.cs" />
-    <Compile Include="PseudocodeIDE.cs">
+    <Compile Include="PseudocodeIDEForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PseudocodeIDE.Designer.cs">
-      <DependentUpon>PseudocodeIDE.cs</DependentUpon>
+    <Compile Include="PseudocodeIDEForm.Designer.cs">
+      <DependentUpon>PseudocodeIDEForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,6 +81,9 @@
     <Compile Include="RunForm.Designer.cs">
       <DependentUpon>OutputForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="findReplace\FindReplaceForm.resx">
+      <DependentUpon>FindReplaceForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -83,8 +93,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="PseudocodeIDE.resx">
-      <DependentUpon>PseudocodeIDE.cs</DependentUpon>
+    <EmbeddedResource Include="PseudocodeIDEForm.resx">
+      <DependentUpon>PseudocodeIDEForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="RunForm.resx">

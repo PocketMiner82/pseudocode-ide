@@ -13,7 +13,7 @@ namespace pseudocode_ide
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new PseudocodeIDE());
+            Application.Run(new PseudocodeIDEForm());
         }
     }
 }
