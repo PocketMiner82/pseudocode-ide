@@ -18,5 +18,34 @@ namespace pseudocode_ide
 
             return new Stack<T>(stack.ToArray().Take(trimCount).Reverse());
         }
+
+        // from https://stackoverflow.com/questions/2641326/finding-all-positions-of-substring-in-a-larger-string-in-c-sharp, modified
+        public static List<int> AllIndexesOf(this string str, string value, int startAt = 0, bool wrap = true)
+        {
+            List<int> indexes = new List<int>();
+            if (String.IsNullOrEmpty(value))
+                return indexes;
+
+            for (int index = startAt; ; index += value.Length)
+            {
+                index = str.IndexOf(value, index);
+                if (index == -1)
+                    break;
+                indexes.Add(index);
+            }
+
+            if (wrap)
+            {
+                for (int index = 0; index < startAt; index += value.Length)
+                {
+                    index = str.IndexOf(value, index);
+                    if (index == -1)
+                        break;
+                    indexes.Add(index);
+                }
+            }
+            
+            return indexes;
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace pseudocode_ide
         private Stack<string> undoStack = new Stack<string>();
         private Stack<string> redoStack = new Stack<string>();
 
-        private Interpreter interpreter = new Interpreter();
+        private Interpreter interpreter;
         private string filePath { get; set; }
 
 
@@ -26,9 +26,12 @@ namespace pseudocode_ide
 
         private FindReplaceForm findReplaceForm;
 
+        public string code { get; private set; } = "";
+
         public PseudocodeIDEForm()
         {
             this.findReplaceForm = new FindReplaceForm(this);
+            this.interpreter = new Interpreter(this);
             this.findReplaceForm.Owner = this;
 
             InitializeComponent();
@@ -51,7 +54,7 @@ namespace pseudocode_ide
 
         private void codeTextBox_TextChanged(object sender, System.EventArgs e)
         {
-            interpreter.code = codeTextBox.Text;
+            this.code = codeTextBox.Text;
             this.isSaved = false;
 
 
@@ -347,12 +350,26 @@ namespace pseudocode_ide
 
         private void findMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplaceForm.Show(FindReplaceTabs.FIND);
+            this.findReplaceForm.Show(FindReplaceTabs.FIND, codeTextBox.SelectedText);
         }
 
         private void replaceMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplaceForm.Show(FindReplaceTabs.REPLACE);
+            this.findReplaceForm.Show(FindReplaceTabs.REPLACE, codeTextBox.SelectedText);
+        }
+
+        public int getSelectionEnd()
+        {
+            return codeTextBox.SelectionStart + codeTextBox.SelectionLength;
+        }
+
+        public void selectText(int selectionStart, int selectionLength)
+        {
+            Invoke(new Action(() =>
+            {
+                codeTextBox.SelectionStart = selectionStart;
+                codeTextBox.SelectionLength = selectionLength;
+            }));
         }
     }
 }
