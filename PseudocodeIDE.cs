@@ -28,6 +28,7 @@ namespace pseudocode_ide
         public PseudocodeIDE()
         {
             InitializeComponent();
+            this.resetUndoRedo();
         }
         
         private void wordWrapMenuItem_Click(object sender, System.EventArgs e)
@@ -46,7 +47,7 @@ namespace pseudocode_ide
             this.isSaved = false;
 
 
-            if (!Text.EndsWith("*") && Text.Contains("-"))
+            if (!Text.EndsWith("*"))
             {
                 Text += "*";
             }
@@ -102,10 +103,11 @@ namespace pseudocode_ide
 
                     using (StreamReader file = new StreamReader(this.filePath))
                     {
+                        int oldSelectionStart = codeTextBox.SelectionStart;
+                        this.ignoreTextChange = true;
                         codeTextBox.Text = file.ReadToEnd();
-                        this.undoStack.Clear();
-                        this.redoStack.Clear();
-                        this.undoStack.Push(codeTextBox.Text);
+                        this.resetUndoRedo();
+                        codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
                     }
                     this.isSaved = true;
                     Text = "Pseudocode IDE - " + this.filePath;
@@ -123,10 +125,22 @@ namespace pseudocode_ide
                 }
             }
 
+            
+            this.ignoreTextChange = true;
             codeTextBox.Clear();
-            Text = "Pseudocode IDE";
+            this.resetUndoRedo();
+            Text = "Pseudocode IDE - New File";
             this.isSaved = true;
             this.filePath = "";
+        }
+
+        private void resetUndoRedo()
+        {
+            this.undoStack.Clear();
+            this.redoStack.Clear();
+            this.undoStack.Push(codeTextBox.Text);
+            undoToolStripMenuItem.Enabled = false;
+            redoToolStripMenuItem.Enabled = false;
         }
 
         private void openMenuItem_Click(object sender, System.EventArgs e)
@@ -189,15 +203,18 @@ namespace pseudocode_ide
 
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
+                this.ignoreTextChange = true;
                 this.updateUndoStack(true);
             }
         }
 
         private void updateUndoStack(bool forceUpdate)
         {
+            undoToolStripMenuItem.Enabled = true;
             if (this.redoStack.Count != 0)
             {
-                forceUpdate = true;
+                this.redoStack.Clear();
+                redoToolStripMenuItem.Enabled = false;
             }
 
             Regex noUpdateAfter = new Regex(@"^[a-zA-Z0-9_]*$");
@@ -211,23 +228,18 @@ namespace pseudocode_ide
                 }
             }
             catch (ArgumentOutOfRangeException) {
-                Debug.WriteLine("No update");
                 return;
             }
 
-            if ((codeTextBox.TextLength > 1 && !forceUpdate && noUpdateAfter.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
-                || (this.undoStack.Count != 0 && this.undoStack.Peek().Equals(undoText)))
+            if ((codeTextBox.SelectionStart > 1 && !forceUpdate && noUpdateAfter.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
+                || this.undoStack.Peek().Equals(undoText))
             {
-                Debug.WriteLine("No update");
                 return;
             }
-            
-
-            Debug.WriteLine("Update:\n\n" + undoText + "\n\n<EOF>");
 
             this.redoStack.Clear();
             this.undoStack.Push(undoText);
-            this.undoStack.Trim(100);
+            this.undoStack = this.undoStack.Trim(250);
             undoToolStripMenuItem.Enabled = true;
         }
 
@@ -235,6 +247,7 @@ namespace pseudocode_ide
         {
             if (this.redoStack.Count != 0)
             {
+                this.lastCursorPosition = codeTextBox.SelectionStart;
                 return;
             }
 
@@ -256,13 +269,22 @@ namespace pseudocode_ide
             if (this.undoStack.Count <= 1)
             {
                 this.ignoreTextChange = true;
+                int oldSelectionStart = codeTextBox.SelectionStart;
                 codeTextBox.Text = this.undoStack.Peek();
+                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
+
                 undoToolStripMenuItem.Enabled = false;
             }
             else
             {
-                this.ignoreTextChange = true;
-                codeTextBox.Text = this.undoStack.Pop();
+                string currentText = codeTextBox.Text;
+                do
+                {
+                    this.ignoreTextChange = true;
+                    int oldSelectionStart = codeTextBox.SelectionStart;
+                    codeTextBox.Text = this.undoStack.Peek();
+                    codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
+                } while (currentText.Equals(this.undoStack.Pop()));
             }
         }
 
@@ -277,7 +299,9 @@ namespace pseudocode_ide
             if (this.redoStack.Count > 0)
             {
                 this.ignoreTextChange = true;
+                int oldSelectionStart = codeTextBox.SelectionStart;
                 codeTextBox.Text = this.redoStack.Pop();
+                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
 
             if (this.redoStack.Count == 0)

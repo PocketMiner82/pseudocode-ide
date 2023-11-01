@@ -230,7 +230,7 @@
             this.MainMenuStrip = this.menuStrip;
             this.MinimumSize = new System.Drawing.Size(350, 250);
             this.Name = "PseudocodeIDE";
-            this.Text = "Pseudocode IDE";
+            this.Text = "Pseudocode IDE - New File";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PseudocodeIDE_FormClosing);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
