@@ -27,12 +27,12 @@ namespace pseudocode_ide
             this.mainForm = mainForm;
             InitializeComponent();
 
-            btFindNext1.Click += (ignored1, ignored2) => this.findNext();
-            btFindNext2.Click += (ignored1, ignored2) => this.findNext();
+            btFindNext1.Click += (ignored1, ignored2) => this.findNextAndUpdateStatus();
+            btFindNext2.Click += (ignored1, ignored2) => this.findNextAndUpdateStatus();
 
             btCount.Click += (ignored1, ignored2) => this.count();
 
-            btReplace.Click += (ignored1, ignored2) => this.replace();
+            btReplace.Click += (ignored1, ignored2) => this.replaceNextAndUpdateStatus();
             btReplaceAll.Click += (ignored1, ignored2) => this.replaceAll();
 
             tbFindWhat1.TextChanged += (ignored1, ignored2) => this.findWhat = tbFindWhat1.Text;
@@ -47,6 +47,8 @@ namespace pseudocode_ide
         public void Show(FindReplaceTabs tab, string findWhat = "")
         {
             tabControl.SelectedIndex = (int) tab;
+            statusLabel.Text = "";
+            statusLabel.ForeColor = SystemColors.ControlText;
 
             Show();
             Focus();
@@ -80,7 +82,7 @@ namespace pseudocode_ide
             if (e.KeyCode == Keys.Enter)
             {
                 e.Handled = true;
-                this.findNext();
+                this.findNextAndUpdateStatus();
             }
         }
 
@@ -111,10 +113,32 @@ namespace pseudocode_ide
             }
         }
 
-        public void findNext()
+        public void findNextAndUpdateStatus()
+        {
+            switch (this.findNext())
+            {
+                case FindReplaceResult.WRAPPED:
+                    statusLabel.Text = $"Find: The end of the document was reached. Continued at the top.";
+                    statusLabel.ForeColor = Color.Green;
+                    break;
+
+                case FindReplaceResult.NOTHING_FOUND:
+                    statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
+                    statusLabel.ForeColor = Color.Red;
+                    break;
+
+                default:
+                    statusLabel.Text = "";
+                    statusLabel.ForeColor = SystemColors.ControlText;
+                    break;
+            }
+        }
+
+        public FindReplaceResult findNext()
         {
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
             string findWhat = this.matchCase ? this.findWhat : this.findWhat.ToLower();
+            FindReplaceResult result = FindReplaceResult.NONE;
 
             int firstOccurence = code.IndexOf(findWhat, this.mainForm.getSelectionEnd());
 
@@ -122,8 +146,7 @@ namespace pseudocode_ide
             {
                 if (this.mainForm.getSelectionEnd() != 0)
                 {
-                    statusLabel.Text = $"Find: The end of the document was reached. Continued on the top.";
-                    statusLabel.ForeColor = Color.Green;
+                    result = FindReplaceResult.WRAPPED;
 
                     // wrap around
                     this.mainForm.selectText(0, 0);
@@ -132,18 +155,13 @@ namespace pseudocode_ide
 
                 if (firstOccurence < 0)
                 {
-                    statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
-                    statusLabel.ForeColor = Color.Red;
-                    return;
+                    result = FindReplaceResult.NOTHING_FOUND;
+                    return result;
                 }
-            }
-            else
-            {
-                statusLabel.Text = "";
-                statusLabel.ForeColor = SystemColors.ControlText;
             }
 
             this.mainForm.selectText(firstOccurence, findWhat.Length);
+            return result;
         }
 
         public void count()
@@ -155,14 +173,100 @@ namespace pseudocode_ide
             statusLabel.ForeColor = Color.Blue;
         }
 
-        public void replace()
+        public void replaceNextAndUpdateStatus()
         {
+            switch (this.replaceNext())
+            {
+                case FindReplaceResult.WRAPPED:
+                    statusLabel.Text = $"Find: The end of the document was reached. Continued on the top.";
+                    statusLabel.ForeColor = Color.Green;
+                    break;
 
+                case FindReplaceResult.REPLACED_WRAPPED:
+                    statusLabel.Text = $"Replace: Replaced 1 occurrence. Continued at the top.";
+                    statusLabel.ForeColor = Color.Blue;
+                    break;
+
+                case FindReplaceResult.NOTHING_FOUND:
+                    statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
+                    statusLabel.ForeColor = Color.Red;
+                    break;
+
+                case FindReplaceResult.NOTHING_MORE_FOUND:
+                    statusLabel.Text = $"Replace: Replaced the last occurence.";
+                    statusLabel.ForeColor = Color.Blue;
+                    break;
+
+                case FindReplaceResult.REPLACED:
+                    statusLabel.Text = $"Replace: Replaced 1 occurrence.";
+                    statusLabel.ForeColor = Color.Blue;
+                    break;
+
+                default:
+                    statusLabel.Text = "";
+                    statusLabel.ForeColor = SystemColors.ControlText;
+                    break;
+            }
+        }
+
+        public FindReplaceResult replaceNext()
+        {
+            if (this.mainForm.getSelectionLength() == 0)
+            {
+                return this.findNext();
+            }
+
+            this.mainForm.setSelectedText(this.replaceWith);
+            this.mainForm.updateUndoStack(true);
+
+            FindReplaceResult result = this.findNext();
+
+            switch (result)
+            {
+                case FindReplaceResult.NOTHING_FOUND:
+                    result = FindReplaceResult.NOTHING_MORE_FOUND;
+                    break;
+                case FindReplaceResult.NONE:
+                    result = FindReplaceResult.REPLACED;
+                    break;
+                case FindReplaceResult.WRAPPED:
+                    result = FindReplaceResult.REPLACED_WRAPPED;
+                    break;
+                default:
+                    break;
+            }
+
+            return result;
         }
 
         public void replaceAll()
         {
+            string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
+            string findWhat = this.matchCase ? this.findWhat : this.findWhat.ToLower();
+            int count = code.AllIndexesOf(findWhat).Count;
 
+            if (count == 0)
+            {
+                statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
+                statusLabel.ForeColor = Color.Red;
+                return;
+            }
+
+            this.mainForm.selectText(0, 0);
+            
+            this.findNext();
+
+            // the count - 1 is needed to allow undo to work correctly
+            this.mainForm.noNewUndoPoint = true;
+            for (int i = 0; i < (count - 1); i++)
+            {
+                this.replaceNext();
+            }
+            this.mainForm.noNewUndoPoint = false;
+            this.replaceNext();
+
+            statusLabel.Text = $"Replace: Replaced {count} occurrence(s).";
+            statusLabel.ForeColor = Color.Blue;
         }
     }
 }

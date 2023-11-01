@@ -54,6 +54,7 @@
       <DependentUpon>FindReplaceForm.cs</DependentUpon>
     </Compile>
     <Compile Include="findReplace\FindReplaceTabs.cs" />
+    <Compile Include="findReplace\FindReplaceResult.cs" />
     <Compile Include="interpreter\Interpreter.cs" />
     <Compile Include="interpreter\sequences\condition\Condition.cs" />
     <Compile Include="interpreter\sequences\condition\IfCondition.cs" />

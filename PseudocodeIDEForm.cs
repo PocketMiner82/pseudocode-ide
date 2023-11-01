@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using pseudocode_ide.findReplace;
+using System.Diagnostics;
 
 namespace pseudocode_ide
 {
@@ -22,11 +23,13 @@ namespace pseudocode_ide
 
         private bool isSaved = true;
         private int lastCursorPosition = 0;
-        private bool ignoreTextChange = false;
+
+        public bool ignoreTextChange { get; set; } = false;
 
         private FindReplaceForm findReplaceForm;
 
         public string code { get; private set; } = "";
+        public bool noNewUndoPoint { get; set; } = false;
 
         public PseudocodeIDEForm()
         {
@@ -258,8 +261,13 @@ namespace pseudocode_ide
             redoToolStripMenuItem.Enabled = false;
         }
 
-        private void updateUndoStack(bool forceUpdate)
+        public void updateUndoStack(bool forceUpdate)
         {
+            if (this.noNewUndoPoint)
+            {
+                return;
+            }
+
             undoToolStripMenuItem.Enabled = true;
             if (this.redoStack.Count != 0)
             {
@@ -287,9 +295,10 @@ namespace pseudocode_ide
             }
 
             this.redoStack.Clear();
+
             this.undoStack.Push(undoText);
             this.undoStack = this.undoStack.Trim(250);
-            undoToolStripMenuItem.Enabled = true;
+            Debug.WriteLine(this.undoStack.Count);
         }
 
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -312,13 +321,15 @@ namespace pseudocode_ide
             else
             {
                 string currentText = codeTextBox.Text;
+                int oldSelectionStart = codeTextBox.SelectionStart;
+
                 do
                 {
                     this.ignoreTextChange = true;
-                    int oldSelectionStart = codeTextBox.SelectionStart;
                     codeTextBox.Text = this.undoStack.Peek();
-                    codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
-                } while (currentText.Equals(this.undoStack.Pop()));
+                } while (this.undoStack.Count > 1 && currentText.Equals(this.undoStack.Pop()));
+
+                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
         }
 
@@ -363,12 +374,25 @@ namespace pseudocode_ide
             return codeTextBox.SelectionStart + codeTextBox.SelectionLength;
         }
 
+        public int getSelectionLength()
+        {
+            return codeTextBox.SelectionLength;
+        }
+
         public void selectText(int selectionStart, int selectionLength)
         {
             Invoke(new Action(() =>
             {
                 codeTextBox.SelectionStart = selectionStart;
                 codeTextBox.SelectionLength = selectionLength;
+            }));
+        }
+
+        internal void setSelectedText(string toReplace)
+        {
+            Invoke(new Action(() =>
+            {
+                codeTextBox.SelectedText = toReplace;
             }));
         }
     }
