@@ -10,16 +10,27 @@ namespace pseudocode_ide
     {
         private PseudocodeIDEForm mainForm;
 
+        /// <summary>
+        /// the search term to find
+        /// </summary>
         private string findWhat = "";
 
+        /// <summary>
+        /// the term to replace the search term with
+        /// </summary>
         private string replaceWith = "";
 
+        /// <summary>
+        /// whether the searching should be case sensitive
+        /// </summary>
         private bool matchCase = false;
 
         public FindReplaceForm(PseudocodeIDEForm mainForm)
         {
             this.mainForm = mainForm;
             InitializeComponent();
+
+            // register some event listeners
 
             btFindNext1.Click += (ignored1, ignored2) => this.findNextAndUpdateStatus();
             btFindNext2.Click += (ignored1, ignored2) => this.findNextAndUpdateStatus();
