@@ -12,28 +12,55 @@ namespace pseudocode_ide
 {
     public partial class PseudocodeIDEForm : Form
     {
+        /// <summary>
+        /// the maximum steps to save in the undo stack
+        /// </summary>
         private const int MAX_UNDO_SIZE = 250;
+
+        /// <summary>
+        /// do not update the undo stack when the last char is a letter from A-Z (case ignored), a number from 0-9 or a underscore
+        /// </summary>
         private readonly Regex NO_UPDATE_AFTER = new Regex(@"^[a-zA-Z0-9_]$", RegexOptions.Multiline);
 
-        private Stack<string> undoStack = new Stack<string>();
-        private Stack<string> redoStack = new Stack<string>();
-
-        private Interpreter interpreter;
-        private string filePath { get; set; }
-
-
-        private bool isSaved = true;
-        private int lastCursorPosition = 0;
+        /// <summary>
+        /// the code currently in the textbox
+        /// </summary>
+        public string code { get; private set; } = "";
 
         /// <summary>
         /// if the textbox update event should be ignored the next time
         /// </summary>
         public bool ignoreTextChange { get; set; } = false;
 
-        private FindReplaceForm findReplaceForm;
-
-        public string code { get; private set; } = "";
+        /// <summary>
+        /// if the undo events should be ignored
+        /// </summary>
         public bool noNewUndoPoint { get; set; } = false;
+
+        /// <summary>
+        /// last cursor position before cursor move
+        /// </summary>
+        private int lastCursorPosition = 0;
+
+        // undo and redo stacks
+        private Stack<string> undoStack = new Stack<string>();
+        private Stack<string> redoStack = new Stack<string>();
+
+        /// <summary>
+        /// the path where this file is saved
+        /// </summary>
+        private string filePath;
+
+        /// <summary>
+        /// is the code saved?
+        /// </summary>
+        private bool isSaved = true;
+
+        private Interpreter interpreter;
+
+        private FindReplaceForm findReplaceForm;
+        
+
 
         public PseudocodeIDEForm()
         {
@@ -62,14 +89,15 @@ namespace pseudocode_ide
         private void codeTextBox_TextChanged(object sender, EventArgs e)
         {
             this.code = codeTextBox.Text;
+
+            // when the code is modified, the code is no longer saved in the file
             this.isSaved = false;
-
-
             if (!Text.EndsWith("*"))
             {
                 Text += "*";
             }
 
+            // only update undo stack if next event not ignored
             if (this.ignoreTextChange)
             {
                 this.ignoreTextChange = false;
@@ -438,6 +466,11 @@ namespace pseudocode_ide
             this.findReplaceForm.Show(FindReplaceTabs.REPLACE, codeTextBox.SelectedText);
         }
 
+        public int getSelectionStart()
+        {
+            return codeTextBox.SelectionStart;
+        }
+
         /// <summary>
         /// Get the end of the current selection in the code text box
         /// </summary>
@@ -452,6 +485,14 @@ namespace pseudocode_ide
         public int getSelectionLength()
         {
             return codeTextBox.SelectionLength;
+        }
+
+        /// <summary>
+        /// Get the currently selected text.
+        /// </summary>
+        public string getSelection()
+        {
+            return codeTextBox.SelectedText;
         }
 
         /// <summary>
@@ -472,7 +513,7 @@ namespace pseudocode_ide
         /// Replace the selected text. Will be invoked on the UI thread.
         /// </summary>
         /// <param name="toReplace">The new text to replace</param>
-        internal void setSelectedText(string toReplace)
+        public void setSelectedText(string toReplace)
         {
             Invoke(new Action(() =>
             {

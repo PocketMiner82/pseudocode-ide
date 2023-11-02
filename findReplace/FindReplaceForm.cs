@@ -44,19 +44,9 @@ namespace pseudocode_ide
             cbMatchCase2.CheckedChanged += (ignored1, ignored2) => this.matchCase = cbMatchCase2.Checked;
         }
 
-        public void Show(FindReplaceTabs tab, string findWhat = "")
-        {
-            tabControl.SelectedIndex = (int) tab;
-            statusLabel.Text = "";
-            statusLabel.ForeColor = SystemColors.ControlText;
-
-            Show();
-            Focus();
-
-            this.findWhat = findWhat != null && !findWhat.Equals("") ? findWhat : this.findWhat;
-
-            this.pageSwitch((int) tab);
-        }
+        // ---------------------------------------------
+        // EVENTS
+        // ---------------------------------------------
 
         private void FindReplaceForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -88,22 +78,45 @@ namespace pseudocode_ide
 
         private void tabControl_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            this.pageSwitch(e.TabPageIndex);
+            this.pageSwitch((FindReplaceTabs)e.TabPageIndex);
         }
 
-        private void pageSwitch(int pageIndex)
+        /// <summary>
+        /// Show the form.
+        /// </summary>
+        /// <param name="tab">the tab to open</param>
+        /// <param name="findWhat">the initial value of the findWhat textbox</param>
+        public void Show(FindReplaceTabs tab, string findWhat = "")
         {
-            Debug.WriteLine(pageIndex);
-            switch (pageIndex)
+            tabControl.SelectedIndex = (int)tab;
+            statusLabel.Text = "";
+            statusLabel.ForeColor = SystemColors.ControlText;
+
+            Show();
+            Focus();
+
+            this.findWhat = findWhat != null && !findWhat.Equals("") ? findWhat : this.findWhat;
+
+            this.pageSwitch(tab);
+        }
+
+        /// <summary>
+        /// Go to a different tab
+        /// </summary>
+        /// <param name="tab">the tab to switch to</param>
+        private void pageSwitch(FindReplaceTabs tab)
+        {
+            Debug.WriteLine(tab);
+            switch (tab)
             {
-                case (int)FindReplaceTabs.REPLACE:
+                case FindReplaceTabs.REPLACE:
                     tbFindWhat2.Text = this.findWhat;
                     cbMatchCase2.Checked = this.matchCase;
                     tbFindWhat2.Select();
                     tbFindWhat2.SelectAll();
                     break;
 
-                case (int)FindReplaceTabs.FIND:
+                case FindReplaceTabs.FIND:
                 default:
                     tbFindWhat1.Text = this.findWhat;
                     cbMatchCase1.Checked = this.matchCase;
@@ -113,6 +126,9 @@ namespace pseudocode_ide
             }
         }
 
+        /// <summary>
+        /// Find the next occurrence and update the status bar.
+        /// </summary>
         public void findNextAndUpdateStatus()
         {
             switch (this.findNext())
@@ -134,6 +150,9 @@ namespace pseudocode_ide
             }
         }
 
+        /// <summary>
+        /// Find the next occurrence.
+        /// </summary>
         public FindReplaceResult findNext()
         {
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
@@ -164,6 +183,9 @@ namespace pseudocode_ide
             return result;
         }
 
+        /// <summary>
+        /// Count the occurrences of a search term and update the status bar.
+        /// </summary>
         public void count()
         {
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
@@ -173,6 +195,10 @@ namespace pseudocode_ide
             statusLabel.ForeColor = Color.Blue;
         }
 
+        /// <summary>
+        /// Replace the current occurrence, find the next and update the status bar.
+        /// If there isn't a current occurence, just find the next.
+        /// </summary>
         public void replaceNextAndUpdateStatus()
         {
             switch (this.replaceNext())
@@ -209,16 +235,25 @@ namespace pseudocode_ide
             }
         }
 
+        /// <summary>
+        /// Replace the current occurrence and find the next.
+        /// If there isn't a current occurence, just find the next.
+        /// </summary>
         public FindReplaceResult replaceNext()
         {
-            if (this.mainForm.getSelectionLength() == 0)
+            // if selection doesn't match search term, find next
+            if ((!this.matchCase && !this.mainForm.getSelection().ToLower().Equals(this.findWhat.ToLower()))
+                || (this.matchCase && !this.mainForm.getSelection().Equals(this.findWhat)))
             {
+                this.mainForm.selectText(this.mainForm.getSelectionStart(), 0);
                 return this.findNext();
             }
 
+            // the selected text will be the search result, so replace it
             this.mainForm.setSelectedText(this.replaceWith);
             this.mainForm.updateUndoStack(true);
 
+            // find the next result
             FindReplaceResult result = this.findNext();
 
             switch (result)
@@ -239,12 +274,16 @@ namespace pseudocode_ide
             return result;
         }
 
+        /// <summary>
+        /// Replace all occurrencea and update the status bar.
+        /// </summary>
         public void replaceAll()
         {
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
             string findWhat = this.matchCase ? this.findWhat : this.findWhat.ToLower();
             int count = code.allIndexesOf(findWhat).Count;
 
+            // no result found
             if (count == 0)
             {
                 statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
@@ -252,11 +291,13 @@ namespace pseudocode_ide
                 return;
             }
 
+            // go to beginning
             this.mainForm.selectText(0, 0);
             
+            // find the first occurence
             this.findNext();
 
-            // the count - 1 is needed to allow undo to work correctly
+            // loop through the occurences and replace them all, the count - 1 is needed to allow undo to work correctly
             this.mainForm.noNewUndoPoint = true;
             for (int i = 0; i < (count - 1); i++)
             {
