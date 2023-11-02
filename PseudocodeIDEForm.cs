@@ -12,6 +12,7 @@ namespace pseudocode_ide
 {
     public partial class PseudocodeIDEForm : Form
     {
+        private const int MAX_UNDO_SIZE = 250;
         private readonly Regex NO_UPDATE_AFTER = new Regex(@"^[a-zA-Z0-9_]$", RegexOptions.Multiline);
 
         private Stack<string> undoStack = new Stack<string>();
@@ -24,6 +25,9 @@ namespace pseudocode_ide
         private bool isSaved = true;
         private int lastCursorPosition = 0;
 
+        /// <summary>
+        /// if the textbox update event should be ignored the next time
+        /// </summary>
         public bool ignoreTextChange { get; set; } = false;
 
         private FindReplaceForm findReplaceForm;
@@ -86,6 +90,7 @@ namespace pseudocode_ide
                 return;
             }
 
+            // deleting always updates undo stack
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
                 this.ignoreTextChange = true;
@@ -113,6 +118,7 @@ namespace pseudocode_ide
 
         private void codeTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
+            // keep tab indentation from previous line on new line
             if (e.KeyChar == (char)Keys.Enter)
             {
                 e.Handled = true;
@@ -129,12 +135,14 @@ namespace pseudocode_ide
 
         private void codeTextBox_SelectionChanged(object sender, EventArgs e)
         {
+            // ignore when we already undid something
             if (this.redoStack.Count != 0)
             {
                 this.lastCursorPosition = codeTextBox.SelectionStart;
                 return;
             }
 
+            // update undo stack when user selected something or cursor moved by more then one since last time
             if (codeTextBox.SelectionLength != 0 || Math.Abs(this.lastCursorPosition - codeTextBox.SelectionStart) > 1)
             {
                 this.updateUndoStack(true);
@@ -176,7 +184,7 @@ namespace pseudocode_ide
                 }
             }
 
-
+            // create new file
             this.ignoreTextChange = true;
             codeTextBox.Clear();
             this.resetUndoRedo();
@@ -201,6 +209,7 @@ namespace pseudocode_ide
 
         private void saveMenuItem_Click(object sender, EventArgs e)
         {
+            // if this is a new file
             if (this.filePath == null || this.filePath.Trim() == "")
             {
                 saveFileDialog();
@@ -241,6 +250,7 @@ namespace pseudocode_ide
 
         private void saveFile()
         {
+            // write to disk
             using (StreamWriter outputFile = new StreamWriter(this.filePath))
             {
                 outputFile.Write(codeTextBox.Text);
@@ -271,6 +281,7 @@ namespace pseudocode_ide
 
         private void openFile()
         {
+            // read from disk
             using (StreamReader file = new StreamReader(this.filePath))
             {
                 this.ignoreTextChange = true;
@@ -287,6 +298,9 @@ namespace pseudocode_ide
         // UNDO/REDO
         // ---------------------------------------------
 
+        /// <summary>
+        /// Resets the undo and redo system 
+        /// </summary>
         private void resetUndoRedo()
         {
             this.undoStack.Clear();
@@ -296,13 +310,19 @@ namespace pseudocode_ide
             redoToolStripMenuItem.Enabled = false;
         }
 
+        /// <summary>
+        /// Updates the undo stack
+        /// </summary>
+        /// <param name="forceUpdate">if the update should be done without checking for whole word</param>
         public void updateUndoStack(bool forceUpdate)
         {
+            // undo currently disabled?
             if (this.noNewUndoPoint)
             {
                 return;
             }
 
+            // when user writes something new, the redo stack will be cleared
             undoToolStripMenuItem.Enabled = true;
             if (this.redoStack.Count != 0)
             {
@@ -312,45 +332,55 @@ namespace pseudocode_ide
 
             string undoText = codeTextBox.Text;
 
-            try
+            // remove the newly added char if this is an update caused by text change
+            if (!forceUpdate)
             {
-                if (!forceUpdate)
+                try
                 {
                     undoText = undoText.Remove(codeTextBox.SelectionStart - 1, 1);
                 }
-            }
-            catch (ArgumentOutOfRangeException) {
-                return;
+                catch (ArgumentOutOfRangeException)
+                {
+                    return;
+                }
             }
 
+
+            // don't update when the last char matches the NO_UPDATE_AFTER regex and the update is caused by text change.
+            // also don't update, when the new undo text is already in the stack
             if ((codeTextBox.SelectionStart > 1 && !forceUpdate && NO_UPDATE_AFTER.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
                 || this.undoStack.Peek().Equals(undoText))
             {
                 return;
             }
 
+            // again, make sure that the redo stack is empty
             this.redoStack.Clear();
 
+            // and update the undo stack, limit max undo size
             this.undoStack.Push(undoText);
-            this.undoStack = this.undoStack.trim(250);
-            Debug.WriteLine(this.undoStack.Count);
+            this.undoStack = this.undoStack.trim(MAX_UNDO_SIZE);
         }
 
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // put current text in redo if not already in there
             if (this.redoStack.Count == 0 || !this.redoStack.Peek().Equals(codeTextBox.Text))
             {
                 this.redoStack.Push(codeTextBox.Text);
                 redoToolStripMenuItem.Enabled = true;
             }
 
+            // the undo stack always has at least one item in it
             if (this.undoStack.Count <= 1)
             {
+                // set the textbox text to the item without removing it from the stack
                 this.ignoreTextChange = true;
                 int oldSelectionStart = codeTextBox.SelectionStart;
                 codeTextBox.Text = this.undoStack.Peek();
                 codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
 
+                // no more things to undo
                 undoToolStripMenuItem.Enabled = false;
             }
             else
@@ -358,6 +388,7 @@ namespace pseudocode_ide
                 string currentText = codeTextBox.Text;
                 int oldSelectionStart = codeTextBox.SelectionStart;
 
+                // set the textbox text to the first item that doesn't match the current text. also remove them from the undo stack
                 do
                 {
                     this.ignoreTextChange = true;
@@ -371,11 +402,13 @@ namespace pseudocode_ide
         private void redoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             undoToolStripMenuItem.Enabled = true;
+            // put current text in undo if not already in there
             if (!this.undoStack.Peek().Equals(codeTextBox.Text))
             {
                 this.undoStack.Push(codeTextBox.Text);
             }
 
+            // set the textbox text to the top item of the redo stack. also remove it from the stack
             if (this.redoStack.Count > 0)
             {
                 this.ignoreTextChange = true;
@@ -384,6 +417,7 @@ namespace pseudocode_ide
                 codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
 
+            // no more things to redo
             if (this.redoStack.Count == 0)
             {
                 redoToolStripMenuItem.Enabled = false;
@@ -404,16 +438,27 @@ namespace pseudocode_ide
             this.findReplaceForm.Show(FindReplaceTabs.REPLACE, codeTextBox.SelectedText);
         }
 
+        /// <summary>
+        /// Get the end of the current selection in the code text box
+        /// </summary>
         public int getSelectionEnd()
         {
             return codeTextBox.SelectionStart + codeTextBox.SelectionLength;
         }
 
+        /// <summary>
+        /// Get the selection length in the code text box
+        /// </summary>
         public int getSelectionLength()
         {
             return codeTextBox.SelectionLength;
         }
 
+        /// <summary>
+        /// Select text in the code text box. Will be invoked on the UI thread.
+        /// </summary>
+        /// <param name="selectionLength">start of the selection</param>
+        /// <param name="selectionStart">length of the selection</param>
         public void selectText(int selectionStart, int selectionLength)
         {
             Invoke(new Action(() =>
@@ -423,6 +468,10 @@ namespace pseudocode_ide
             }));
         }
 
+        /// <summary>
+        /// Replace the selected text. Will be invoked on the UI thread.
+        /// </summary>
+        /// <param name="toReplace">The new text to replace</param>
         internal void setSelectedText(string toReplace)
         {
             Invoke(new Action(() =>
