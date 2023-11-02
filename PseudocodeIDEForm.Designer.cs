@@ -209,9 +209,10 @@
             // 
             // codeTextBox
             // 
+            this.codeTextBox.AcceptsTab = true;
             this.codeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.codeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.codeTextBox.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.codeTextBox.Font = new System.Drawing.Font("Courier New", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.codeTextBox.HideSelection = false;
             this.codeTextBox.Location = new System.Drawing.Point(0, 24);
             this.codeTextBox.Name = "codeTextBox";
@@ -222,6 +223,7 @@
             this.codeTextBox.SelectionChanged += new System.EventHandler(this.codeTextBox_SelectionChanged);
             this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
             this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
+            this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.codeTextBox_KeyPress);
             // 
             // PseudocodeIDEForm
             // 

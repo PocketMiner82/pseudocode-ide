@@ -45,17 +45,17 @@ namespace pseudocode_ide
         // COMMON EVENT LISTENERS
         // ---------------------------------------------
 
-        private void wordWrapMenuItem_Click(object sender, System.EventArgs e)
+        private void wordWrapMenuItem_Click(object sender, EventArgs e)
         {
             codeTextBox.WordWrap = wordWrapMenuItem.Checked;
         }
 
-        private void EqualsIsOperatorMenuItem_Click(object sender, System.EventArgs e)
+        private void EqualsIsOperatorMenuItem_Click(object sender, EventArgs e)
         {
             Tokens.setEqualsIsCompareOperator(EqualsIsOperatorMenuItem.Checked);
         }
 
-        private void codeTextBox_TextChanged(object sender, System.EventArgs e)
+        private void codeTextBox_TextChanged(object sender, EventArgs e)
         {
             this.code = codeTextBox.Text;
             this.isSaved = false;
@@ -83,12 +83,47 @@ namespace pseudocode_ide
                 && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
             {
                 e.SuppressKeyPress = true;
+                return;
             }
 
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
                 this.ignoreTextChange = true;
                 this.updateUndoStack(true);
+                return;
+            }
+
+            // shift+tab removes a tab at the beginning of a line if existing
+            if (Control.ModifierKeys == Keys.Shift && e.KeyCode == Keys.Tab)
+            {
+                e.SuppressKeyPress = true;
+                int currentCursorPos = codeTextBox.SelectionStart;
+                int currentLine = codeTextBox.GetLineFromCharIndex(codeTextBox.SelectionStart);
+
+                if (codeTextBox.Lines.Count() > 0 && codeTextBox.Lines[currentLine].StartsWith("\t"))
+                {
+                    string[] lines = codeTextBox.Lines;
+                    lines[currentLine] = codeTextBox.Lines[currentLine].Substring(1);
+                    codeTextBox.Lines = lines;
+                    codeTextBox.SelectionStart = currentCursorPos - 1;
+                }
+                return;
+            }
+        }
+
+        private void codeTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+
+                int currentLineIndex = codeTextBox.GetLineFromCharIndex(codeTextBox.SelectionStart);
+                string currentLine = codeTextBox.Lines[currentLineIndex - 1];
+                int indentationLevel = currentLine.getIndentationLevel();
+
+                string indentation = new string('\t', indentationLevel);
+
+                codeTextBox.SelectedText = indentation;
             }
         }
 
@@ -130,7 +165,7 @@ namespace pseudocode_ide
         // NEW/OPEN/SAVE
         // ---------------------------------------------
 
-        private void newMenuItem_Click(object sender, System.EventArgs e)
+        private void newMenuItem_Click(object sender, EventArgs e)
         {
             if (!this.isSaved)
             {
@@ -150,7 +185,7 @@ namespace pseudocode_ide
             this.filePath = "";
         }
 
-        private void openMenuItem_Click(object sender, System.EventArgs e)
+        private void openMenuItem_Click(object sender, EventArgs e)
         {
             if (!this.isSaved)
             {
@@ -164,7 +199,7 @@ namespace pseudocode_ide
             this.openFileDialog();
         }
 
-        private void saveMenuItem_Click(object sender, System.EventArgs e)
+        private void saveMenuItem_Click(object sender, EventArgs e)
         {
             if (this.filePath == null || this.filePath.Trim() == "")
             {
@@ -297,7 +332,7 @@ namespace pseudocode_ide
             this.redoStack.Clear();
 
             this.undoStack.Push(undoText);
-            this.undoStack = this.undoStack.Trim(250);
+            this.undoStack = this.undoStack.trim(250);
             Debug.WriteLine(this.undoStack.Count);
         }
 

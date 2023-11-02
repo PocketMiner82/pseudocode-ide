@@ -9,7 +9,7 @@ namespace pseudocode_ide
 {
     public static class Extensions
     {
-        public static Stack<T> Trim<T>(this Stack<T> stack, int trimCount)
+        public static Stack<T> trim<T>(this Stack<T> stack, int trimCount)
         {
             if (stack.Count <= trimCount)
             {
@@ -20,7 +20,7 @@ namespace pseudocode_ide
         }
 
         // from https://stackoverflow.com/questions/2641326/finding-all-positions-of-substring-in-a-larger-string-in-c-sharp, modified
-        public static List<int> AllIndexesOf(this string str, string value, int startAt = 0, bool wrap = true)
+        public static List<int> allIndexesOf(this string str, string value, int startAt = 0, bool wrap = true)
         {
             List<int> indexes = new List<int>();
             if (String.IsNullOrEmpty(value))
@@ -46,6 +46,23 @@ namespace pseudocode_ide
             }
             
             return indexes;
+        }
+
+        public static int getIndentationLevel(this string line)
+        {
+            int indentationLevel = 0;
+            foreach (char c in line)
+            {
+                if (c == '\t')
+                {
+                    indentationLevel++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return indentationLevel;
         }
     }
 }

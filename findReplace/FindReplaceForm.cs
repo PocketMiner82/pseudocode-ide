@@ -169,7 +169,7 @@ namespace pseudocode_ide
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
             string findWhat = this.matchCase ? this.findWhat : this.findWhat.ToLower();
 
-            statusLabel.Text = $"Count: Found {code.AllIndexesOf(findWhat).Count} occurrences in the code.";
+            statusLabel.Text = $"Count: Found {code.allIndexesOf(findWhat).Count} occurrences in the code.";
             statusLabel.ForeColor = Color.Blue;
         }
 
@@ -243,7 +243,7 @@ namespace pseudocode_ide
         {
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
             string findWhat = this.matchCase ? this.findWhat : this.findWhat.ToLower();
-            int count = code.AllIndexesOf(findWhat).Count;
+            int count = code.allIndexesOf(findWhat).Count;
 
             if (count == 0)
             {
