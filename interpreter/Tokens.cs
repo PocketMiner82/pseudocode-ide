@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace pseudocode_ide.interpreter
+﻿namespace pseudocode_ide.interpreter
 {
     public static class Tokens
     {

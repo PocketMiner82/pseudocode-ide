@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using pseudocode_ide.findReplace;
-using System.Diagnostics;
 
 namespace pseudocode_ide
 {
