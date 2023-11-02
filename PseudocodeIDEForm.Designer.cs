@@ -211,6 +211,7 @@
             // 
             this.codeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.codeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.codeTextBox.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.codeTextBox.HideSelection = false;
             this.codeTextBox.Location = new System.Drawing.Point(0, 24);
             this.codeTextBox.Name = "codeTextBox";
