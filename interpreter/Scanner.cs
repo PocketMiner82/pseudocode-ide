@@ -81,6 +81,11 @@ namespace pseudocode_ide.interpreter
         {
             while (!this.isAtEnd())
             {
+                if (OutputForm.runTaskCancelToken.IsCancellationRequested)
+                {
+                    return tokens;
+                }
+
                 // we are at the beginning of the next lexeme
                 this.start = this.current;
                 this.scanToken();
@@ -184,7 +189,7 @@ namespace pseudocode_ide.interpreter
                     }
                     else
                     {
-                        Logger.syntaxError(line, "Unexpected character.");
+                        Logger.error(line, "Unexpected character.");
                     }
                     break;
             }
@@ -247,7 +252,7 @@ namespace pseudocode_ide.interpreter
             {
                 if (!textEmpty)
                 {
-                    Logger.syntaxError(this.line, "Expected closing type after 'ENDE'");
+                    Logger.error(this.line, "Expected closing type after 'ENDE'");
                     return;
                 }
 
@@ -303,12 +308,12 @@ namespace pseudocode_ide.interpreter
 
             if (i > 0)
             {
-                Logger.syntaxError(line, "Too many characters in character literal.");
+                Logger.error(line, "Too many characters in character literal.");
                 return;
             }
             else if (this.isAtEnd())
             {
-                Logger.syntaxError(line, "Unterminated char.");
+                Logger.error(line, "Unterminated char.");
                 return;
             }
 
@@ -330,7 +335,7 @@ namespace pseudocode_ide.interpreter
 
             if (this.isAtEnd())
             {
-                Logger.syntaxError(line, "Unterminated string.");
+                Logger.error(line, "Unterminated string.");
                 return;
             }
 

@@ -7,6 +7,8 @@ namespace pseudocode_ide.interpreter
     {
         public static bool hadError { get; set; } = false;
 
+        public static bool hadRuntimeError { get; set; } = false;
+
         private OutputForm outputForm;
 
         private string code
@@ -16,6 +18,7 @@ namespace pseudocode_ide.interpreter
                 return this.outputForm.mainForm.code;
             }
         }
+
 
         public Interpreter(OutputForm outputForm)
         {
@@ -38,11 +41,15 @@ namespace pseudocode_ide.interpreter
 
             foreach (Token token in tokens)
             {
+                if (OutputForm.runTaskCancelToken.IsCancellationRequested)
+                {
+                    break;
+                }
                 Logger.info(token.ToString());
             }
 
             this.outputForm.stopMenuItem_Click(null, null);
-            this.outputForm.outputText += "\n";
+            this.outputForm.outputText += "\n\n\n";
             this.outputForm.scrollRtbOutputToEnd();
         }
     }

@@ -59,8 +59,10 @@ namespace pseudocode_ide
 
         public new void Show()
         {
-            this.init();
+            Focus();
             base.Show();
+
+            rtbOutput.Select();
         }
 
         private void OutputForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -76,9 +78,9 @@ namespace pseudocode_ide
         // METHODS
         // ---------------------------------------------
 
-        public void init()
+        public void ShowAndRun()
         {
-            Focus();
+            this.Show();
 
             this.startMenuItem_Click(null, null);
         }

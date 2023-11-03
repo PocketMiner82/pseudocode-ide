@@ -50,7 +50,6 @@
             // startMenuItem
             // 
             this.startMenuItem.AutoToolTip = true;
-            this.startMenuItem.Enabled = false;
             this.startMenuItem.ForeColor = System.Drawing.Color.Green;
             this.startMenuItem.Name = "startMenuItem";
             this.startMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
@@ -62,6 +61,7 @@
             // stopMenuItem
             // 
             this.stopMenuItem.AutoToolTip = true;
+            this.stopMenuItem.Enabled = false;
             this.stopMenuItem.ForeColor = System.Drawing.Color.Red;
             this.stopMenuItem.Name = "stopMenuItem";
             this.stopMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5)));

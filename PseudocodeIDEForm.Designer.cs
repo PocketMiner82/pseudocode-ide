@@ -47,6 +47,8 @@
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.codeTextBox = new System.Windows.Forms.RichTextBox();
+            this.openOutputFormMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -169,6 +171,8 @@
             // 
             this.runMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runProgramMenuItem,
+            this.openOutputFormMenuItem,
+            this.toolStripSeparator2,
             this.singleEqualIsCompareOperatorMenuItem});
             this.runMenuItem.Name = "runMenuItem";
             this.runMenuItem.Size = new System.Drawing.Size(40, 20);
@@ -205,8 +209,9 @@
             // 
             this.showHelpMenuItem.Name = "showHelpMenuItem";
             this.showHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.showHelpMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.showHelpMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showHelpMenuItem.Text = "Show Help";
+            this.showHelpMenuItem.Click += new System.EventHandler(this.showHelpMenuItem_Click);
             // 
             // codeTextBox
             // 
@@ -225,6 +230,19 @@
             this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
             this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
             this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.codeTextBox_KeyPress);
+            // 
+            // openOutputFormMenuItem
+            // 
+            this.openOutputFormMenuItem.Name = "openOutputFormMenuItem";
+            this.openOutputFormMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
+            this.openOutputFormMenuItem.Size = new System.Drawing.Size(346, 22);
+            this.openOutputFormMenuItem.Text = "Open Output Form";
+            this.openOutputFormMenuItem.Click += new System.EventHandler(this.openOutputFormMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(343, 6);
             // 
             // PseudocodeIDEForm
             // 
@@ -267,6 +285,8 @@
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem openOutputFormMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }
 
