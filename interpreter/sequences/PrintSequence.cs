@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace pseudocode_ide.interpreter.sequences
 {
-    public class PrintSequence : Sequence
+    public class PrintSequence : FunctionCallSequence
     {
-        public PrintSequence(List<Token> tokens, int line) : base(tokens, line)
-        {
-        }
+        public PrintSequence(List<Token> argumentTokens, int line) : base(argumentTokens, line) { }
 
         public override void execute()
         {

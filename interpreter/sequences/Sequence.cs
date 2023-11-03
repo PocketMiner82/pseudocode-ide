@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace pseudocode_ide.interpreter.sequences
 {
@@ -6,19 +7,32 @@ namespace pseudocode_ide.interpreter.sequences
     {
         public List<Variable> variables = new List<Variable>();
 
-        public List<Sequence> sequences = new List<Sequence>();
+        public List<Sequence> sequences;
 
         protected int line;
 
+        protected List<Token> tokens;
 
-        public Sequence(List<Token> tokens, int line)
+
+        public Sequence(List<Token> tokens, int line, bool doNotParse = false)
         {
+            this.tokens = tokens;
+            this.line = line;
 
+            if (!doNotParse)
+            {
+                this.parse();
+            }
+        }
+
+        public virtual void parse()
+        {
+            this.sequences = new Parser(ref this.tokens).parseFunctionTokens(out this.variables);
         }
 
         public virtual void execute()
         {
-            foreach (Sequence sequence in sequences)
+            foreach (Sequence sequence in this.sequences)
             {
                 sequence.execute();
             }

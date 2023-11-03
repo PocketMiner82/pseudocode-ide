@@ -5,5 +5,11 @@
         public TokenType type { get; set; }
 
         public object value { get; set; }
+
+        public Variable(TokenType type, object value)
+        {
+            this.type = type;
+            this.value = value;
+        }
     }
 }

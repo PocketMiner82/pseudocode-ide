@@ -72,7 +72,7 @@ namespace pseudocode_ide.interpreter
             keywords.Add("NICHTS",          NULL);
         }
 
-    public Scanner(string code)
+        public Scanner(string code)
         {
             this.code = code;
         }

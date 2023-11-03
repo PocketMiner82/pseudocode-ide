@@ -64,6 +64,7 @@
     <Compile Include="interpreter\log\LogPrefix.cs" />
     <Compile Include="interpreter\Parser.cs" />
     <Compile Include="interpreter\Scanner.cs" />
+    <Compile Include="interpreter\sequences\FunctionCallSequence.cs" />
     <Compile Include="interpreter\sequences\MainSequence.cs" />
     <Compile Include="interpreter\sequences\condition\Condition.cs" />
     <Compile Include="interpreter\sequences\condition\IfCondition.cs" />
@@ -74,7 +75,7 @@
     <Compile Include="interpreter\sequences\loop\Loop.cs" />
     <Compile Include="interpreter\sequences\loop\WhileLoop.cs" />
     <Compile Include="interpreter\sequences\PrintSequence.cs" />
-    <Compile Include="interpreter\sequences\RuntimeError.cs" />
+    <Compile Include="interpreter\RuntimeError.cs" />
     <Compile Include="interpreter\sequences\Sequence.cs" />
     <Compile Include="interpreter\sequences\condition\SwitchCaseCondition.cs" />
     <Compile Include="interpreter\sequences\Variable.cs" />

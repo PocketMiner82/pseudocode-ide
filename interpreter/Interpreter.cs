@@ -48,6 +48,9 @@ namespace pseudocode_ide.interpreter
                 Logger.info(token.ToString());
             }
 
+            Parser parser = new Parser(ref tokens);
+            parser.parseMain().execute();
+
             this.outputForm.stopMenuItem_Click(null, null);
             this.outputForm.outputText += "\n\n\n";
             this.outputForm.scrollRtbOutputToEnd();
