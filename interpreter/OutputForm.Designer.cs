@@ -1,6 +1,6 @@
 ﻿namespace pseudocode_ide
 {
-    partial class RunForm
+    partial class OutputForm
     {
         /// <summary>
         /// Required designer variable.
@@ -42,33 +42,47 @@
             this.stopMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
+            this.menuStrip.ShowItemToolTips = true;
             this.menuStrip.Size = new System.Drawing.Size(784, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
             // startMenuItem
             // 
+            this.startMenuItem.AutoToolTip = true;
+            this.startMenuItem.Enabled = false;
+            this.startMenuItem.ForeColor = System.Drawing.Color.Green;
             this.startMenuItem.Name = "startMenuItem";
+            this.startMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.startMenuItem.Size = new System.Drawing.Size(43, 20);
             this.startMenuItem.Text = "Start";
+            this.startMenuItem.ToolTipText = "Start (F5)";
+            this.startMenuItem.Click += new System.EventHandler(this.startMenuItem_Click);
             // 
             // stopMenuItem
             // 
+            this.stopMenuItem.AutoToolTip = true;
+            this.stopMenuItem.ForeColor = System.Drawing.Color.Red;
             this.stopMenuItem.Name = "stopMenuItem";
+            this.stopMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5)));
             this.stopMenuItem.Size = new System.Drawing.Size(43, 20);
             this.stopMenuItem.Text = "Stop";
+            this.stopMenuItem.ToolTipText = "Stop (Shift+F5)";
+            this.stopMenuItem.Click += new System.EventHandler(this.stopMenuItem_Click);
             // 
             // rtbOutput
             // 
             this.rtbOutput.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtbOutput.Font = new System.Drawing.Font("Courier New", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rtbOutput.Location = new System.Drawing.Point(0, 24);
             this.rtbOutput.Name = "rtbOutput";
+            this.rtbOutput.ReadOnly = true;
             this.rtbOutput.Size = new System.Drawing.Size(784, 437);
             this.rtbOutput.TabIndex = 1;
             this.rtbOutput.Text = "";
             this.rtbOutput.WordWrap = false;
             // 
-            // RunForm
+            // OutputForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -77,8 +91,9 @@
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
             this.MinimumSize = new System.Drawing.Size(350, 250);
-            this.Name = "RunForm";
+            this.Name = "OutputForm";
             this.Text = "Output";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OutputForm_FormClosing);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.ResumeLayout(false);

@@ -8,7 +8,13 @@ namespace pseudocode_ide
 {
     public partial class FindReplaceForm : Form
     {
-        private PseudocodeIDEForm mainForm;
+        public PseudocodeIDEForm mainForm
+        {
+            get
+            {
+                return (PseudocodeIDEForm) Owner;
+            }
+        }
 
         /// <summary>
         /// the search term to find
@@ -27,7 +33,7 @@ namespace pseudocode_ide
 
         public FindReplaceForm(PseudocodeIDEForm mainForm)
         {
-            this.mainForm = mainForm;
+            Owner = mainForm;
             InitializeComponent();
 
             // register some event listeners
@@ -85,6 +91,10 @@ namespace pseudocode_ide
         {
             this.pageSwitch((FindReplaceTabs)e.TabPageIndex);
         }
+
+        // ---------------------------------------------
+        // METHODS
+        // ---------------------------------------------
 
         /// <summary>
         /// Show the form.

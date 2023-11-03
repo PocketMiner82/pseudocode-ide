@@ -43,7 +43,7 @@
             this.wordWrapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runProgramMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.EqualsIsOperatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.singleEqualIsCompareOperatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.codeTextBox = new System.Windows.Forms.RichTextBox();
@@ -169,7 +169,7 @@
             // 
             this.runMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.runProgramMenuItem,
-            this.EqualsIsOperatorMenuItem});
+            this.singleEqualIsCompareOperatorMenuItem});
             this.runMenuItem.Name = "runMenuItem";
             this.runMenuItem.Size = new System.Drawing.Size(40, 20);
             this.runMenuItem.Text = "Run";
@@ -178,19 +178,20 @@
             // 
             this.runProgramMenuItem.Name = "runProgramMenuItem";
             this.runProgramMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.runProgramMenuItem.Size = new System.Drawing.Size(311, 22);
+            this.runProgramMenuItem.Size = new System.Drawing.Size(346, 22);
             this.runProgramMenuItem.Text = "Run Program";
+            this.runProgramMenuItem.Click += new System.EventHandler(this.runProgramMenuItem_Click);
             // 
-            // EqualsIsOperatorMenuItem
+            // singleEqualIsCompareOperatorMenuItem
             // 
-            this.EqualsIsOperatorMenuItem.CheckOnClick = true;
-            this.EqualsIsOperatorMenuItem.Name = "EqualsIsOperatorMenuItem";
-            this.EqualsIsOperatorMenuItem.ShortcutKeyDisplayString = "";
-            this.EqualsIsOperatorMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.singleEqualIsCompareOperatorMenuItem.CheckOnClick = true;
+            this.singleEqualIsCompareOperatorMenuItem.Name = "singleEqualIsCompareOperatorMenuItem";
+            this.singleEqualIsCompareOperatorMenuItem.ShortcutKeyDisplayString = "";
+            this.singleEqualIsCompareOperatorMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.D0)));
-            this.EqualsIsOperatorMenuItem.Size = new System.Drawing.Size(311, 22);
-            this.EqualsIsOperatorMenuItem.Text = "\'=\' is used as compare operator";
-            this.EqualsIsOperatorMenuItem.Click += new System.EventHandler(this.EqualsIsOperatorMenuItem_Click);
+            this.singleEqualIsCompareOperatorMenuItem.Size = new System.Drawing.Size(346, 22);
+            this.singleEqualIsCompareOperatorMenuItem.Text = "Single \'=\' is used as compare operator";
+            this.singleEqualIsCompareOperatorMenuItem.Click += new System.EventHandler(this.singleEqualIsCompareOperatorMenuItem_Click);
             // 
             // helpMenuItem
             // 
@@ -262,7 +263,7 @@
         private System.Windows.Forms.ToolStripMenuItem newMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewMenuItem;
         private System.Windows.Forms.ToolStripMenuItem wordWrapMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem EqualsIsOperatorMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem singleEqualIsCompareOperatorMenuItem;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;

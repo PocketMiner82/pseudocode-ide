@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using pseudocode_ide.findReplace;
+using System.Diagnostics;
 
 namespace pseudocode_ide
 {
@@ -19,12 +20,21 @@ namespace pseudocode_ide
         /// <summary>
         /// do not update the undo stack when the last char is a letter from A-Z (case ignored), a number from 0-9 or a underscore
         /// </summary>
-        private readonly Regex NO_UPDATE_AFTER = new Regex(@"^[a-zA-Z0-9_]$", RegexOptions.Multiline);
+        private readonly Regex NO_UPDATE_AFTER = new Regex(@"^[a-zA-Z0-9_äöüÄÖÜß]$", RegexOptions.Multiline);
 
         /// <summary>
         /// the code currently in the textbox
         /// </summary>
-        public string code { get; private set; } = "";
+        public string code
+        {
+            get
+            {
+                return (string)Invoke((Func<string>)delegate
+                {
+                    return codeTextBox.Text == null ? "" : codeTextBox.Text;
+                });
+            }
+        }
 
         /// <summary>
         /// if the textbox update event should be ignored the next time
@@ -55,17 +65,14 @@ namespace pseudocode_ide
         /// </summary>
         private bool isSaved = true;
 
-        private Interpreter interpreter;
-
         private FindReplaceForm findReplaceForm;
-        
 
+        private OutputForm outputForm;
 
         public PseudocodeIDEForm()
         {
             this.findReplaceForm = new FindReplaceForm(this);
-            this.interpreter = new Interpreter(this);
-            this.findReplaceForm.Owner = this;
+            this.outputForm = new OutputForm(this);
 
             InitializeComponent();
             this.resetUndoRedo();
@@ -80,15 +87,14 @@ namespace pseudocode_ide
             codeTextBox.WordWrap = wordWrapMenuItem.Checked;
         }
 
-        private void EqualsIsOperatorMenuItem_Click(object sender, EventArgs e)
+        private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
-            Tokens.setEqualsIsCompareOperator(EqualsIsOperatorMenuItem.Checked);
+            Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
+            Debug.WriteLine(Scanner.singleEqualIsCompareOperator);
         }
 
         private void codeTextBox_TextChanged(object sender, EventArgs e)
         {
-            this.code = codeTextBox.Text;
-
             // when the code is modified, the code is no longer saved in the file
             this.isSaved = false;
             if (!Text.EndsWith("*"))
@@ -183,6 +189,12 @@ namespace pseudocode_ide
             if (!this.findReplaceForm.IsDisposed)
             {
                 this.findReplaceForm.Close();
+                this.Close();
+                return;
+            }
+            if (!this.outputForm.IsDisposed)
+            {
+                this.outputForm.Close();
                 this.Close();
                 return;
             }
@@ -518,6 +530,15 @@ namespace pseudocode_ide
             {
                 codeTextBox.SelectedText = toReplace;
             }));
+        }
+
+        // ---------------------------------------------
+        // RUN PROGRAM
+        // ---------------------------------------------
+
+        private void runProgramMenuItem_Click(object sender, EventArgs e)
+        {
+            this.outputForm.Show();
         }
     }
 }
