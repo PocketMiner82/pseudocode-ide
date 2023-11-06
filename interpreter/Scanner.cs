@@ -9,7 +9,7 @@ namespace pseudocode_ide.interpreter
         public static bool singleEqualIsCompareOperator { get; set; } = false;
 
         private readonly string code;
-        private List<Token> tokens = new List<Token>();
+        private LinkedList<Token> tokens = new LinkedList<Token>();
 
         private int start = 0;
         private int current = 0;
@@ -77,7 +77,7 @@ namespace pseudocode_ide.interpreter
             this.code = code;
         }
 
-        public List<Token> scanTokens()
+        public LinkedList<Token> scanTokens()
         {
             while (!this.isAtEnd())
             {
@@ -91,7 +91,7 @@ namespace pseudocode_ide.interpreter
                 this.scanToken();
             }
 
-            this.tokens.Add(new Token(EOF, "", null, line));
+            this.tokens.AddLast(new Token(EOF, "", null, line));
             return tokens;
         }
 
@@ -415,7 +415,7 @@ namespace pseudocode_ide.interpreter
         private void addToken(TokenType type, object literal = null)
         {
             string text = this.code.Substring(this.start, this.current - this.start);
-            this.tokens.Add(new Token(type, text, literal, this.line));
+            this.tokens.AddLast(new Token(type, text, literal, this.line));
         }
     }
 }

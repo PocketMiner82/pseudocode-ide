@@ -69,6 +69,7 @@ namespace pseudocode_ide
 
         private OutputForm outputForm;
 
+
         public PseudocodeIDEForm()
         {
             this.findReplaceForm = new FindReplaceForm(this);

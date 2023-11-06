@@ -32,7 +32,7 @@ namespace pseudocode_ide.interpreter
             Logger.info(LogMessage.START_INTERPRETING);
 
             Scanner scanner = new Scanner(code);
-            List<Token> tokens = scanner.scanTokens();
+            LinkedList<Token> tokens = scanner.scanTokens();
 
             if (OutputForm.runTaskCancelToken.IsCancellationRequested)
             {
@@ -48,7 +48,9 @@ namespace pseudocode_ide.interpreter
                 Logger.info(token.ToString());
             }
 
-            Parser parser = new Parser(ref tokens);
+            List<Token> tokensList = new List<Token>(tokens);
+
+            Parser parser = new Parser(ref tokensList);
             parser.parseMain().execute();
 
             this.outputForm.stopMenuItem_Click(null, null);
