@@ -111,7 +111,7 @@ namespace codeOutput
                     Activator.CreateInstance(type, new Action<string>(Logger.print), new Action(Interpreter.onStop));
                 }
             }
-            catch (ThreadAbortException){ }
+            catch (ThreadAbortException) { }
             catch (Exception e)
             {
                 Logger.error(e.ToString());
