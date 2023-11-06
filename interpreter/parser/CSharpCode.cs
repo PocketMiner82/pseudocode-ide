@@ -107,9 +107,17 @@ namespace codeOutput
                 if (this.compiledAssembly != null)
                 {
                     Type type = this.compiledAssembly.GetType("codeOutput.CodeOutput");
+
                     Activator.CreateInstance(type, new Action<string>(Logger.print), new Action(Interpreter.onStop));
                 }
-            } catch (ThreadAbortException) { }
+            }
+            catch (ThreadAbortException){ }
+            catch (Exception e)
+            {
+                Logger.error(e.ToString());
+                Interpreter.hadRuntimeError = true;
+                Interpreter.onStop();
+            }
         }
     }
 }

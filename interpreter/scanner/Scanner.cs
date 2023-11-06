@@ -92,7 +92,7 @@ namespace pseudocodeIde.interpreter
                 this.scanToken();
             }
 
-            this.tokens.AddLast(new Token(EOF, "", null, line));
+            this.tokens.AddLast(Token.eof(this.line));
             return this.tokens;
         }
 

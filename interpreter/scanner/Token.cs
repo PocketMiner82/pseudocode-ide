@@ -21,5 +21,10 @@
                 + (this.lexeme.Equals("\n") || this.lexeme.Equals("\r") ? "" : this.lexeme) + " "
                 + this.literal;
         }
+
+        public static Token eof(int line)
+        {
+            return new Token(TokenType.EOF, "", null, line);
+        }
     }
 }

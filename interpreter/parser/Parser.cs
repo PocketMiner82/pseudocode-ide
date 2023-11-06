@@ -38,6 +38,11 @@ namespace pseudocodeIde.interpreter
         public Parser(LinkedList<Token> tokens)
         {
             this.tokens = tokens;
+
+            for (int i = 0; i < 3; i++)
+            {
+                this.tokens.AddLast(Token.eof(this.tokens.Last.Value.line));
+            }
         }
 
         public CSharpCode parseTokens()
@@ -98,6 +103,7 @@ namespace pseudocodeIde.interpreter
             Token currentToken = this.currentToken.Value;
             Token possibleColon = this.currentToken.Next.Value;
             Token possibleVarType = this.currentToken.Next.Next.Value;
+            Token possibleVarAssign = this.currentToken.Next.Next.Next.Value;
 
             if (possibleColon.type == COLON)
             {
@@ -106,7 +112,11 @@ namespace pseudocodeIde.interpreter
                     if (this.isInConstructor)
                     {
                         this.cSharpCode.fields += $"protected {tokenToCSharp[possibleVarType.type]} _{currentToken.lexeme};\n";
-                        this.addCode($"_{currentToken.lexeme}");
+
+                        if (possibleVarAssign.type == VAR_ASSIGN)
+                        {
+                            this.addCode($"_{currentToken.lexeme}");
+                        }
 
                         this.advance();
                         this.advance();
