@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using pseudocode_ide.findReplace;
 using System.Diagnostics;
-using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace pseudocode_ide
 {
@@ -553,10 +552,7 @@ namespace pseudocode_ide
 
         private void showHelpMenuItem_Click(object sender, EventArgs e)
         {
-            TaskDialog dialog = new TaskDialog()
-            {
-                Caption = "Pseudocode IDE - Help",
-                Text = "Basic Usage:\n" +
+            MessageBox.Show("Basic Usage:\n" +
                             "Just write code and execute it as defined in the \"Formelsammlung 1.5.2 TG Informationstechnik\" for the Abitur 2024.\n\n" +
                             "Additional operators:\n" +
                             "UND - defined as and operator\n" +
@@ -565,11 +561,10 @@ namespace pseudocode_ide
                             "- multiple files\n" +
                             "- classes/objects: requires multiple files\n" +
                             "- lists: is a class" +
-                            "- FÜR ... IN ...: unnecessary without lists"
-            };
+                            "- FÜR ... IN ...: unnecessary without lists",
 
-            
-            dialog.Show();
+                            "Pseudocode IDE - Help"
+            );
         }
     }
 }
