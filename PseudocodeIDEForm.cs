@@ -478,6 +478,9 @@ namespace pseudocode_ide
             this.findReplaceForm.Show(FindReplaceTabs.REPLACE, codeTextBox.SelectedText);
         }
 
+        /// <summary>
+        /// Get the start of the current selection in the code text box
+        /// </summary>
         public int getSelectionStart()
         {
             return codeTextBox.SelectionStart;
@@ -556,13 +559,13 @@ namespace pseudocode_ide
             MessageBox.Show("Basic Usage:\n" +
                             "Just write code and execute it as defined in the \"Formelsammlung 1.5.2 TG Informationstechnik\" for the Abitur 2024.\n\n" +
                             "Additional operators:\n" +
-                            "UND - defined as and operator\n" +
-                            "ODER - defined as or operator\n\n" +
+                            "&& - defined as and operator\n" +
+                            "|| - defined as or operator\n\n" +
                             "Not implemented:\n" +
                             "- multiple files\n" +
                             "- classes/objects: requires multiple files\n" +
-                            "- lists: is a class" +
-                            "- FÜR ... IN ...: unnecessary without lists",
+                            /*"- lists: is a class" +
+                            "- FÜR ... IN ...: unnecessary without lists",*/
 
                             "Pseudocode IDE - Help"
             );
