@@ -1,6 +1,6 @@
-﻿using pseudocode_ide.interpreter.sequences;
+﻿using pseudocodeIde.interpreter.sequences;
 
-namespace pseudocode_ide.interpreter.log
+namespace pseudocodeIde.interpreter.logging
 {
     public static class Logger
     {
@@ -8,12 +8,12 @@ namespace pseudocode_ide.interpreter.log
 
         public static void info(string msg)
         {
-            print(LogPrefix.TIMESTAMP + LogPrefix.INFO + msg + "\n");
+            print(LogPrefix.TIMESTAMP + LogPrefix.INFO + msg);
         }
 
         public static void error(string msg)
         {
-            print(LogPrefix.TIMESTAMP + LogPrefix.ERROR + msg + "\n");
+            print(LogPrefix.TIMESTAMP + LogPrefix.ERROR + msg);
         }
 
         public static void error(int line, string msg, string what = "")
@@ -32,7 +32,7 @@ namespace pseudocode_ide.interpreter.log
         {
             if (outputForm != null)
             {
-                outputForm.outputText += message;
+                outputForm.outputText += message + "\n";
                 outputForm.scrollRtbOutputToEnd();
             }
         }

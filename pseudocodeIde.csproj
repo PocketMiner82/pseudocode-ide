@@ -55,30 +55,18 @@
     </Compile>
     <Compile Include="findReplace\FindReplaceTabs.cs" />
     <Compile Include="findReplace\FindReplaceResult.cs" />
+    <Compile Include="interpreter\codeOutput\BaseCodeOutput.cs" />
     <Compile Include="interpreter\Interpreter.cs" />
-    <Compile Include="interpreter\log\Logger.cs" />
-    <Compile Include="interpreter\log\LogMessage.cs" />
-    <Compile Include="interpreter\log\LogPrefix.cs" />
-    <Compile Include="interpreter\Parser.cs" />
-    <Compile Include="interpreter\Scanner.cs" />
-    <Compile Include="interpreter\sequences\FunctionCallSequence.cs" />
-    <Compile Include="interpreter\sequences\MainSequence.cs" />
-    <Compile Include="interpreter\sequences\condition\Condition.cs" />
-    <Compile Include="interpreter\sequences\condition\IfCondition.cs" />
-    <Compile Include="interpreter\sequences\condition\IfElseCondition.cs" />
-    <Compile Include="interpreter\sequences\loop\DoWhileLoop.cs" />
-    <Compile Include="interpreter\sequences\loop\ForEachLoop.cs" />
-    <Compile Include="interpreter\sequences\loop\ForLoop.cs" />
-    <Compile Include="interpreter\sequences\loop\Loop.cs" />
-    <Compile Include="interpreter\sequences\loop\WhileLoop.cs" />
-    <Compile Include="interpreter\sequences\PrintSequence.cs" />
-    <Compile Include="interpreter\RuntimeError.cs" />
-    <Compile Include="interpreter\sequences\Sequence.cs" />
-    <Compile Include="interpreter\sequences\condition\SwitchCaseCondition.cs" />
-    <Compile Include="interpreter\sequences\Variable.cs" />
-    <Compile Include="interpreter\Token.cs" />
-    <Compile Include="interpreter\Tokens.cs" />
-    <Compile Include="interpreter\TokenType.cs" />
+    <Compile Include="interpreter\logging\Logger.cs" />
+    <Compile Include="interpreter\logging\LogMessage.cs" />
+    <Compile Include="interpreter\logging\LogPrefix.cs" />
+    <Compile Include="interpreter\parser\CSharpCode.cs" />
+    <Compile Include="interpreter\parser\Parser.cs" />
+    <Compile Include="interpreter\scanner\Scanner.cs" />
+    <Compile Include="interpreter\logging\RuntimeError.cs" />
+    <Compile Include="interpreter\scanner\Token.cs" />
+    <Compile Include="interpreter\scanner\Tokens.cs" />
+    <Compile Include="interpreter\scanner\TokenType.cs" />
     <Compile Include="PseudocodeIDEForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -1,4 +1,4 @@
-﻿namespace pseudocode_ide.interpreter
+﻿namespace pseudocodeIde.interpreter
 {
     public enum TokenType
     {

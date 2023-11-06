@@ -1,4 +1,4 @@
-﻿namespace pseudocode_ide
+﻿namespace pseudocodeIde
 {
     partial class FindReplaceForm
     {

@@ -1,4 +1,4 @@
-﻿namespace pseudocode_ide.findReplace
+﻿namespace pseudocodeIde.findReplace
 {
     public enum FindReplaceResult
     {

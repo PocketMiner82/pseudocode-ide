@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace pseudocode_ide
+namespace pseudocodeIde
 {
     public static class Extensions
     {

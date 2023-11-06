@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace pseudocode_ide
+namespace pseudocodeIde
 {
     static class Program
     {

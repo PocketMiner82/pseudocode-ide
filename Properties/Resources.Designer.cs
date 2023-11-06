@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace pseudocode_ide.Properties
+namespace pseudocodeIde.Properties
 {
 
 

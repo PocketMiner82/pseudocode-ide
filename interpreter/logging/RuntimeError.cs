@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pseudocode_ide.interpreter.sequences
+namespace pseudocodeIde.interpreter.sequences
 {
     public class RuntimeError : Exception
     {

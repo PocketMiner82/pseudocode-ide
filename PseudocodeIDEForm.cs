@@ -1,14 +1,14 @@
-﻿using pseudocode_ide.interpreter;
+﻿using pseudocodeIde.interpreter;
 using System.Windows.Forms;
 using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using pseudocode_ide.findReplace;
+using pseudocodeIde.findReplace;
 using System.Diagnostics;
 
-namespace pseudocode_ide
+namespace pseudocodeIde
 {
     public partial class PseudocodeIDEForm : Form
     {

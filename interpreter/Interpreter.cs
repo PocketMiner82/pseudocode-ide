@@ -1,7 +1,8 @@
-﻿using pseudocode_ide.interpreter.log;
+﻿using pseudocodeIde.interpreter.logging;
+using pseudocodeIde.interpreter.parser;
 using System.Collections.Generic;
 
-namespace pseudocode_ide.interpreter
+namespace pseudocodeIde.interpreter
 {
     public class Interpreter
     {
@@ -48,10 +49,12 @@ namespace pseudocode_ide.interpreter
                 Logger.info(token.ToString());
             }
 
-            List<Token> tokensList = new List<Token>(tokens);
+            Parser parser = new Parser(tokens);
+            CSharpCode cSharpCode = parser.parse();
 
-            Parser parser = new Parser(ref tokensList);
-            parser.parseMain().execute();
+
+            Logger.info(LogMessage.RUNNING_PROGRAM);
+            cSharpCode.execute();
 
             this.outputForm.stopMenuItem_Click(null, null);
             this.outputForm.outputText += "\n\n\n";

@@ -1,11 +1,11 @@
-﻿using pseudocode_ide.interpreter;
-using pseudocode_ide.interpreter.log;
+﻿using pseudocodeIde.interpreter;
+using pseudocodeIde.interpreter.logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace pseudocode_ide
+namespace pseudocodeIde
 {
     public partial class OutputForm : Form
     {

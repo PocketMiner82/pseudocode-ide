@@ -1,10 +1,10 @@
-﻿using pseudocode_ide.findReplace;
+﻿using pseudocodeIde.findReplace;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace pseudocode_ide
+namespace pseudocodeIde
 {
     public partial class FindReplaceForm : Form
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pseudocode_ide.interpreter.log
+namespace pseudocodeIde.interpreter.logging
 {
     public static class LogPrefix
     {

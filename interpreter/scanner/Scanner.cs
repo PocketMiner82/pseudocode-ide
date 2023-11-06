@@ -1,8 +1,8 @@
-﻿using pseudocode_ide.interpreter.log;
+﻿using pseudocodeIde.interpreter.logging;
 using System.Collections.Generic;
-using static pseudocode_ide.interpreter.TokenType;
+using static pseudocodeIde.interpreter.TokenType;
 
-namespace pseudocode_ide.interpreter
+namespace pseudocodeIde.interpreter
 {
     public class Scanner
     {
