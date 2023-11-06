@@ -112,6 +112,8 @@ namespace pseudocodeIde
             {
                 runTaskCancelTokenSource.Cancel();
             }
+
+            this.interpreter.stopProgram();
         }
 
         public void scrollRtbOutputToEnd()

@@ -1,6 +1,7 @@
 ﻿using pseudocodeIde.interpreter.logging;
 using pseudocodeIde.interpreter.parser;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace pseudocodeIde.interpreter
 {
@@ -11,6 +12,8 @@ namespace pseudocodeIde.interpreter
         public static bool hadRuntimeError { get; set; } = false;
 
         private OutputForm outputForm;
+
+        private Thread programThread = null;
 
         private string code
         {
@@ -28,37 +31,72 @@ namespace pseudocodeIde.interpreter
 
         public void run()
         {
+            if (!this.tryRun())
+            {
+                this.outputForm.stopMenuItem_Click(null, null);
+                this.outputForm.outputText += "\n\n\n";
+                this.outputForm.scrollRtbOutputToEnd();
+            }
+        }
+
+        private bool tryRun()
+        {
             hadError = false;
 
-            Logger.info(LogMessage.START_INTERPRETING);
+            Logger.info(LogMessage.GENERATING_C_SHARP_CODE);
 
             Scanner scanner = new Scanner(code);
             LinkedList<Token> tokens = scanner.scanTokens();
 
-            if (OutputForm.runTaskCancelToken.IsCancellationRequested)
+            if (this.cancelRequestedOrError())
             {
-                return;
+                return false;
             }
 
             foreach (Token token in tokens)
             {
                 if (OutputForm.runTaskCancelToken.IsCancellationRequested)
                 {
-                    break;
+                    return false;
                 }
                 Logger.info(token.ToString());
             }
 
             Parser parser = new Parser(tokens);
-            CSharpCode cSharpCode = parser.parse();
+            CSharpCode cSharpCode = parser.parseTokens();
 
+            if (this.cancelRequestedOrError())
+            {
+                return false;
+            }
+
+            Logger.info(LogMessage.COMPILING_C_SHARP_CODE);
+            cSharpCode.compile();
+
+            if (this.cancelRequestedOrError())
+            {
+                return false;
+            }
 
             Logger.info(LogMessage.RUNNING_PROGRAM);
-            cSharpCode.execute();
+            Logger.print("");
 
-            this.outputForm.stopMenuItem_Click(null, null);
-            this.outputForm.outputText += "\n\n\n";
-            this.outputForm.scrollRtbOutputToEnd();
+            this.programThread = new Thread(cSharpCode.execute);
+            this.programThread.Start();
+            return true;
+        }
+
+        private bool cancelRequestedOrError()
+        {
+            return hadError || OutputForm.runTaskCancelToken.IsCancellationRequested;
+        }
+
+        public void stopProgram()
+        {
+            if (this.programThread != null && this.programThread.IsAlive)
+            {
+                this.programThread.Abort();
+            }
         }
     }
 }

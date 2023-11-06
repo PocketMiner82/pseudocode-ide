@@ -55,7 +55,6 @@
     </Compile>
     <Compile Include="findReplace\FindReplaceTabs.cs" />
     <Compile Include="findReplace\FindReplaceResult.cs" />
-    <Compile Include="interpreter\codeOutput\BaseCodeOutput.cs" />
     <Compile Include="interpreter\Interpreter.cs" />
     <Compile Include="interpreter\logging\Logger.cs" />
     <Compile Include="interpreter\logging\LogMessage.cs" />

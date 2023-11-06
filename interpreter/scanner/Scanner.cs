@@ -9,6 +9,7 @@ namespace pseudocodeIde.interpreter
         public static bool singleEqualIsCompareOperator { get; set; } = false;
 
         private readonly string code;
+
         private LinkedList<Token> tokens = new LinkedList<Token>();
 
         private int start = 0;
@@ -83,7 +84,7 @@ namespace pseudocodeIde.interpreter
             {
                 if (OutputForm.runTaskCancelToken.IsCancellationRequested)
                 {
-                    return tokens;
+                    return this.tokens;
                 }
 
                 // we are at the beginning of the next lexeme
@@ -92,7 +93,7 @@ namespace pseudocodeIde.interpreter
             }
 
             this.tokens.AddLast(new Token(EOF, "", null, line));
-            return tokens;
+            return this.tokens;
         }
 
         private void scanToken()
@@ -207,7 +208,7 @@ namespace pseudocodeIde.interpreter
             {
                 switch (this.peek())
                 {
-                    // Ignore more than one whitespace
+                    // Ignore whitespace
                     case ' ':
                     case '\r':
                     case '\t':
@@ -220,7 +221,7 @@ namespace pseudocodeIde.interpreter
 
             if (!isNewLine)
             {
-                this.addToken(WHITESPACE);
+                //this.addToken(WHITESPACE);
             }
         }
 
@@ -308,12 +309,12 @@ namespace pseudocodeIde.interpreter
 
             if (i > 0)
             {
-                Logger.error(line, "Too many characters in character literal.");
+                Logger.error(this.line, "Too many characters in character literal.");
                 return;
             }
             else if (this.isAtEnd())
             {
-                Logger.error(line, "Unterminated char.");
+                Logger.error(this.line, "Unterminated char.");
                 return;
             }
 
@@ -322,15 +323,15 @@ namespace pseudocodeIde.interpreter
 
             // trim the surrounding quotes
             string value = this.code.Substring(this.start + 1, this.current - this.start - 2);
-            addToken(CHAR, value);
+            this.addToken(CHAR, value);
         }
 
         private void handleString()
         {
             while (this.peek() != '"' && !this.isAtEnd())
             {
-                if (peek() == '\n') line++;
-                advance();
+                if (this.peek() == '\n') this.line++;
+                this.advance();
             }
 
             if (this.isAtEnd())
@@ -340,11 +341,11 @@ namespace pseudocodeIde.interpreter
             }
 
             // the next char must be the closing "
-            advance();
+            this.advance();
 
             // trim the surrounding quotes
             string value = this.code.Substring(this.start + 1, this.current - this.start - 2);
-            addToken(STRING, value);
+            this.addToken(STRING, value);
         }
 
         private bool match(char expected)
@@ -399,7 +400,7 @@ namespace pseudocodeIde.interpreter
 
         private bool isAlphaNumeric(char c)
         {
-            return isAlpha(c) || isDigit(c);
+            return this.isAlpha(c) || this.isDigit(c);
         }
 
         private bool isAtEnd()

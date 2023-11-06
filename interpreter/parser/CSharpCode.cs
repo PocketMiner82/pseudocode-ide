@@ -1,10 +1,10 @@
-﻿using pseudocodeIde.interpreter.codeOutput;
-using pseudocodeIde.interpreter.logging;
+﻿using pseudocodeIde.interpreter.logging;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace pseudocodeIde.interpreter.parser
 {
@@ -14,7 +14,7 @@ namespace pseudocodeIde.interpreter.parser
 using System;
 using System.Collections.Generic;
 
-namespace pseudocodeIde.interpreter.codeOutput
+namespace codeOutput
 {
     public class CodeOutput : BaseCodeOutput
     {
@@ -22,7 +22,6 @@ namespace pseudocodeIde.interpreter.codeOutput
 
         public CodeOutput(Action<string> printMethod) : base(printMethod)
         {
-            schreibe(""Hello world!"");
             %CONSTRUCTOR%
         }
 
@@ -38,9 +37,9 @@ namespace pseudocodeIde.interpreter.codeOutput
             this.printMethod = printMethod;
         }
 
-        protected virtual void schreibe(string msg)
+        protected virtual void schreibe(object msg)
         {
-            this.printMethod(msg);
+            this.printMethod(msg.ToString());
         }
     }
 }
@@ -82,9 +81,10 @@ namespace pseudocodeIde.interpreter.codeOutput
 
             CompilerResults result = provider.CompileAssemblyFromSource(parameters, code);
 
+            Logger.info($"C# code:\n\n{code}\n");
+
             if (result.Errors.Count > 0)
             {
-                Logger.error($"Error while compiling the following generated C# code:\n\n{code}\n");
                 Logger.error($"Following errors occurred:");
 
                 foreach(CompilerError error in result.Errors)
@@ -100,11 +100,14 @@ namespace pseudocodeIde.interpreter.codeOutput
 
         public void execute()
         {
-            if (this.compiledAssembly != null)
+            try
             {
-                Type type = this.compiledAssembly.GetType("pseudocodeIde.interpreter.codeOutput.CodeOutput");
-                Activator.CreateInstance(type, new Action<string>(Logger.print));
-            }
+                if (this.compiledAssembly != null)
+                {
+                    Type type = this.compiledAssembly.GetType("codeOutput.CodeOutput");
+                    Activator.CreateInstance(type, new Action<string>(Logger.print));
+                }
+            } catch (ThreadAbortException) { }
         }
     }
 }

@@ -14,12 +14,12 @@ namespace pseudocodeIde.interpreter.logging
         public static void error(string msg)
         {
             print(LogPrefix.TIMESTAMP + LogPrefix.ERROR + msg);
+            Interpreter.hadError = true;
         }
 
         public static void error(int line, string msg, string what = "")
         {
             error($"{what}line {line}: {msg}");
-            Interpreter.hadError = true;
         }
 
         public static void runtimeError(RuntimeError runtimeError)
