@@ -105,15 +105,15 @@ namespace pseudocodeIde.interpreter
                 {
                     if (this.isInConstructor)
                     {
-                        this.cSharpCode.fields += $"protected {tokenToCSharp[possibleVarType.type]} {currentToken.lexeme};\n";
-                        this.addCode($"{currentToken.lexeme}");
+                        this.cSharpCode.fields += $"protected {tokenToCSharp[possibleVarType.type]} _{currentToken.lexeme};\n";
+                        this.addCode($"_{currentToken.lexeme}");
 
                         this.advance();
                         this.advance();
                     }
                     else
                     {
-                        this.addCode($"{tokenToCSharp[possibleVarType.type]} {currentToken.lexeme}");
+                        this.addCode($"{tokenToCSharp[possibleVarType.type]} _{currentToken.lexeme}");
 
                         this.advance();
                         this.advance();
@@ -127,7 +127,7 @@ namespace pseudocodeIde.interpreter
                 }
             }
 
-            this.addCode(currentToken.lexeme);
+            this.addCode("_" + currentToken.lexeme);
         }
 
         private bool isVarType(TokenType type)

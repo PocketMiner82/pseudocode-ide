@@ -1,5 +1,6 @@
 ﻿using pseudocodeIde.interpreter.logging;
 using pseudocodeIde.interpreter.parser;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -11,7 +12,7 @@ namespace pseudocodeIde.interpreter
 
         public static bool hadRuntimeError { get; set; } = false;
 
-        private OutputForm outputForm;
+        private static OutputForm outputForm;
 
         private Thread programThread = null;
 
@@ -19,23 +20,34 @@ namespace pseudocodeIde.interpreter
         {
             get
             {
-                return this.outputForm.mainForm.code;
+                return outputForm.mainForm.code;
             }
         }
 
 
         public Interpreter(OutputForm outputForm)
         {
-            this.outputForm = outputForm;
+            Interpreter.outputForm = outputForm;
         }
 
         public void run()
         {
             if (!this.tryRun())
             {
-                this.outputForm.stopMenuItem_Click(null, null);
-                this.outputForm.outputText += "\n\n\n";
-                this.outputForm.scrollRtbOutputToEnd();
+                onStop();
+            }
+        }
+
+        public static void onStop()
+        {
+            if (outputForm != null)
+            {
+                outputForm.Invoke(new Action(() =>
+                {
+                    outputForm.stopMenuItem_Click(null, null);
+                    outputForm.outputText += "\n\n\n";
+                    outputForm.scrollRtbOutputToEnd();
+                }));
             }
         }
 

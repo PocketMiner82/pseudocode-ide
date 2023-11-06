@@ -20,9 +20,11 @@ namespace codeOutput
     {
         %FIELDS%
 
-        public CodeOutput(Action<string> printMethod) : base(printMethod)
+        public CodeOutput(Action<string> printMethod, Action stopMethod) : base(printMethod)
         {
             %CONSTRUCTOR%
+
+            stopMethod();
         }
 
         %METHODS%
@@ -37,7 +39,7 @@ namespace codeOutput
             this.printMethod = printMethod;
         }
 
-        protected virtual void schreibe(object msg)
+        protected virtual void _schreibe(object msg)
         {
             this.printMethod(msg.ToString());
         }
@@ -105,7 +107,7 @@ namespace codeOutput
                 if (this.compiledAssembly != null)
                 {
                     Type type = this.compiledAssembly.GetType("codeOutput.CodeOutput");
-                    Activator.CreateInstance(type, new Action<string>(Logger.print));
+                    Activator.CreateInstance(type, new Action<string>(Logger.print), new Action(Interpreter.onStop));
                 }
             } catch (ThreadAbortException) { }
         }
