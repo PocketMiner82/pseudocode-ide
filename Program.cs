@@ -5,13 +5,12 @@ namespace pseudocodeIde
 {
     static class Program
     {
-        /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
-        /// </summary>
         [STAThread]
         static void Main()
         {
+            // allow automatic scaling
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new PseudocodeIDEForm());
