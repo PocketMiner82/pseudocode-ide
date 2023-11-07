@@ -14,33 +14,25 @@ namespace pseudocodeIde.interpreter.parser
 using System;
 using System.Collections.Generic;
 
-namespace codeOutput
-{
-    public class CodeOutput : BaseCodeOutput
-    {
+namespace codeOutput {
+    public class CodeOutput : BaseCodeOutput {
         %FIELDS%
 
-        public CodeOutput(Action<string> printMethod, Action stopMethod) : base(printMethod)
-        {
+        public CodeOutput(Action<string> printMethod) : base(printMethod) {
             %CONSTRUCTOR%
-
-            stopMethod();
         }
 
         %METHODS%
     }
 
-    public class BaseCodeOutput
-    {
+    public class BaseCodeOutput {
         private Action<string> printMethod;
 
-        public BaseCodeOutput(Action<string> printMethod)
-        {
+        public BaseCodeOutput(Action<string> printMethod) {
             this.printMethod = printMethod;
         }
 
-        protected virtual void _schreibe(object msg)
-        {
+        protected virtual void _schreibe(object msg) {
             this.printMethod(msg.ToString());
         }
     }
@@ -108,16 +100,20 @@ namespace codeOutput
                 {
                     Type type = this.compiledAssembly.GetType("codeOutput.CodeOutput");
 
-                    Activator.CreateInstance(type, new Action<string>(Logger.print), new Action(Interpreter.onStop));
+                    Activator.CreateInstance(type, new Action<string>(Logger.print));
                 }
             }
-            catch (ThreadAbortException) { }
+            catch (ThreadAbortException)
+            {
+                return;
+            }
             catch (Exception e)
             {
                 Logger.error(e.ToString());
                 Interpreter.hadRuntimeError = true;
-                Interpreter.onStop();
             }
+
+            Interpreter.onStop();
         }
     }
 }
