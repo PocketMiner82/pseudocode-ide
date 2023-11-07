@@ -13,6 +13,7 @@ namespace pseudocodeIde.interpreter.parser
         private const string TEMPLATE_CLASS = @"
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace codeOutput {
     public class CodeOutput : BaseCodeOutput {
@@ -34,6 +35,10 @@ namespace codeOutput {
 
         protected virtual void _schreibe(object msg) {
             this.printMethod(msg.ToString());
+        }
+
+        protected virtual void _warte(int millis) {
+            Thread.Sleep(millis);
         }
     }
 }
