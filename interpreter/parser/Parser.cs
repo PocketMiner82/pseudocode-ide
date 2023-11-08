@@ -9,12 +9,13 @@ namespace pseudocodeIde.interpreter
 {
     public class Parser
     {
+        private const string FUNCTION_HEADER_TEMPLATE = "protected {type} {identifier}(%insideParens%) {\n";
+
         private LinkedList<Token> tokens;
 
         private CSharpCode cSharpCode = new CSharpCode();
 
         LinkedListNode<Token> currentToken;
-        private int line = 1;
 
         private static readonly Dictionary<TokenType, string> tokenToCSharp = new Dictionary<TokenType, string>();
 
@@ -56,50 +57,57 @@ namespace pseudocodeIde.interpreter
 
                 // we are at the beginning of the next token
                 this.advance();
-                this.parseToken();
+                this.addCode(this.parseToken());
             }
 
             this.cSharpCode.constructor += ";";
 
+            if (!this.isInConstructor)
+            {
+                // function end
+                this.addCode("}");
+            }
+
             return this.cSharpCode;
         }
 
-        private void parseToken()
+        private string parseToken(bool insideFunctionParens=false)
         {
             Token token = this.currentToken.Value;
 
+            if (!insideFunctionParens)
+            {
+                switch (token.type)
+                {
+                    case FUNCTION:
+                        return this.handleFunction();
+                }
+            }
+
             switch (token.type)
             {
-                case FUNCTION:
-                    this.isInConstructor = false;
-                    this.handleFunction();
-                    break;
-
                 case IDENTIFIER:
-                    this.tryHandleVarDef();
-                    break;
+                    return this.tryHandleVarDef();
 
                 case NEW_LINE:
-                    this.line++;
-                    this.addCode(";\n");
-                    break;
+                    return ";\n";
 
                 default:
                     if (tokenToCSharp.ContainsKey(token.type))
                     {
-                        this.addCode(tokenToCSharp[token.type]);
+                        return tokenToCSharp[token.type];
                     }
                     else
                     {
-                        this.addCode(token.lexeme);
+                        return token.lexeme;
                     }
-                    
-                    break;
             }
         }
 
-        private void tryHandleVarDef()
+        private string tryHandleVarDef()
         {
+            string output = "";
+
             Token currentToken = this.currentToken.Value;
             Token possibleColon = this.currentToken.Next.Value;
             Token possibleVarType = this.currentToken.Next.Next.Value;
@@ -115,29 +123,24 @@ namespace pseudocodeIde.interpreter
 
                         if (possibleVarAssign.type == VAR_ASSIGN)
                         {
-                            this.addCode($"_{currentToken.lexeme}");
+                            output += $"_{currentToken.lexeme}";
                         }
-
-                        this.advance();
-                        this.advance();
                     }
                     else
                     {
-                        this.addCode($"{tokenToCSharp[possibleVarType.type]} _{currentToken.lexeme}");
-
-                        this.advance();
-                        this.advance();
+                        output += $"{tokenToCSharp[possibleVarType.type]} _{currentToken.lexeme}";
                     }
-                    
-                    return;
+
+                    this.advance(2);
+                    return output;
                 }
                 else
                 {
-                    Logger.error(this.line, $"Expected type for variable definition, not '{possibleVarType.lexeme}'");
+                    Logger.error(possibleVarType.line, $"Expected type for variable definition, not '{possibleVarType.lexeme}'");
                 }
             }
 
-            this.addCode("_" + currentToken.lexeme);
+            return "_" + currentToken.lexeme;
         }
 
         private bool isVarType(TokenType type)
@@ -155,9 +158,69 @@ namespace pseudocodeIde.interpreter
             }
         }
 
-        private void handleFunction()
+        private string handleFunction()
         {
-            
+            string output = "";
+            string insideParens = "";
+            Token operationKeyword = this.currentToken.Value;
+
+            Token possibleIdentifier = this.advance();
+            Token possibleLeftParen = this.advance();
+
+            Token possibleRightParen = this.advance();
+            Token possibleColon = this.currentToken.Next.Value;
+            Token possibleType = this.currentToken.Next.Value;
+            Token possibleNewLine = this.currentToken.Next.Value;
+
+            if (possibleIdentifier.type != IDENTIFIER && possibleLeftParen.type != LEFT_PAREN)
+            {
+                Logger.error(operationKeyword.line, "Unexpected symbols after OPERATION keyword.");
+                return "";
+            }
+
+
+            while (!this.isAtEnd())
+            {
+                if (possibleRightParen.type == NEW_LINE)
+                {
+                    Logger.error(operationKeyword.line, "New line before OPERATION definition end.");
+                    return "\n";
+                }
+                else if (possibleRightParen.type != RIGHT_PAREN
+                      && possibleColon.type != COLON
+                      && !this.isVarType(possibleType.type)
+                      && possibleNewLine.type != NEW_LINE)
+                {
+                    insideParens += this.parseToken(true);
+                    possibleRightParen = this.advance();
+                    possibleColon = this.currentToken.Next.Value;
+                    possibleType = this.currentToken.Next.Value;
+                    possibleNewLine = this.currentToken.Next.Value;
+                }
+                else if (possibleRightParen.type == RIGHT_PAREN
+                      && possibleColon.type == COLON
+                      && this.isVarType(possibleType.type)
+                      && possibleNewLine.type == NEW_LINE)
+                {
+                    break;
+                }
+                else
+                {
+                    Logger.error(operationKeyword.line, "Unexpected symbols after OPERATION keyword.");
+                }
+            }
+
+            if (!this.isInConstructor)
+            {
+                output += "}\n\n";
+            }
+
+            this.isInConstructor = false;
+
+            return output + FUNCTION_HEADER_TEMPLATE
+                .Replace("%type%", tokenToCSharp[possibleType.type])
+                .Replace("%identifier%", "_" + possibleIdentifier.lexeme)
+                .Replace("%insideParens%", insideParens);
         }
 
         private Token advance()
@@ -165,6 +228,17 @@ namespace pseudocodeIde.interpreter
             this.currentToken = this.peekLinkedList();
 
             return this.currentToken.Value;
+        }
+
+        private Token advance(int count)
+        {
+            Token current = null;
+            for (int i = 0; i < count; i++)
+            {
+                current = this.advance();
+            }
+
+            return current;
         }
 
         private Token peek()
