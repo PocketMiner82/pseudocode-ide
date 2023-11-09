@@ -91,7 +91,6 @@ namespace pseudocodeIde
         private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
             Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
-            Debug.WriteLine(Scanner.singleEqualIsCompareOperator);
         }
 
         private void codeTextBox_TextChanged(object sender, EventArgs e)

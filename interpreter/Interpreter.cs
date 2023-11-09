@@ -45,8 +45,6 @@ namespace pseudocodeIde.interpreter
                 outputForm.Invoke(new Action(() =>
                 {
                     outputForm.stopMenuItem_Click(null, null);
-                    outputForm.outputText += "\n\n\n";
-                    outputForm.scrollRtbOutputToEnd();
                 }));
             }
         }
@@ -82,7 +80,6 @@ namespace pseudocodeIde.interpreter
                 return false;
             }
 
-            Logger.info(LogMessage.COMPILING_C_SHARP_CODE);
             cSharpCode.compile();
 
             if (this.cancelRequestedOrError())

@@ -242,6 +242,7 @@ namespace pseudocodeIde.interpreter
                     this.advance();
                 }
                 this.handleIdentifier(false);
+                return;
             }
 
             TokenType type;

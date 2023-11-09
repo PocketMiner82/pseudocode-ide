@@ -37,6 +37,8 @@ namespace pseudocodeIde
                 Invoke(new Action(() =>
                 {
                     rtbOutput.Text = value;
+                    rtbOutput.SelectionStart = rtbOutput.Text.Length;
+                    rtbOutput.ScrollToCaret();
                 }));
             }
         }
@@ -72,6 +74,10 @@ namespace pseudocodeIde
                 e.Cancel = true;
                 Hide();
             }
+            else
+            {
+                this.interpreter.stopProgram();
+            }
         }
 
         // ---------------------------------------------
@@ -87,12 +93,16 @@ namespace pseudocodeIde
 
         private void startMenuItem_Click(object sender, EventArgs e)
         {
+            this.stopMenuItem_Click(null, null);
+
             startMenuItem.Enabled = false;
             stopMenuItem.Enabled = true;
 
             runTaskCancelTokenSource = new CancellationTokenSource();
             runTaskCancelToken = runTaskCancelTokenSource.Token;
-            this.runTask = Task.Run(() =>this.interpreter.run());
+
+            outputText = "";
+            this.runTask = Task.Run(() => this.interpreter.run());
         }
 
         public void stopMenuItem_Click(object sender, EventArgs e)
@@ -114,15 +124,6 @@ namespace pseudocodeIde
             }
 
             this.interpreter.stopProgram();
-        }
-
-        public void scrollRtbOutputToEnd()
-        {
-            Invoke(new Action(() =>
-            {
-                rtbOutput.SelectionStart = rtbOutput.Text.Length;
-                rtbOutput.ScrollToCaret();
-            }));
         }
     }
 }

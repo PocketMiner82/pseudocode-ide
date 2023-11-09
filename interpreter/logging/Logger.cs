@@ -33,7 +33,6 @@ namespace pseudocodeIde.interpreter.logging
             if (outputForm != null)
             {
                 outputForm.outputText += message + "\n";
-                outputForm.scrollRtbOutputToEnd();
             }
         }
     }

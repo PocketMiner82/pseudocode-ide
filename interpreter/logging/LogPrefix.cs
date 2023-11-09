@@ -6,6 +6,8 @@ namespace pseudocodeIde.interpreter.logging
     {
         public const string INFO = "[INFO ] ";
 
+        public const string DEBUG = "[DEBUG] ";
+
         public const string ERROR = "[ERROR] ";
 
         public static string TIMESTAMP

@@ -17,13 +17,13 @@ using System.Threading;
 
 namespace codeOutput {
     public class CodeOutput : BaseCodeOutput {
-        %FIELDS%
+%FIELDS%
 
         public CodeOutput(Action<string> printMethod) : base(printMethod) {
-            %CONSTRUCTOR%
+%CONSTRUCTOR%
         }
 
-        %METHODS%
+%METHODS%
     }
 
     public class BaseCodeOutput {
@@ -55,6 +55,7 @@ namespace codeOutput {
 
         public void compile()
         {
+
             CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
 
             CompilerParameters parameters = new CompilerParameters();
@@ -77,18 +78,19 @@ namespace codeOutput {
                 .Replace("%CONSTRUCTOR%", this.constructor)
                 .Replace("%METHODS%", this.methods);
 
+            Logger.print($"\n{code}\n");
+
+            Logger.info(LogMessage.COMPILING_C_SHARP_CODE);
 
             CompilerResults result = provider.CompileAssemblyFromSource(parameters, code);
 
-            Logger.info($"C# code:\n\n{code}\n");
-
             if (result.Errors.Count > 0)
             {
-                Logger.error($"Following errors occurred:");
+                Logger.error($"The following error(s) occurred while compiling:");
 
                 foreach(CompilerError error in result.Errors)
                 {
-                    Logger.error($"- {error}");
+                    Logger.error($"\t{error}");
                 }
 
                 return;
