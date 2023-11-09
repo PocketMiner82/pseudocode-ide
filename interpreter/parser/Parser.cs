@@ -11,7 +11,7 @@ namespace pseudocodeIde.interpreter
 {
     public class Parser
     {
-        private const string FUNCTION_HEADER_TEMPLATE = "protected %type% %identifier%(%insideParens%) { ";
+        private const string FUNCTION_HEADER_TEMPLATE = "private %type% %identifier%(%insideParens%) {";
 
         private static readonly Dictionary<TokenType, string> TOKEN_TO_CSHARP = new Dictionary<TokenType, string>();
 
@@ -56,7 +56,7 @@ namespace pseudocodeIde.interpreter
 
             TOKEN_TO_CSHARP.Add(BREAK, "break");
 
-            TOKEN_TO_CSHARP.Add(RETURN, "return");
+            TOKEN_TO_CSHARP.Add(RETURN, "return ");
 
             TOKEN_TO_CSHARP.Add(VAR_ASSIGN, "=");
 
@@ -103,7 +103,7 @@ namespace pseudocodeIde.interpreter
             if (!this.isInConstructor)
             {
                 // function end
-                this.addCode((NO_SEMICOLON_AFTER.Contains(this.cSharpCode.methods.LastOrDefault()) ? "" : ";") + "\n");
+                this.addCode((NO_SEMICOLON_AFTER.Contains(this.cSharpCode.methods.LastOrDefault()) ? "" : ";") + "\n}\n");
             }
 
             return this.cSharpCode;
@@ -385,7 +385,7 @@ namespace pseudocodeIde.interpreter
                 {
                     if (this.isInConstructor && !insideFunctionParens)
                     {
-                        this.cSharpCode.fields += $"protected {TOKEN_TO_CSHARP[possibleVarType.type]} _{identifier.lexeme};\n";
+                        this.cSharpCode.fields += $"private {TOKEN_TO_CSHARP[possibleVarType.type]} _{identifier.lexeme};\n";
 
                         if (possibleVarAssign.type == VAR_ASSIGN)
                         {
@@ -493,7 +493,7 @@ namespace pseudocodeIde.interpreter
 
             if (!this.isInConstructor)
             {
-                output += ";\n}\n\n";
+                output += (NO_SEMICOLON_AFTER.Contains(output.LastOrDefault()) ? "" : ";")  + "}\n\n";
             }
 
             this.isInConstructor = false;

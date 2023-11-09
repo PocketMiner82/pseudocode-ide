@@ -17,13 +17,22 @@ using System.Threading;
 
 namespace codeOutput {
     public class CodeOutput : BaseCodeOutput {
+// GENERATED FIELDS START
+
 %FIELDS%
+// GENERATED FIELDS END
 
         public CodeOutput(Action<string> printMethod) : base(printMethod) {
+// GENERATED CONSTRUCTOR START
+
 %CONSTRUCTOR%
+// GENERATED CONSTRUCTOR END
         }
 
+// GENERATED METHODS START
+
 %METHODS%
+// GENERATED METHODS END
     }
 
     public class BaseCodeOutput {
