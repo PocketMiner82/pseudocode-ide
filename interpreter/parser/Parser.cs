@@ -9,7 +9,7 @@ namespace pseudocodeIde.interpreter
 {
     public class Parser
     {
-        private const string FUNCTION_HEADER_TEMPLATE = "protected {type} {identifier}(%insideParens%) {\n";
+        private const string FUNCTION_HEADER_TEMPLATE = "protected %type% %identifier%(%insideParens%) { ";
 
         private LinkedList<Token> tokens;
 
@@ -23,15 +23,13 @@ namespace pseudocodeIde.interpreter
 
         static Parser()
         {
-            tokenToCSharp.Add(WHITESPACE, " ");
-            tokenToCSharp.Add(LEFT_PAREN, "(");
-            tokenToCSharp.Add(RIGHT_PAREN, ")");
-
             tokenToCSharp.Add(TYPE_BOOL, "bool");
             tokenToCSharp.Add(TYPE_INT, "int");
             tokenToCSharp.Add(TYPE_DOUBLE, "double");
             tokenToCSharp.Add(TYPE_CHAR, "char");
             tokenToCSharp.Add(TYPE_STRING, "string");
+            tokenToCSharp.Add(TYPE_VOID, "void");
+            tokenToCSharp.Add(RETURN, "return");
 
             tokenToCSharp.Add(VAR_ASSIGN, "=");
         }
@@ -65,7 +63,7 @@ namespace pseudocodeIde.interpreter
             if (!this.isInConstructor)
             {
                 // function end
-                this.addCode("}");
+                this.addCode(";\n}");
             }
 
             return this.cSharpCode;
@@ -87,7 +85,7 @@ namespace pseudocodeIde.interpreter
             switch (token.type)
             {
                 case IDENTIFIER:
-                    return this.tryHandleVarDef();
+                    return this.tryHandleVarDef(insideFunctionParens);
 
                 case NEW_LINE:
                     return ";\n";
@@ -104,7 +102,7 @@ namespace pseudocodeIde.interpreter
             }
         }
 
-        private string tryHandleVarDef()
+        private string tryHandleVarDef(bool insideFunctionParens)
         {
             string output = "";
 
@@ -117,7 +115,7 @@ namespace pseudocodeIde.interpreter
             {
                 if(this.isVarType(possibleVarType.type))
                 {
-                    if (this.isInConstructor)
+                    if (this.isInConstructor && !insideFunctionParens)
                     {
                         this.cSharpCode.fields += $"protected {tokenToCSharp[possibleVarType.type]} _{currentToken.lexeme};\n";
 
@@ -162,6 +160,8 @@ namespace pseudocodeIde.interpreter
         {
             string output = "";
             string insideParens = "";
+            TokenType type = TYPE_VOID;
+
             Token operationKeyword = this.currentToken.Value;
 
             Token possibleIdentifier = this.advance();
@@ -169,10 +169,9 @@ namespace pseudocodeIde.interpreter
 
             Token possibleRightParen = this.advance();
             Token possibleColon = this.currentToken.Next.Value;
-            Token possibleType = this.currentToken.Next.Value;
-            Token possibleNewLine = this.currentToken.Next.Value;
+            Token possibleType = this.currentToken.Next.Next.Value;
 
-            if (possibleIdentifier.type != IDENTIFIER && possibleLeftParen.type != LEFT_PAREN)
+            if (possibleIdentifier.type != IDENTIFIER || possibleLeftParen.type != LEFT_PAREN)
             {
                 Logger.error(operationKeyword.line, "Unexpected symbols after OPERATION keyword.");
                 return "";
@@ -186,39 +185,41 @@ namespace pseudocodeIde.interpreter
                     Logger.error(operationKeyword.line, "New line before OPERATION definition end.");
                     return "\n";
                 }
-                else if (possibleRightParen.type != RIGHT_PAREN
-                      && possibleColon.type != COLON
-                      && !this.isVarType(possibleType.type)
-                      && possibleNewLine.type != NEW_LINE)
+                else if (possibleRightParen.type == RIGHT_PAREN
+                      && possibleColon.type == COLON
+                      && this.isVarType(possibleType.type))
+                {
+                    type = possibleType.type;
+                    this.advance(2);
+                    break;
+                }
+                else if (possibleRightParen.type == RIGHT_PAREN)
+                {
+                    break;
+                }
+                else if (possibleRightParen.type != RIGHT_PAREN)
                 {
                     insideParens += this.parseToken(true);
                     possibleRightParen = this.advance();
                     possibleColon = this.currentToken.Next.Value;
-                    possibleType = this.currentToken.Next.Value;
-                    possibleNewLine = this.currentToken.Next.Value;
-                }
-                else if (possibleRightParen.type == RIGHT_PAREN
-                      && possibleColon.type == COLON
-                      && this.isVarType(possibleType.type)
-                      && possibleNewLine.type == NEW_LINE)
-                {
-                    break;
+                    possibleType = this.currentToken.Next.Next.Value;
                 }
                 else
                 {
-                    Logger.error(operationKeyword.line, "Unexpected symbols after OPERATION keyword.");
+                    Logger.error(operationKeyword.line, "Unexpected symbols in operation line.");
+                    return "";
                 }
             }
 
             if (!this.isInConstructor)
             {
-                output += "}\n\n";
+                output += ";\n}\n\n";
             }
 
             this.isInConstructor = false;
 
             return output + FUNCTION_HEADER_TEMPLATE
-                .Replace("%type%", tokenToCSharp[possibleType.type])
+                .Replace("%type%", tokenToCSharp[type])
                 .Replace("%identifier%", "_" + possibleIdentifier.lexeme)
                 .Replace("%insideParens%", insideParens);
         }
