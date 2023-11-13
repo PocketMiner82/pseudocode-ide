@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using pseudocodeIde.findReplace;
 using System.Diagnostics;
+using pseudocode_ide;
+using Newtonsoft.Json;
 
 namespace pseudocodeIde
 {
@@ -91,16 +93,13 @@ namespace pseudocodeIde
         private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
             Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
+            this.setFileNotSaved();
         }
 
         private void codeTextBox_TextChanged(object sender, EventArgs e)
         {
             // when the code is modified, the code is no longer saved in the file
-            this.isSaved = false;
-            if (!Text.EndsWith("*"))
-            {
-                Text += "*";
-            }
+            this.setFileNotSaved();
 
             // only update undo stack if next event not ignored
             if (this.ignoreTextChange)
@@ -228,8 +227,8 @@ namespace pseudocodeIde
             codeTextBox.Clear();
             this.resetUndoRedo();
             Text = "Pseudocode IDE - New File";
-            this.isSaved = true;
             this.filePath = "";
+            this.setFileSaved();
         }
 
         private void openMenuItem_Click(object sender, EventArgs e)
@@ -258,6 +257,22 @@ namespace pseudocodeIde
                 saveFile();
             }
 
+        }
+
+        private void setFileSaved()
+        {
+            this.isSaved = true;
+            saveMenuItem.Enabled = false;
+        }
+
+        private void setFileNotSaved()
+        {
+            this.isSaved = false;
+            if (!Text.EndsWith("*"))
+            {
+                Text += "*";
+            }
+            saveMenuItem.Enabled = true;
         }
 
         public bool saveFileDialog()
@@ -289,13 +304,15 @@ namespace pseudocodeIde
 
         private void saveFile()
         {
+            PseudocodeFile pFile = new PseudocodeFile(Scanner.singleEqualIsCompareOperator, codeTextBox.Lines);
+
             // write to disk
             using (StreamWriter outputFile = new StreamWriter(this.filePath))
             {
-                outputFile.Write(codeTextBox.Text);
+                outputFile.Write(JsonConvert.SerializeObject(pFile, Formatting.Indented));
             }
 
-            this.isSaved = true;
+            this.setFileSaved();
             Text = "Pseudocode IDE - " + this.filePath;
         }
 
@@ -324,12 +341,15 @@ namespace pseudocodeIde
             using (StreamReader file = new StreamReader(this.filePath))
             {
                 this.ignoreTextChange = true;
-                codeTextBox.Text = file.ReadToEnd();
+                PseudocodeFile pFile = JsonConvert.DeserializeObject<PseudocodeFile>(file.ReadToEnd());
+
+                codeTextBox.Lines = pFile.fileContent;
+                singleEqualIsCompareOperatorMenuItem.Checked = pFile.singleEqualIsCompareOperator;
 
                 this.resetUndoRedo();
             }
 
-            this.isSaved = true;
+            this.setFileSaved();
             Text = "Pseudocode IDE - " + this.filePath;
         }
 
