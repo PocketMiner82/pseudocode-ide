@@ -31,36 +31,39 @@ namespace pseudocodeIde.interpreter
 
         static Parser()
         {
-            TOKEN_TO_CSHARP.Add(TYPE_BOOL, "bool");
-            TOKEN_TO_CSHARP.Add(TYPE_INT, "int");
-            TOKEN_TO_CSHARP.Add(TYPE_DOUBLE, "double");
-            TOKEN_TO_CSHARP.Add(TYPE_CHAR, "char");
-            TOKEN_TO_CSHARP.Add(TYPE_STRING, "string");
-            TOKEN_TO_CSHARP.Add(TYPE_VOID, "void");
+            TOKEN_TO_CSHARP.Add(TYPE_BOOL,      "bool");
+            TOKEN_TO_CSHARP.Add(TYPE_INT,       "int");
+            TOKEN_TO_CSHARP.Add(TYPE_DOUBLE,    "double");
+            TOKEN_TO_CSHARP.Add(TYPE_CHAR,      "char");
+            TOKEN_TO_CSHARP.Add(TYPE_STRING,    "string");
+            TOKEN_TO_CSHARP.Add(TYPE_VOID,      "void");
 
-            TOKEN_TO_CSHARP.Add(END_IF, "}");
-            TOKEN_TO_CSHARP.Add(END_FOR, "}");
-            TOKEN_TO_CSHARP.Add(END_WHILE, "}");
-            TOKEN_TO_CSHARP.Add(END_SWITCH, "}");
+            TOKEN_TO_CSHARP.Add(END_IF,         "}");
+            TOKEN_TO_CSHARP.Add(END_FOR,        "}");
+            TOKEN_TO_CSHARP.Add(END_WHILE,      "}");
+            TOKEN_TO_CSHARP.Add(END_SWITCH,     "}");
 
-            TOKEN_TO_CSHARP.Add(IF, "if");
-            TOKEN_TO_CSHARP.Add(ELSE, "} else {");
+            TOKEN_TO_CSHARP.Add(IF,             "if");
+            TOKEN_TO_CSHARP.Add(ELSE,           "} else {");
 
-            TOKEN_TO_CSHARP.Add(WHILE, "while");
+            TOKEN_TO_CSHARP.Add(WHILE,          "while");
 
-            TOKEN_TO_CSHARP.Add(AND, "&&");
-            TOKEN_TO_CSHARP.Add(OR, "||");
+            TOKEN_TO_CSHARP.Add(AND,            "&&");
+            TOKEN_TO_CSHARP.Add(OR,             "||");
 
-            TOKEN_TO_CSHARP.Add(TRUE, "true");
-            TOKEN_TO_CSHARP.Add(FALSE, "false");
+            TOKEN_TO_CSHARP.Add(TRUE,           "true");
+            TOKEN_TO_CSHARP.Add(FALSE,          "false");
 
-            TOKEN_TO_CSHARP.Add(BREAK, "break");
+            TOKEN_TO_CSHARP.Add(BREAK,          "break");
 
-            TOKEN_TO_CSHARP.Add(RETURN, "return ");
+            TOKEN_TO_CSHARP.Add(RETURN,         "return ");
 
-            TOKEN_TO_CSHARP.Add(VAR_ASSIGN, "=");
+            TOKEN_TO_CSHARP.Add(VAR_ASSIGN,     "=");
 
-            TOKEN_TO_CSHARP.Add(EQUAL, "==");
+            TOKEN_TO_CSHARP.Add(EQUAL,          "==");
+
+            TOKEN_TO_CSHARP.Add(TYPE_LIST,      "Liste");
+            TOKEN_TO_CSHARP.Add(NEW,            "new ");
 
 
             NO_SEMICOLON_AFTER.Add('}');
@@ -430,6 +433,7 @@ namespace pseudocodeIde.interpreter
                 case TYPE_DOUBLE:
                 case TYPE_CHAR:
                 case TYPE_STRING:
+                case TYPE_LIST:
                     return true;
                 default:
                     return false;

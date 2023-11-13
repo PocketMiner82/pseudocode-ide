@@ -41,6 +41,20 @@ namespace codeOutput {
             Thread.Sleep(millis);
         }
     }
+
+    public class Liste<T> : List<T> {
+        public void _anhaengen(T value) {
+            Add(value);
+        }
+
+        public T _gib(int index) {
+            return this[index];
+        }
+
+        public void _ersetzen(int index, T value) {
+            this[index] = value;
+        }
+    }
 }
 ";
 

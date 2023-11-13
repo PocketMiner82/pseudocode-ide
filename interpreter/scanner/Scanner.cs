@@ -69,6 +69,9 @@ namespace pseudocodeIde.interpreter
             keywords.Add("Text",            TYPE_STRING);
             keywords.Add("String",          TYPE_STRING);
             keywords.Add("string",          TYPE_STRING);
+
+            keywords.Add("Liste",           TYPE_LIST);
+            keywords.Add("NEU",             NEW);
                                             
             keywords.Add("NICHTS",          NULL);
         }
@@ -104,10 +107,8 @@ namespace pseudocodeIde.interpreter
                 // single char lexems
                 case '(': this.addToken(LEFT_PAREN); break;
                 case ')': this.addToken(RIGHT_PAREN); break;
-                //case '{': this.addToken(LEFT_BRACE); break;
-                //case '}': this.addToken(RIGHT_BRACE); break;
-                //case '[': this.addToken(LEFT_BRACKET); break;
-                //case ']': this.addToken(RIGHT_BRACKET); break;
+                case '[': this.addToken(LEFT_BRACKET); break;
+                case ']': this.addToken(RIGHT_BRACKET); break;
                 case ',': this.addToken(COMMA); break;
                 case '.': this.addToken(DOT); break;
                 case '-': this.addToken(MINUS); break;
@@ -115,6 +116,8 @@ namespace pseudocodeIde.interpreter
                 case ';': this.addToken(SEMICOLON); break;
                 case '*': this.addToken(STAR); break;
                 case '←': this.addToken(VAR_ASSIGN); break;
+                case '&': this.addToken(SINGLE_AND); break;
+                case '|': this.addToken(SINGLE_OR); break;
 
                 // single or two char lexems
                 case '!':
