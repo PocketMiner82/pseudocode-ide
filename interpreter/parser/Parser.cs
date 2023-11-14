@@ -164,7 +164,7 @@ namespace pseudocodeIde.interpreter
                         }
                         else
                         {
-                            Logger.error(possibleLeftBracket.line, $"Expected ], not '{this.currentToken.Value.lexeme}'");
+                            Logger.error(possibleLeftBracket.line, $"']' erwartet, nicht '{this.currentToken.Value.lexeme}'.");
                             return "";
                         }
                     }
@@ -198,7 +198,7 @@ namespace pseudocodeIde.interpreter
 
             if (this.isAtEnd() || currentToken.type == NEW_LINE)
             {
-                Logger.error(currentToken.line, "Expected IN or BIS in FÜR definition before end of line.");
+                Logger.error(currentToken.line, "IN oder BIS in der FÜR-Definition erwartet.");
                 return "";
             }
 
@@ -219,7 +219,7 @@ namespace pseudocodeIde.interpreter
 
                 if (this.isAtEnd() || currentToken.type == NEW_LINE)
                 {
-                    Logger.error(currentToken.line, "Expected SCHRITT in FÜR definition before end of line.");
+                    Logger.error(currentToken.line, "SCHRITT in der FÜR-Definition erwartet.");
                     return "";
                 }
 
@@ -295,7 +295,7 @@ namespace pseudocodeIde.interpreter
 
             if (this.isAtEnd())
             {
-                Logger.error(currentToken.line, "Expected SOLANGE before end of file.");
+                Logger.error(currentToken.line, "SOLANGE vor Dateiende erwartet.");
                 return "";
             }
 
@@ -329,7 +329,7 @@ namespace pseudocodeIde.interpreter
 
                 if (this.isAtEnd() || currentToken.type == NEW_LINE)
                 {
-                    Logger.error(switchKeyword.line, "Expected GLEICH before end of line.");
+                    Logger.error(switchKeyword.line, "GLEICH vor Zeilenende erwartet.");
                     return "";
                 }
             }
@@ -350,7 +350,7 @@ namespace pseudocodeIde.interpreter
 
                 if (this.isAtEnd())
                 {
-                    Logger.error(currentToken.line, "Expected ENDE FALLS before end of file.");
+                    Logger.error(currentToken.line, "ENDE FALLS vor Dateiende erwartet.");
                     return "";
                 }
 
@@ -441,7 +441,7 @@ namespace pseudocodeIde.interpreter
                 }
                 else
                 {
-                    Logger.error(possibleVarType.line, $"Expected type for variable definition, not '{possibleVarType.lexeme}'");
+                    Logger.error(possibleVarType.line, $"Für die Variablendefinition wurde die Angabe eines Typs erwartet, nicht '{possibleVarType.lexeme}'");
                 }
             }
             // special case for for loop
@@ -480,7 +480,7 @@ namespace pseudocodeIde.interpreter
                     Token possibleGreaterSign = this.currentToken.NextOrLast().NextOrLast().Value;
                     if (possibleGreaterSign.type != GREATER)
                     {
-                        Logger.error(possibleVarType.line, $"Expected '>', not '{possibleGreaterSign.lexeme}'");
+                        Logger.error(possibleVarType.line, $"'>' erwartet, nicht '{possibleGreaterSign.lexeme}'");
                         return "";
                     }
                     output += ">";
@@ -527,7 +527,7 @@ namespace pseudocodeIde.interpreter
 
             if (possibleIdentifier.type != IDENTIFIER || possibleLeftParen.type != LEFT_PAREN)
             {
-                Logger.error(operationKeyword.line, "Unexpected symbols after OPERATION keyword.");
+                Logger.error(operationKeyword.line, "Unerwartete Zeichen nach dem OPERATION-Keyword.");
                 return "";
             }
 
@@ -536,7 +536,7 @@ namespace pseudocodeIde.interpreter
             {
                 if (possibleRightParen.type == NEW_LINE)
                 {
-                    Logger.error(operationKeyword.line, "New line before OPERATION definition end.");
+                    Logger.error(operationKeyword.line, "Neue Zeile vor dem Ende der OPERATION-Definition.");
                     return "\n";
                 }
                 else if (possibleRightParen.type == RIGHT_PAREN
@@ -560,7 +560,7 @@ namespace pseudocodeIde.interpreter
                 }
                 else
                 {
-                    Logger.error(operationKeyword.line, "Unexpected symbols in operation line.");
+                    Logger.error(operationKeyword.line, "Unerwartete Zeichen.");
                     return "";
                 }
             }

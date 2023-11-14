@@ -1,4 +1,5 @@
-﻿using pseudocodeIde.interpreter.logging;
+﻿using Newtonsoft.Json.Linq;
+using pseudocodeIde.interpreter.logging;
 using pseudocodeIde.interpreter.parser;
 using System;
 using System.Collections.Generic;
@@ -63,14 +64,8 @@ namespace pseudocodeIde.interpreter
                 return false;
             }
 
-            foreach (Token token in tokens)
-            {
-                if (OutputForm.runTaskCancelToken.IsCancellationRequested)
-                {
-                    return false;
-                }
-                Logger.info(token.ToString());
-            }
+            string tokensString = string.Join(", ", tokens);
+            Logger.info($"Generierte Tokens: {tokensString}");
 
             Parser parser = new Parser(tokens);
             CSharpCode cSharpCode = parser.parseTokens();

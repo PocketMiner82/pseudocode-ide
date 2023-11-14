@@ -2,9 +2,10 @@
 {
     public static class LogMessage
     {
-        public const string GENERATING_C_SHARP_CODE = "Generating C# code...";
-        public const string COMPILING_C_SHARP_CODE = "Compiling C# code...";
+        public const string GENERATING_C_SHARP_CODE = "Generiere C#-Code...";
+        public const string COMPILING_C_SHARP_CODE = "Kompiliere C#-Code...";
 
-        public const string RUNNING_PROGRAM = "Running program...";
+        public const string RUNNING_PROGRAM = "Programm wird ausgeführt...";
+        public static string COMPILE_ERRORS = "Beim Kompilieren sind folgende Fehler aufgetreten:";
     }
 }

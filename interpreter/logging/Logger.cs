@@ -17,15 +17,9 @@ namespace pseudocodeIde.interpreter.logging
             Interpreter.hadError = true;
         }
 
-        public static void error(int line, string msg, string what = "")
+        public static void error(int line, string msg)
         {
-            error($"{what}line {line}: {msg}");
-        }
-
-        public static void runtimeError(RuntimeError runtimeError)
-        {
-            error(runtimeError.line, runtimeError.Message, "while executing ");
-            Interpreter.hadRuntimeError = true;
+            error($"Zeile {line}: {msg}");
         }
 
         public static void print(string message)

@@ -193,7 +193,7 @@ namespace pseudocodeIde.interpreter
                     }
                     else
                     {
-                        Logger.error(line, "Unexpected character.");
+                        Logger.error(this.line, $"Unerwartetes Zeichen: '{c}'.");
                     }
                     break;
             }
@@ -257,7 +257,7 @@ namespace pseudocodeIde.interpreter
             {
                 if (!textEmpty)
                 {
-                    Logger.error(this.line, "Expected closing type after 'ENDE'");
+                    Logger.error(this.line, "Nach 'ENDE' muss die zu schließende Anweisung stehen.");
                     return;
                 }
 
@@ -313,12 +313,12 @@ namespace pseudocodeIde.interpreter
 
             if (i > 0)
             {
-                Logger.error(this.line, "Too many characters in character literal.");
+                Logger.error(this.line, "Zu viele Zeichen im Zeichenliteral.");
                 return;
             }
             else if (this.isAtEnd())
             {
-                Logger.error(this.line, "Unterminated char.");
+                Logger.error(this.line, "Nicht abgeschlossenes Zeichenliteral.");
                 return;
             }
 
@@ -340,7 +340,7 @@ namespace pseudocodeIde.interpreter
 
             if (this.isAtEnd())
             {
-                Logger.error(line, "Unterminated string.");
+                Logger.error(line, "Nicht abgeschlossene Zeichenkette.");
                 return;
             }
 

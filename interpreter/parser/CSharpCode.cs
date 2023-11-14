@@ -12,6 +12,7 @@ namespace pseudocodeIde.interpreter.parser
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace codeOutput {
     public class CodeOutput : BaseCodeOutput {
@@ -37,6 +38,30 @@ namespace codeOutput {
 
         protected virtual void _warte(int millis) {
             Thread.Sleep(millis);
+        }
+
+        protected virtual string _benutzereingabe(string text, string title)
+        {
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 200,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = title,
+                StartPosition = FormStartPosition.CenterScreen,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+            Label textLabel = new Label() { Location = new System.Drawing.Point(12, 24), Size = new System.Drawing.Size(454, 42), Text=text };
+            TextBox textBox = new TextBox() { Location = new System.Drawing.Point(12, 69), Size = new System.Drawing.Size(454, 42) };
+            Button confirmation = new Button() { Text = ""OK"", Location = new System.Drawing.Point(373, 101), Size = new System.Drawing.Size(93, 31), DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : """";
         }
     }
 
@@ -67,7 +92,6 @@ namespace codeOutput {
 
         public void compile()
         {
-
             CodeDomProvider provider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider();
 
             CompilerParameters parameters = new CompilerParameters();
@@ -100,7 +124,7 @@ namespace codeOutput {
 
             if (result.Errors.Count > 0)
             {
-                Logger.error($"The following error(s) occurred while compiling:");
+                Logger.error(LogMessage.COMPILE_ERRORS);
 
                 foreach(CompilerError error in result.Errors)
                 {
