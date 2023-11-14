@@ -1,4 +1,5 @@
-﻿using System;
+﻿using pseudocodeIde.interpreter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,7 +42,7 @@ namespace pseudocodeIde
                     indexes.Add(index);
                 }
             }
-            
+
             return indexes;
         }
 
@@ -60,6 +61,11 @@ namespace pseudocodeIde
                 }
             }
             return indentationLevel;
+        }
+
+        public static LinkedListNode<Token> NextOrLast(this LinkedListNode<Token> node)
+        {
+            return node.Next == null ? node : node.Next;
         }
     }
 }

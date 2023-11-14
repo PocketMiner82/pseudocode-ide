@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using pseudocodeIde.findReplace;
-using System.Diagnostics;
 using pseudocode_ide;
 using Newtonsoft.Json;
 
@@ -200,7 +199,7 @@ namespace pseudocodeIde
 
             if (!this.isSaved)
             {
-                if (MessageBox.Show("Do you want to save them?", "Unsaved changes", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("Möchtest du deine ungespeicherten Änderungen speichern?", "Ungespeicherte Änderungen", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     this.saveMenuItem_Click(null, null);
                 }
@@ -215,7 +214,8 @@ namespace pseudocodeIde
         {
             if (!this.isSaved)
             {
-                if (MessageBox.Show("Do you really want to create a new file?\nAll unsaved changes will be lost.", "Unsaved changes",
+                if (MessageBox.Show("Möchtest du wirklich eine neue Datei erstellen?\n" +
+                    "Alle ungespeicherten Änderungen gehen verloren!", "Ungespeicherte Änderungen",
                     MessageBoxButtons.YesNo) == DialogResult.No)
                 {
                     return;
@@ -226,7 +226,7 @@ namespace pseudocodeIde
             this.ignoreTextChange = true;
             codeTextBox.Clear();
             this.resetUndoRedo();
-            Text = "Pseudocode IDE - New File";
+            Text = "Pseudocode IDE - Neue Datei";
             this.filePath = "";
             this.setFileSaved();
         }
@@ -235,7 +235,8 @@ namespace pseudocodeIde
         {
             if (!this.isSaved)
             {
-                if (MessageBox.Show("Do you really want to open a new file?\nAll unsaved changes will be lost.", "Unsaved changes",
+                if (MessageBox.Show("Möchtest du wirklich eine andere Datei öffnen?\n" +
+                    "Alle ungespeicherten Änderungen gehen verloren!", "Ungespeicherte Änderungen",
                     MessageBoxButtons.YesNo) == DialogResult.No)
                 {
                     return;
@@ -279,10 +280,10 @@ namespace pseudocodeIde
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                saveFileDialog.Filter = "Pseudocode File (*.pseudocode)|*.pseudocode|All files (*.*)|*.*";
+                saveFileDialog.Filter = "Pseudocode Datei (*.pseudocode)|*.pseudocode|Alle Dateien (*.*)|*.*";
                 saveFileDialog.FilterIndex = 1;
                 saveFileDialog.RestoreDirectory = true;
-                saveFileDialog.Title = "New Pseudocode File";
+                saveFileDialog.Title = "Neue Pseudocode Datei";
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -320,10 +321,10 @@ namespace pseudocodeIde
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Pseudocode File (*.pseudocode)|*.pseudocode|All files (*.*)|*.*";
+                openFileDialog.Filter = "Pseudocode Datei (*.pseudocode)|*.pseudocode|Alle Dateien (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
-                openFileDialog.Title = "Open Pseudocode File"; ;
+                openFileDialog.Title = "Pseudocode Datei öffnen"; ;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -341,7 +342,18 @@ namespace pseudocodeIde
             using (StreamReader file = new StreamReader(this.filePath))
             {
                 this.ignoreTextChange = true;
-                PseudocodeFile pFile = JsonConvert.DeserializeObject<PseudocodeFile>(file.ReadToEnd());
+                PseudocodeFile pFile;
+                try
+                {
+                    pFile = JsonConvert.DeserializeObject<PseudocodeFile>(file.ReadToEnd());
+                }
+                catch
+                {
+                    MessageBox.Show("Konnte den JSON Code in '" + this.filePath + "' nicht parsen.", "Fehler");
+                    this.filePath = "";
+                    this.ignoreTextChange = false;
+                    return;
+                }
 
                 codeTextBox.Lines = pFile.fileContent;
                 singleEqualIsCompareOperatorMenuItem.Checked = pFile.singleEqualIsCompareOperator;
@@ -575,18 +587,19 @@ namespace pseudocodeIde
 
         private void showHelpMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Basic Usage:\n" +
-                            "Just write code and execute it as defined in the \"Formelsammlung 1.5.2 TG Informationstechnik\" for the Abitur 2024.\n\n" +
-                            "Additional operators:\n" +
-                            "&& - defined as and operator\n" +
-                            "|| - defined as or operator\n\n" +
-                            "Not implemented:\n" +
-                            "- multiple files\n" +
-                            "- classes/objects: requires multiple files\n" +
-                            /*"- lists: is a class" +
-                            "- FÜR ... IN ...: unnecessary without lists",*/
+            MessageBox.Show("Grundlegende Verwendung:\n" +
+                            "Dieses Programm ermöglicht die Ausführung von Pseudocode nach der \"Formelsammlung 1.5.2 TG Informationstechnik\" für das Abitur 2024 in Baden Württemberg.\n\n" +
+                            "Zusätzlich zu der Definition in der Formelsammlung wurden folgende Operationen definiert:\n" +
+                            "UND - Und-Vergleich\n" +
+                            "ODER - Oder-Vergleich\n" +
+                            "schreibe(<text>) - Schreibt den gegeben Text in das Ausgabefenster\n" +
+                            "warte(<zeitMs>) - Delay für eine bestimmte Zeit in Millisekunden\n" +
+                            "benutzereingabe(<text>, <titel>):string - Öffnet ein Dialogfenster. Gibt den eingegebenen Text zurück.\n\n" +
+                            "Nicht implementiert:\n" +
+                            "- Unterstützung für mehrere Dateien\n" +
+                            "- Klassen/Objekte - erfordert Unterstützung für mehrere Dateien\n",
 
-                            "Pseudocode IDE - Help"
+                            "Pseudocode IDE - Hilfe"
             );
         }
     }

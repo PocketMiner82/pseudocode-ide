@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace pseudocode_ide
+﻿namespace pseudocode_ide
 {
     public class PseudocodeFile
     {

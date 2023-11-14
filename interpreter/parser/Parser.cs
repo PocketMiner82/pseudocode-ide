@@ -1,9 +1,6 @@
 ﻿using pseudocodeIde.interpreter.logging;
 using pseudocodeIde.interpreter.parser;
-using pseudocodeIde.interpreter.sequences;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using static pseudocodeIde.interpreter.TokenType;
 
@@ -141,6 +138,37 @@ namespace pseudocodeIde.interpreter
 
                 case NEW_LINE:
                     return (NO_SEMICOLON_AFTER.Contains(prevChar) ? "" : ";") + "\n";
+
+                case VAR_ASSIGN:
+                    string output = TOKEN_TO_CSHARP[token.type];
+                    Token possibleLeftBracket = this.peek();
+                    if (possibleLeftBracket.type == LEFT_BRACKET)
+                    {
+                        this.advance();
+                        output += "new() {";
+
+                        while(!this.isAtEnd() && this.peek().type != RIGHT_BRACKET && this.peek().type == NEW_LINE)
+                        {
+                            output += this.parseToken(this.advance().lexeme.Last(), true);
+                        }
+
+                        if (!this.isAtEnd() && this.peek().type == RIGHT_BRACKET)
+                        {
+                            this.advance();
+                            output += "}";
+
+                            if (this.peek().type == NEW_LINE)
+                            {
+                                output += ";";
+                            }
+                        }
+                        else
+                        {
+                            Logger.error(possibleLeftBracket.line, $"Expected ], not '{this.currentToken.Value.lexeme}'");
+                            return "";
+                        }
+                    }
+                    return output;
 
                 default:
                     if (TOKEN_TO_CSHARP.ContainsKey(token.type))
@@ -378,17 +406,25 @@ namespace pseudocodeIde.interpreter
             string output = "";
 
             Token identifier = this.currentToken.Value;
-            Token possibleColon = this.currentToken.Next.Value;
-            Token possibleVarType = this.currentToken.Next.Next.Value;
-            Token possibleVarAssign = this.currentToken.Next.Next.Next.Value;
+            Token possibleColon = this.currentToken.NextOrLast().Value;
+            Token possibleVarType = this.currentToken.NextOrLast().NextOrLast().Value;
+            Token possibleVarAssign = this.currentToken.NextOrLast().NextOrLast().NextOrLast().Value;
 
             if (possibleColon.type == COLON)
             {
                 if(this.isVarType(possibleVarType.type))
                 {
+                    string type = TOKEN_TO_CSHARP[possibleVarType.type];
+                    if (possibleVarAssign.type == LESS)
+                    {
+                        this.advance();
+                        type = this.tryHandleTypedVarType();
+                        possibleVarAssign = this.currentToken.NextOrLast().NextOrLast().NextOrLast().Value;
+                    }
+
                     if (this.isInConstructor && !insideFunctionParens)
                     {
-                        this.cSharpCode.fields += $"private {TOKEN_TO_CSHARP[possibleVarType.type]} _{identifier.lexeme};\n";
+                        this.cSharpCode.fields += $"private {type} _{identifier.lexeme};\n";
 
                         if (possibleVarAssign.type == VAR_ASSIGN)
                         {
@@ -397,7 +433,7 @@ namespace pseudocodeIde.interpreter
                     }
                     else
                     {
-                        output += $"{TOKEN_TO_CSHARP[possibleVarType.type]} _{identifier.lexeme}";
+                        output += $"{type} _{identifier.lexeme}";
                     }
 
                     this.advance(2);
@@ -422,6 +458,40 @@ namespace pseudocodeIde.interpreter
             }
 
             return "_" + identifier.lexeme;
+        }
+
+        private string tryHandleTypedVarType()
+        {
+            string output = "";
+
+            Token possibleVarType = this.currentToken.NextOrLast().Value;
+            Token possibleLessSign = this.currentToken.NextOrLast().NextOrLast().Value;
+
+            if (this.isVarType(possibleVarType.type))
+            {
+                string type = TOKEN_TO_CSHARP[possibleVarType.type];
+                if (possibleLessSign.type == LESS)
+                {
+                    output += type + "<";
+
+                    this.advance(2);
+                    output += this.tryHandleTypedVarType();
+
+                    Token possibleGreaterSign = this.currentToken.NextOrLast().NextOrLast().Value;
+                    if (possibleGreaterSign.type != GREATER)
+                    {
+                        Logger.error(possibleVarType.line, $"Expected '>', not '{possibleGreaterSign.lexeme}'");
+                        return "";
+                    }
+                    output += ">";
+                }
+                else
+                {
+                    return type;
+                }
+            }
+
+            return output;
         }
 
         private bool isVarType(TokenType type)
@@ -452,8 +522,8 @@ namespace pseudocodeIde.interpreter
             Token possibleLeftParen = this.advance();
 
             Token possibleRightParen = this.advance();
-            Token possibleColon = this.currentToken.Next.Value;
-            Token possibleType = this.currentToken.Next.Next.Value;
+            Token possibleColon = this.currentToken.NextOrLast().Value;
+            Token possibleType = this.currentToken.NextOrLast().NextOrLast().Value;
 
             if (possibleIdentifier.type != IDENTIFIER || possibleLeftParen.type != LEFT_PAREN)
             {
@@ -485,8 +555,8 @@ namespace pseudocodeIde.interpreter
                 {
                     insideParens += this.parseToken(insideParens.LastOrDefault(), true);
                     possibleRightParen = this.advance();
-                    possibleColon = this.currentToken.Next.Value;
-                    possibleType = this.currentToken.Next.Next.Value;
+                    possibleColon = this.currentToken.NextOrLast().Value;
+                    possibleType = this.currentToken.NextOrLast().NextOrLast().Value;
                 }
                 else
                 {
@@ -535,7 +605,7 @@ namespace pseudocodeIde.interpreter
         {
             return this.currentToken == null
                 ? this.tokens.First
-                : this.currentToken.Next;
+                : this.currentToken.NextOrLast();
         }
 
         private bool isAtEnd()

@@ -1,8 +1,6 @@
 ﻿using pseudocodeIde.interpreter.logging;
 using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -70,7 +68,7 @@ namespace codeOutput {
         public void compile()
         {
 
-            CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
+            CodeDomProvider provider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider();
 
             CompilerParameters parameters = new CompilerParameters();
 
@@ -85,6 +83,8 @@ namespace codeOutput {
             parameters.ReferencedAssemblies.Add("System.Windows.Forms.dll");
             parameters.ReferencedAssemblies.Add("System.Xml.dll");
             parameters.ReferencedAssemblies.Add("System.Xml.Linq.dll");
+
+            parameters.CompilerOptions += "/unsafe /optimize /langversion:9.0";
             
 
             string code = TEMPLATE_CLASS
