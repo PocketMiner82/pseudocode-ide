@@ -124,6 +124,8 @@ namespace pseudocodeIde
             }
 
             this.interpreter.stopProgram();
+
+            Logger.info(LogMessage.STOPPED_PROGRAM);
         }
     }
 }

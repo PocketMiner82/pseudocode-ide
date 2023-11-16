@@ -63,8 +63,8 @@ namespace pseudocodeIde.interpreter
                 return false;
             }
 
-            string tokensString = string.Join(", ", tokens);
-            Logger.info($"Generierte Tokens: {tokensString}");
+            string tokensString = string.Join("\n", tokens);
+            Logger.info($"Generierte Tokens:\n{tokensString}\n\n");
 
             Parser parser = new Parser(tokens);
             CSharpCode cSharpCode = parser.parseTokens();

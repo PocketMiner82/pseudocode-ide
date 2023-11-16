@@ -1,4 +1,6 @@
-﻿using pseudocodeIde.interpreter.logging;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using pseudocodeIde.interpreter.logging;
 using System;
 using System.CodeDom.Compiler;
 using System.Reflection;
@@ -64,7 +66,11 @@ namespace codeOutput {
             prompt.AcceptButton = confirmation;
 
             try {
-                return prompt.ShowDialog() == DialogResult.OK ? (T?)Convert.ChangeType(textBox.Text, Nullable.GetUnderlyingType(typeof(T))) : default(T?);
+                if (prompt.ShowDialog() == DialogResult.OK && double.TryParse(textBox.Text, out double result)) {
+                    return (T?)Convert.ChangeType(result, Nullable.GetUnderlyingType(typeof(T)));
+                } else {
+                    return (T?)Convert.ChangeType(textBox.Text, Nullable.GetUnderlyingType(typeof(T)));
+                }
             } catch {
                 return default(T?);
             }
@@ -120,6 +126,12 @@ namespace codeOutput {
                 .Replace("%FIELDS%", this.fields)
                 .Replace("%CONSTRUCTOR%", this.constructor)
                 .Replace("%METHODS%", this.methods);
+
+            // pretty print code
+            SyntaxNode node = CSharpSyntaxTree.ParseText(code).GetRoot();
+            code = node.NormalizeWhitespace().ToFullString();
+
+            Logger.info(LogMessage.GENERATED_C_SHARP_CODE);
 
             string printCode = "1\t";
             int line = 1;
