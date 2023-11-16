@@ -592,9 +592,9 @@ namespace pseudocodeIde
                             "Zusätzlich zu der Definition in der Formelsammlung wurden folgende Operationen definiert:\n" +
                             "UND - Und-Vergleich\n" +
                             "ODER - Oder-Vergleich\n" +
-                            "schreibe(<text>) - Schreibt den gegeben Text in das Ausgabefenster\n" +
-                            "warte(<zeitMs>) - Delay für eine bestimmte Zeit in Millisekunden\n" +
-                            "benutzereingabe(<text>, <titel>):string - Öffnet ein Dialogfenster. Gibt den eingegebenen Text zurück.\n\n" +
+                            "schreibe(text) - Schreibt den gegeben Text in das Ausgabefenster\n" +
+                            "warte(zeitMs) - Delay für eine bestimmte Zeit in Millisekunden\n" +
+                            "benutzereingabe<Typ>(text, titel):Typ - Öffnet ein Dialogfenster. Gibt den eingegebenen Text als gegeben Typ zurück.\n\n" +
                             "Nicht implementiert:\n" +
                             "- Unterstützung für mehrere Dateien\n" +
                             "- Klassen/Objekte - erfordert Unterstützung für mehrere Dateien\n",

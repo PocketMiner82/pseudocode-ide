@@ -28,10 +28,10 @@ namespace pseudocodeIde.interpreter
 
         static Parser()
         {
-            TOKEN_TO_CSHARP.Add(TYPE_BOOL,      "bool");
-            TOKEN_TO_CSHARP.Add(TYPE_INT,       "int");
-            TOKEN_TO_CSHARP.Add(TYPE_DOUBLE,    "double");
-            TOKEN_TO_CSHARP.Add(TYPE_CHAR,      "char");
+            TOKEN_TO_CSHARP.Add(TYPE_BOOL,      "bool?");
+            TOKEN_TO_CSHARP.Add(TYPE_INT,       "int?");
+            TOKEN_TO_CSHARP.Add(TYPE_DOUBLE,    "double?");
+            TOKEN_TO_CSHARP.Add(TYPE_CHAR,      "char?");
             TOKEN_TO_CSHARP.Add(TYPE_STRING,    "string");
             TOKEN_TO_CSHARP.Add(TYPE_VOID,      "void");
 
@@ -61,6 +61,7 @@ namespace pseudocodeIde.interpreter
 
             TOKEN_TO_CSHARP.Add(TYPE_LIST,      "Liste");
             TOKEN_TO_CSHARP.Add(NEW,            "new ");
+            TOKEN_TO_CSHARP.Add(NULL,           "null");
 
 
             NO_SEMICOLON_AFTER.Add('}');

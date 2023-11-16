@@ -3,68 +3,19 @@ using System;
 using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace pseudocodeIde.interpreter.parser
 {
     public class CSharpCode
     {
-        private const string TEMPLATE_CLASS = @"
-using System;
+        private const string TEMPLATE_CLASS =
+@"using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace codeOutput {
-    public class CodeOutput : BaseCodeOutput {
-%FIELDS%
-
-        public CodeOutput(Action<string> printMethod) : base(printMethod) {
-%CONSTRUCTOR%
-        }
-
-%METHODS%
-    }
-
-    public class BaseCodeOutput {
-        private Action<string> printMethod;
-
-        public BaseCodeOutput(Action<string> printMethod) {
-            this.printMethod = printMethod;
-        }
-
-        protected virtual void _schreibe(object msg) {
-            this.printMethod(msg.ToString());
-        }
-
-        protected virtual void _warte(int millis) {
-            Thread.Sleep(millis);
-        }
-
-        protected virtual string _benutzereingabe(string text, string title)
-        {
-            Form prompt = new Form()
-            {
-                Width = 500,
-                Height = 200,
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                Text = title,
-                StartPosition = FormStartPosition.CenterScreen,
-                MaximizeBox = false,
-                MinimizeBox = false
-            };
-            Label textLabel = new Label() { Location = new System.Drawing.Point(12, 24), Size = new System.Drawing.Size(454, 42), Text=text };
-            TextBox textBox = new TextBox() { Location = new System.Drawing.Point(12, 69), Size = new System.Drawing.Size(454, 42) };
-            Button confirmation = new Button() { Text = ""OK"", Location = new System.Drawing.Point(373, 101), Size = new System.Drawing.Size(93, 31), DialogResult = DialogResult.OK };
-            confirmation.Click += (sender, e) => { prompt.Close(); };
-            prompt.Controls.Add(textBox);
-            prompt.Controls.Add(confirmation);
-            prompt.Controls.Add(textLabel);
-            prompt.AcceptButton = confirmation;
-
-            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : """";
-        }
-    }
-
     public class Liste<T> : List<T> {
         public void _anhaengen(T value) {
             Add(value);
@@ -78,8 +29,63 @@ namespace codeOutput {
             this[index] = value;
         }
     }
-}
-";
+
+    public class BaseCodeOutput {
+        private Action<string> printMethod;
+
+        public BaseCodeOutput(Action<string> printMethod) {
+            this.printMethod = printMethod;
+        }
+
+        protected virtual void _schreibe(object msg) {
+            this.printMethod(msg == null ? ""NICHTS"" : msg.ToString());
+        }
+
+        protected virtual void _warte(int millis) {
+            Thread.Sleep(millis);
+        }
+
+        protected virtual T? _benutzereingabe<T>(string text, string title) {
+            Form prompt = new Form() {
+                Width = 500,
+                Height = 200,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = title,
+                StartPosition = FormStartPosition.CenterScreen,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+            Label textLabel = new Label() { Location = new System.Drawing.Point(12, 24), Size = new System.Drawing.Size(454, 42), Text = text };
+            TextBox textBox = new TextBox() { Location = new System.Drawing.Point(12, 69), Size = new System.Drawing.Size(454, 42) };
+            Button confirmation = new Button() { Text = ""OK"", Location = new System.Drawing.Point(373, 101), Size = new System.Drawing.Size(93, 31), DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+
+            try {
+                return prompt.ShowDialog() == DialogResult.OK ? (T?)Convert.ChangeType(textBox.Text, Nullable.GetUnderlyingType(typeof(T))) : default(T?);
+            } catch {
+                return default(T?);
+            }
+        }
+    }
+
+// ---------------------------------------------------------
+// ---- AB HIER BEGINNT DER AUTOMATISCH GENERIERTE CODE ----
+// ---------------------------------------------------------
+
+    public class CodeOutput : BaseCodeOutput {
+%FIELDS%
+
+        public CodeOutput(Action<string> printMethod) : base(printMethod) {
+%CONSTRUCTOR%
+        }
+
+%METHODS%
+    }
+}";
 
         public string fields { get; set; } = "";
 
@@ -116,7 +122,20 @@ namespace codeOutput {
                 .Replace("%CONSTRUCTOR%", this.constructor)
                 .Replace("%METHODS%", this.methods);
 
-            Logger.print($"\n{code}\n");
+            string printCode = "1\t";
+            int line = 1;
+            foreach(char c in code)
+            {
+                if (c == '\n')
+                {
+                    printCode += "\n" + ++line + "\t";
+                    continue;
+                }
+
+                printCode += c;
+            }
+
+            Logger.print($"\n{printCode}\n");
 
             Logger.info(LogMessage.COMPILING_C_SHARP_CODE);
 
