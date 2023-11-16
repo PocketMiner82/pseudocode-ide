@@ -129,21 +129,60 @@ namespace pseudocodeIde
                 return;
             }
 
-            // shift+tab removes a tab at the beginning of a line if existing
-            if (Control.ModifierKeys == Keys.Shift && e.KeyCode == Keys.Tab)
+            if (e.KeyCode == Keys.Tab)
             {
-                e.SuppressKeyPress = true;
-                int currentCursorPos = codeTextBox.SelectionStart;
-                int currentLine = codeTextBox.GetLineFromCharIndex(codeTextBox.SelectionStart);
-
-                if (codeTextBox.Lines.Count() > 0 && codeTextBox.Lines[currentLine].StartsWith("\t"))
+                if (Control.ModifierKeys == Keys.Shift && codeTextBox.SelectionLength <= 0)
                 {
-                    string[] lines = codeTextBox.Lines;
-                    lines[currentLine] = codeTextBox.Lines[currentLine].Substring(1);
-                    codeTextBox.Lines = lines;
-                    codeTextBox.SelectionStart = currentCursorPos - 1;
+                    e.SuppressKeyPress = true;
+                    int currentCursorPos = codeTextBox.SelectionStart;
+                    int currentLine = codeTextBox.GetLineFromCharIndex(codeTextBox.SelectionStart);
+
+
+                    if (codeTextBox.Lines.Count() > 0 && codeTextBox.Lines[currentLine].StartsWith("\t"))
+                    {
+                        string[] lines = codeTextBox.Lines;
+                        lines[currentLine] = codeTextBox.Lines[currentLine].Substring(1);
+                        codeTextBox.Lines = lines;
+                        codeTextBox.SelectionStart = currentCursorPos - 1;
+                    }
                 }
-                return;
+                else if (codeTextBox.SelectionLength > 0)
+                {
+                    e.SuppressKeyPress = true;
+
+                    int startIndexOfLine = codeTextBox.GetFirstCharIndexOfCurrentLine();
+                    int selectionStart = codeTextBox.SelectionStart;
+                    codeTextBox.SelectionStart = startIndexOfLine;
+                    codeTextBox.SelectionLength += selectionStart - startIndexOfLine;
+
+                    if (codeTextBox.SelectedText.EndsWith("\n"))
+                    {
+                        codeTextBox.SelectionLength--;
+                    }
+
+                    string[] selectedLines = codeTextBox.SelectedText.Split('\n');
+
+                    for (int i = 0; i < selectedLines.Length; i++)
+                    {
+                        // shift+tab removes a tab at the beginning of a line
+                        if (Control.ModifierKeys == Keys.Shift && selectedLines[i].StartsWith("\t"))
+                        {
+                            selectedLines[i] = selectedLines[i].Substring(1);
+                        }
+                        // if normal tab, add tab at beginning of a line
+                        else if(Control.ModifierKeys != Keys.Shift)
+                        {
+                            selectedLines[i] = "\t" + selectedLines[i];
+                        }
+                    }
+                    
+                    string selectedText = string.Join("\n", selectedLines);
+                    codeTextBox.SelectedText = selectedText;
+
+                    // reselect the updated text
+                    codeTextBox.SelectionStart = startIndexOfLine;
+                    codeTextBox.SelectionLength = selectedText.Length;
+                }
             }
         }
 
