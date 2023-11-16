@@ -1,6 +1,4 @@
-﻿using pseudocodeIde.interpreter.sequences;
-
-namespace pseudocodeIde.interpreter.logging
+﻿namespace pseudocodeIde.interpreter.logging
 {
     public static class Logger
     {
