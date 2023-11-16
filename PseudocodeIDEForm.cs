@@ -131,6 +131,7 @@ namespace pseudocodeIde
 
             if (e.KeyCode == Keys.Tab)
             {
+                // shift+tab removes a tab at the beginning of a line if existing
                 if (Control.ModifierKeys == Keys.Shift && codeTextBox.SelectionLength <= 0)
                 {
                     e.SuppressKeyPress = true;
@@ -146,6 +147,7 @@ namespace pseudocodeIde
                         codeTextBox.SelectionStart = currentCursorPos - 1;
                     }
                 }
+                // handle differently if there is selected text
                 else if (codeTextBox.SelectionLength > 0)
                 {
                     e.SuppressKeyPress = true;
