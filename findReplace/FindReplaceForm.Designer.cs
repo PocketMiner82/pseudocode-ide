@@ -82,7 +82,7 @@
             // cbMatchCase2
             // 
             this.cbMatchCase2.AutoSize = true;
-            this.cbMatchCase2.Location = new System.Drawing.Point(9, 112);
+            this.cbMatchCase2.Location = new System.Drawing.Point(9, 117);
             this.cbMatchCase2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cbMatchCase2.Name = "cbMatchCase2";
             this.cbMatchCase2.Size = new System.Drawing.Size(117, 24);
@@ -195,7 +195,7 @@
             // cbMatchCase1
             // 
             this.cbMatchCase1.AutoSize = true;
-            this.cbMatchCase1.Location = new System.Drawing.Point(9, 112);
+            this.cbMatchCase1.Location = new System.Drawing.Point(9, 117);
             this.cbMatchCase1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cbMatchCase1.Name = "cbMatchCase1";
             this.cbMatchCase1.Size = new System.Drawing.Size(117, 24);

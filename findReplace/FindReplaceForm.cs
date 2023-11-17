@@ -104,7 +104,7 @@ namespace pseudocodeIde
         public void Show(FindReplaceTabs tab, string findWhat = "")
         {
             tabControl.SelectedIndex = (int)tab;
-            statusLabel.Text = "";
+            statusLabel.Text = " ";
             statusLabel.ForeColor = SystemColors.ControlText;
 
             Show();
@@ -159,7 +159,7 @@ namespace pseudocodeIde
                     break;
 
                 default:
-                    statusLabel.Text = "";
+                    statusLabel.Text = " ";
                     statusLabel.ForeColor = SystemColors.ControlText;
                     break;
             }
@@ -244,7 +244,7 @@ namespace pseudocodeIde
                     break;
 
                 default:
-                    statusLabel.Text = "";
+                    statusLabel.Text = " ";
                     statusLabel.ForeColor = SystemColors.ControlText;
                     break;
             }
