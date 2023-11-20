@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using pseudocodeIde.findReplace;
 using pseudocode_ide;
 using Newtonsoft.Json;
+using AutoUpdaterDotNET;
 
 namespace pseudocodeIde
 {
@@ -83,6 +84,12 @@ namespace pseudocodeIde
         // ---------------------------------------------
         // COMMON EVENT LISTENERS
         // ---------------------------------------------
+
+        private void PseudocodeIDEForm_Load(object sender, EventArgs e)
+        {
+            AutoUpdater.RunUpdateAsAdmin = false;
+            AutoUpdater.Start("https://github.com/PocketMiner82/pseudocode-ide/AutoUpdater.xml");
+        }
 
         private void wordWrapMenuItem_Click(object sender, EventArgs e)
         {
