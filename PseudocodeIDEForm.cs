@@ -88,6 +88,9 @@ namespace pseudocodeIde
         private void PseudocodeIDEForm_Load(object sender, EventArgs e)
         {
             AutoUpdater.RunUpdateAsAdmin = false;
+            AutoUpdater.ClearAppDirectory = true;
+            AutoUpdater.TopMost = true;
+            AutoUpdater.SetOwner(this);
             AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
         }
 
