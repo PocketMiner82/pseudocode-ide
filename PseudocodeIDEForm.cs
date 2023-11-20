@@ -651,12 +651,12 @@ namespace pseudocodeIde
 
         private void updatePseudocodeIDEMenuItem_Click(object sender, EventArgs e)
         {
-            this.checkForUpdate(true);
+            this.checkForUpdate(false);
         }
 
         private void PseudocodeIDEForm_Load(object sender, EventArgs e)
         {
-            this.checkForUpdate(false);
+            this.checkForUpdate(true);
             AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
         }
 
@@ -668,18 +668,20 @@ namespace pseudocodeIde
             }
             else
             {
-                MessageBox.Show("Es sind keine Aktualisierungen verfügbar.", "Info");
+                MessageBox.Show("Es sind keine Aktualisierungen verfügbar.", "Aktualisierungen");
             }
         }
 
-        private void checkForUpdate(bool force)
+        private void checkForUpdate(bool firstRun)
         {
             AutoUpdater.RunUpdateAsAdmin = false;
             AutoUpdater.ClearAppDirectory = true;
             AutoUpdater.AppTitle = "Pseudocode IDE";
             AutoUpdater.SetOwner(this);
             AutoUpdater.ShowSkipButton = false;
-            AutoUpdater.Mandatory = force;
+            AutoUpdater.Mandatory = !firstRun;
+            AutoUpdater.Synchronous = firstRun;
+
             AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
 
         }
