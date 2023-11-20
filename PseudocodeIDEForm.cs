@@ -88,7 +88,7 @@ namespace pseudocodeIde
         private void PseudocodeIDEForm_Load(object sender, EventArgs e)
         {
             AutoUpdater.RunUpdateAsAdmin = false;
-            AutoUpdater.Start("https://github.com/PocketMiner82/pseudocode-ide/AutoUpdater.xml");
+            AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
         }
 
         private void wordWrapMenuItem_Click(object sender, EventArgs e)
