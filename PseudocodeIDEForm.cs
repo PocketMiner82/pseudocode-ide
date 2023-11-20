@@ -85,14 +85,6 @@ namespace pseudocodeIde
         // COMMON EVENT LISTENERS
         // ---------------------------------------------
 
-        private void PseudocodeIDEForm_Load(object sender, EventArgs e)
-        {
-            AutoUpdater.RunUpdateAsAdmin = false;
-            AutoUpdater.ClearAppDirectory = true;
-            AutoUpdater.SetOwner(this);
-            AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
-        }
-
         private void wordWrapMenuItem_Click(object sender, EventArgs e)
         {
             codeTextBox.WordWrap = wordWrapMenuItem.Checked;
@@ -651,6 +643,45 @@ namespace pseudocodeIde
 
                             "Pseudocode IDE - Hilfe"
             );
+        }
+
+        // ---------------------------------------------
+        // (AUTO) UPDATE
+        // ---------------------------------------------
+
+        private void updatePseudocodeIDEMenuItem_Click(object sender, EventArgs e)
+        {
+            this.checkForUpdate(true);
+        }
+
+        private void PseudocodeIDEForm_Load(object sender, EventArgs e)
+        {
+            this.checkForUpdate(false);
+            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
+        }
+
+        private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
+        {
+            if (args.IsUpdateAvailable)
+            {
+                AutoUpdater.ShowUpdateForm(args);
+            }
+            else
+            {
+                MessageBox.Show("Es sind keine Aktualisierungen verfügbar.", "Info");
+            }
+        }
+
+        private void checkForUpdate(bool force)
+        {
+            AutoUpdater.RunUpdateAsAdmin = false;
+            AutoUpdater.ClearAppDirectory = true;
+            AutoUpdater.AppTitle = "Pseudocode IDE";
+            AutoUpdater.SetOwner(this);
+            AutoUpdater.ShowSkipButton = false;
+            AutoUpdater.Mandatory = force;
+            AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
+
         }
     }
 }
