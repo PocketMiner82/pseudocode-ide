@@ -54,6 +54,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoUpdater.NET, Version=1.8.4.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
       <HintPath>packages\Autoupdater.NET.Official.1.8.4\lib\net45\AutoUpdater.NET.dll</HintPath>
@@ -175,6 +178,7 @@
       <DependentUpon>PseudocodeIDEForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
