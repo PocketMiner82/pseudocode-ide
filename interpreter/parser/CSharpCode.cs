@@ -32,14 +32,14 @@ namespace codeOutput {
     }
 
     public class BaseCodeOutput {
-        private Action<string> printMethod;
+        private Action<string, bool> printMethod;
 
-        public BaseCodeOutput(Action<string> printMethod) {
+        public BaseCodeOutput(Action<string, bool> printMethod) {
             this.printMethod = printMethod;
         }
 
-        protected virtual void _schreibe(object msg) {
-            this.printMethod(msg == null ? ""NICHTS"" : msg.ToString());
+        protected virtual void _schreibe(object msg, bool newLine = true) {
+            this.printMethod(msg == null ? ""NICHTS"" : msg.ToString(), newLine);
         }
 
         protected virtual void _warte(int millis) {
@@ -84,7 +84,7 @@ namespace codeOutput {
     public class CodeOutput : BaseCodeOutput {
 %FIELDS%
 
-        public CodeOutput(Action<string> printMethod) : base(printMethod) {
+        public CodeOutput(Action<string, bool> printMethod) : base(printMethod) {
 %CONSTRUCTOR%
         }
 
@@ -175,7 +175,7 @@ namespace codeOutput {
                 {
                     Type type = this.compiledAssembly.GetType("codeOutput.CodeOutput");
 
-                    Activator.CreateInstance(type, new Action<string>(Logger.print));
+                    Activator.CreateInstance(type, new Action<string, bool>(Logger.print));
                 }
             }
             catch (ThreadAbortException)

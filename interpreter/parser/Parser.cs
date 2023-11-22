@@ -413,7 +413,12 @@ namespace pseudocodeIde.interpreter
 
             if (possibleColon.type == COLON)
             {
-                if(this.isVarType(possibleVarType.type))
+                if (isInForLoopVarDef)
+                {
+                    this.currentVarIdentifier = "_" + identifier.lexeme;
+                }
+
+                if (this.isVarType(possibleVarType.type))
                 {
                     string type = TOKEN_TO_CSHARP[possibleVarType.type];
                     if (possibleVarAssign.type == LESS)

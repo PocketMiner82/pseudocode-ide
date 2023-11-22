@@ -20,11 +20,11 @@
             error($"Zeile {line}: {msg}");
         }
 
-        public static void print(string message)
+        public static void print(string message, bool newLine = true)
         {
             if (outputForm != null)
             {
-                outputForm.outputText += message + "\n";
+                outputForm.outputText += message + (newLine ? "\n" : "");
             }
         }
     }
