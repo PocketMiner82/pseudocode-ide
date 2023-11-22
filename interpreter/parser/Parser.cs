@@ -148,7 +148,7 @@ namespace pseudocodeIde.interpreter
                         this.advance();
                         output += "new() {";
 
-                        while(!this.isAtEnd() && this.peek().type != RIGHT_BRACKET && this.peek().type == NEW_LINE)
+                        while(!this.isAtEnd() && this.peek().type != RIGHT_BRACKET && this.peek().type != NEW_LINE)
                         {
                             output += this.parseToken(this.advance().lexeme.Last(), true);
                         }
@@ -165,7 +165,7 @@ namespace pseudocodeIde.interpreter
                         }
                         else
                         {
-                            Logger.error(possibleLeftBracket.line, $"']' erwartet, nicht '{this.currentToken.Value.lexeme}'.");
+                            Logger.error(possibleLeftBracket.line, $"']' erwartet, nicht '{this.currentToken.Value.lexeme}'.\n\n{output}");
                             return "";
                         }
                     }
