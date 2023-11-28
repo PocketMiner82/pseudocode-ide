@@ -658,6 +658,11 @@ namespace pseudocodeIde
 
         private void PseudocodeIDEForm_Load(object sender, EventArgs e)
         {
+            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
+
+            FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
+
             this.checkForUpdate(true);
         }
 
@@ -666,8 +671,6 @@ namespace pseudocodeIde
             string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
             string tempExePath = Path.Combine(tempExeDir, "pseudocodeIdeUpdater.exe");
-
-            FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
 
             using (Process compiler = new Process())
             {
