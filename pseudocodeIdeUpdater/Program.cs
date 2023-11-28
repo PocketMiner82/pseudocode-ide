@@ -23,8 +23,8 @@ namespace pseudocodeIdeUpdater
 
             try
             {
-                string path = "C:\\Users\\RuwenFitz\\source\\repos\\pseudocode-ide\\bin\\Debug";//args[0];
-                bool firstRun = bool.Parse(false.ToString()); //bool.Parse(args[1]);
+                string path = args[0];
+                bool firstRun = bool.Parse(args[1]);
 
                 if (!firstRun)
                 {

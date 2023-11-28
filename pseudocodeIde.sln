@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pseudocodeIde", "pseudocodeIde\pseudocodeIde.csproj", "{603882E3-0193-4A3A-B160-2DDD09954744}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DCF8B141-F5D1-4447-8193-8BAEA2EBADAE} = {DCF8B141-F5D1-4447-8193-8BAEA2EBADAE}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pseudocodeIdeUpdater", "pseudocodeIdeUpdater\pseudocodeIdeUpdater.csproj", "{DCF8B141-F5D1-4447-8193-8BAEA2EBADAE}"
 EndProject
