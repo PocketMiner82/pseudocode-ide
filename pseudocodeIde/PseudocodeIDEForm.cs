@@ -8,7 +8,8 @@ using System.Text.RegularExpressions;
 using pseudocodeIde.findReplace;
 using pseudocode_ide;
 using Newtonsoft.Json;
-using AutoUpdaterDotNET;
+using System.Diagnostics;
+using Microsoft.VisualBasic.FileIO;
 
 namespace pseudocodeIde
 {
@@ -657,33 +658,31 @@ namespace pseudocodeIde
         private void PseudocodeIDEForm_Load(object sender, EventArgs e)
         {
             this.checkForUpdate(true);
-            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
-        }
-
-        private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
-        {
-            if (args.IsUpdateAvailable)
-            {
-                AutoUpdater.ShowUpdateForm(args);
-            }
-            else
-            {
-                MessageBox.Show("Es sind keine Aktualisierungen verfügbar.", "Aktualisierungen");
-            }
         }
 
         private void checkForUpdate(bool firstRun)
         {
-            AutoUpdater.RunUpdateAsAdmin = false;
-            AutoUpdater.ClearAppDirectory = true;
-            AutoUpdater.AppTitle = "Pseudocode IDE";
-            AutoUpdater.SetOwner(this);
-            AutoUpdater.ShowSkipButton = false;
-            AutoUpdater.Mandatory = !firstRun;
-            AutoUpdater.Synchronous = firstRun;
+            string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
+            string tempExePath = Path.Combine(tempExeDir, "pseudocodeIdeUpdater.exe");
 
-            AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
+            FileSystem.CopyDirectory(Path.Combine(Environment.CurrentDirectory, "updater"), tempExeDir, true);
 
+            Debug.WriteLine($"{tempExeDir}\n\n{tempExePath}\n\n{Environment.CurrentDirectory}");
+
+            using (Process compiler = new Process())
+            {
+                compiler.StartInfo.FileName = tempExePath;
+                compiler.StartInfo.WorkingDirectory = tempExeDir;
+                compiler.StartInfo.Arguments = $"\"{Environment.CurrentDirectory}\" \"{firstRun}\"";
+                compiler.StartInfo.UseShellExecute = true;
+                compiler.Start();
+
+                if (firstRun)
+                {
+                    compiler.WaitForExit();
+                }
+                
+            }
         }
     }
 }
