@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace pseudocodeIde
@@ -10,6 +11,8 @@ namespace pseudocodeIde
         {
             // allow automatic scaling
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
+
+            string myAppPath = System.Reflection.Assembly.GetEntryAssembly().Location;
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

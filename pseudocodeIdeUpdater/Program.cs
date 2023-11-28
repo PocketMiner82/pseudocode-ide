@@ -1,6 +1,7 @@
 ﻿using AutoUpdaterDotNET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -38,6 +39,8 @@ namespace pseudocodeIdeUpdater
                 AutoUpdater.ShowSkipButton = false;
                 AutoUpdater.Mandatory = !firstRun;
                 AutoUpdater.Synchronous = true;
+                AutoUpdater.ApplicationExitEvent += AutoUpdater_ApplicationExitEvent;
+                AutoUpdater.ExecutablePath = "pseudocode-ide.exe";
 
                 AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
 
@@ -47,6 +50,14 @@ namespace pseudocodeIdeUpdater
                 MessageBox.Show("Bitte führe pseudecode-ide.exe aus, nicht dieses Tool.", "Fehler");
             }
             
+        }
+
+        private static void AutoUpdater_ApplicationExitEvent()
+        {
+            foreach (var process in Process.GetProcessesByName("pseudocode-ide"))
+            {
+                process.Kill();
+            }
         }
 
         private static void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)

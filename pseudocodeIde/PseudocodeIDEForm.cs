@@ -10,6 +10,7 @@ using pseudocode_ide;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using Microsoft.VisualBasic.FileIO;
+using System.Reflection;
 
 namespace pseudocodeIde
 {
@@ -662,18 +663,17 @@ namespace pseudocodeIde
 
         private void checkForUpdate(bool firstRun)
         {
+            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
             string tempExePath = Path.Combine(tempExeDir, "pseudocodeIdeUpdater.exe");
 
-            FileSystem.CopyDirectory(Path.Combine(Environment.CurrentDirectory, "updater"), tempExeDir, true);
-
-            Debug.WriteLine($"{tempExeDir}\n\n{tempExePath}\n\n{Environment.CurrentDirectory}");
+            FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
 
             using (Process compiler = new Process())
             {
                 compiler.StartInfo.FileName = tempExePath;
                 compiler.StartInfo.WorkingDirectory = tempExeDir;
-                compiler.StartInfo.Arguments = $"\"{Environment.CurrentDirectory}\" \"{firstRun}\"";
+                compiler.StartInfo.Arguments = $"\"{currentDir}\" \"{firstRun}\"";
                 compiler.StartInfo.UseShellExecute = true;
                 compiler.Start();
 
