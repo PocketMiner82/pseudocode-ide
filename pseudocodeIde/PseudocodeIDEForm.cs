@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Microsoft.VisualBasic.FileIO;
 using System.Reflection;
+using ScintillaNET;
 
 namespace pseudocodeIde
 {
@@ -73,6 +74,8 @@ namespace pseudocodeIde
 
         private OutputForm outputForm;
 
+        private int maxLineNumberCharLength;
+
 
         public PseudocodeIDEForm()
         {
@@ -81,6 +84,19 @@ namespace pseudocodeIde
 
             InitializeComponent();
             this.resetUndoRedo();
+
+            // disable right click menu
+            codeTextBox.UsePopup(false);
+
+            this.codeTextBox_TextChanged(null, null);
+            // on first start, the code is always saved
+            this.setFileSaved();
+
+            // set font
+            foreach (Style style in codeTextBox.Styles)
+            {
+                style.Font = "Courier New";
+            }
         }
 
         // ---------------------------------------------
@@ -89,140 +105,13 @@ namespace pseudocodeIde
 
         private void wordWrapMenuItem_Click(object sender, EventArgs e)
         {
-            codeTextBox.WordWrap = wordWrapMenuItem.Checked;
+            codeTextBox.WrapMode = wordWrapMenuItem.Checked ? WrapMode.Word : WrapMode.None;
         }
 
         private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
             Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
             this.setFileNotSaved();
-        }
-
-        private void codeTextBox_TextChanged(object sender, EventArgs e)
-        {
-            // when the code is modified, the code is no longer saved in the file
-            this.setFileNotSaved();
-
-            // only update undo stack if next event not ignored
-            if (this.ignoreTextChange)
-            {
-                this.ignoreTextChange = false;
-            }
-            else
-            {
-                this.updateUndoStack(false);
-            }
-        }
-
-        private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            // ignore CTRL[+SHIFT]+(Z/Y/L/R/E)
-            if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E)
-                && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
-            {
-                e.SuppressKeyPress = true;
-                return;
-            }
-
-            // deleting always updates undo stack
-            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
-            {
-                this.ignoreTextChange = true;
-                this.updateUndoStack(true);
-                return;
-            }
-
-            if (e.KeyCode == Keys.Tab)
-            {
-                // shift+tab removes a tab at the beginning of a line if existing
-                if (Control.ModifierKeys == Keys.Shift && codeTextBox.SelectionLength <= 0)
-                {
-                    e.SuppressKeyPress = true;
-                    int currentCursorPos = codeTextBox.SelectionStart;
-                    int currentLine = codeTextBox.GetLineFromCharIndex(codeTextBox.SelectionStart);
-
-
-                    if (codeTextBox.Lines.Count() > 0 && codeTextBox.Lines[currentLine].StartsWith("\t"))
-                    {
-                        string[] lines = codeTextBox.Lines;
-                        lines[currentLine] = codeTextBox.Lines[currentLine].Substring(1);
-                        codeTextBox.Lines = lines;
-                        codeTextBox.SelectionStart = currentCursorPos - 1;
-                    }
-                }
-                // handle differently if there is selected text
-                else if (codeTextBox.SelectionLength > 0)
-                {
-                    e.SuppressKeyPress = true;
-
-                    int startIndexOfLine = codeTextBox.GetFirstCharIndexOfCurrentLine();
-                    int selectionStart = codeTextBox.SelectionStart;
-                    codeTextBox.SelectionStart = startIndexOfLine;
-                    codeTextBox.SelectionLength += selectionStart - startIndexOfLine;
-
-                    if (codeTextBox.SelectedText.EndsWith("\n"))
-                    {
-                        codeTextBox.SelectionLength--;
-                    }
-
-                    string[] selectedLines = codeTextBox.SelectedText.Split('\n');
-
-                    for (int i = 0; i < selectedLines.Length; i++)
-                    {
-                        // shift+tab removes a tab at the beginning of a line
-                        if (Control.ModifierKeys == Keys.Shift && selectedLines[i].StartsWith("\t"))
-                        {
-                            selectedLines[i] = selectedLines[i].Substring(1);
-                        }
-                        // if normal tab, add tab at beginning of a line
-                        else if(Control.ModifierKeys != Keys.Shift)
-                        {
-                            selectedLines[i] = "\t" + selectedLines[i];
-                        }
-                    }
-                    
-                    string selectedText = string.Join("\n", selectedLines);
-                    codeTextBox.SelectedText = selectedText;
-
-                    // reselect the updated text
-                    codeTextBox.SelectionStart = startIndexOfLine;
-                    codeTextBox.SelectionLength = selectedText.Length;
-                }
-            }
-        }
-
-        private void codeTextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // keep tab indentation from previous line on new line
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                e.Handled = true;
-
-                int currentLineIndex = codeTextBox.GetLineFromCharIndex(codeTextBox.SelectionStart);
-                string currentLine = codeTextBox.Lines[currentLineIndex - 1];
-                int indentationLevel = currentLine.getIndentationLevel();
-
-                string indentation = new string('\t', indentationLevel);
-
-                codeTextBox.SelectedText = indentation;
-            }
-        }
-
-        private void codeTextBox_SelectionChanged(object sender, EventArgs e)
-        {
-            // ignore when we already undid something
-            if (this.redoStack.Count != 0)
-            {
-                this.lastCursorPosition = codeTextBox.SelectionStart;
-                return;
-            }
-
-            // update undo stack when user selected something or cursor moved by more then one since last time
-            if (codeTextBox.SelectionLength != 0 || Math.Abs(this.lastCursorPosition - codeTextBox.SelectionStart) > 1)
-            {
-                this.updateUndoStack(true);
-            }
-            this.lastCursorPosition = codeTextBox.SelectionStart;
         }
 
         private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
@@ -248,6 +137,177 @@ namespace pseudocodeIde
                     this.saveMenuItem_Click(null, null);
                 }
             }
+        }
+
+        // ---------------------------------------------
+        // CODE TEXTBOX EVENT LISTENERS
+        // ---------------------------------------------
+
+        private void userUpdatedText()
+        {
+            // only update undo stack if next event not ignored
+            if (this.ignoreTextChange)
+            {
+                this.ignoreTextChange = false;
+            }
+            else
+            {
+                this.updateUndoStack(false);
+            }
+        }
+
+        private void codeTextBox_UpdateUI(object sender, UpdateUIEventArgs e)
+        {
+            switch (e.Change)
+            {
+                case UpdateChange.Content:
+                    this.userUpdatedText();
+                    break;
+                case UpdateChange.Selection:
+                    this.userChangedSelection();
+                    break;
+            }
+        }
+
+        private void codeTextBox_TextChanged(object sender, EventArgs e)
+        {
+            // when the code is modified, the code is no longer saved in the file
+            this.setFileNotSaved();
+
+            // Did the number of characters in the line number display change?
+            int maxLineNumberCharLength = codeTextBox.Lines.Count.ToString().Length;
+            if (maxLineNumberCharLength == this.maxLineNumberCharLength)
+                return;
+
+            // calculate the width required to display the last line number
+            // + include some padding for good measure
+            const int padding = 2;
+            codeTextBox.Margins[0].Width = codeTextBox.TextWidth(Style.LineNumber, new string('9', maxLineNumberCharLength + 1)) + padding;
+            this.maxLineNumberCharLength = maxLineNumberCharLength;
+        }
+
+        private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            // ignore CTRL[+SHIFT]+(Z/Y/L/R/E)
+            if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E)
+                && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
+            {
+                e.SuppressKeyPress = true;
+                return;
+            }
+
+            // deleting always updates undo stack
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
+            {
+                this.ignoreTextChange = true;
+                this.updateUndoStack(true);
+                e.SuppressKeyPress = false;
+                return;
+            }
+        }
+
+        private void codeTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // keep tab indentation from previous line on new line
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+
+                int currentLineIndex = codeTextBox.CurrentLine - 1;
+                string currentLine = codeTextBox.Lines[currentLineIndex].Text;
+                int indentationLevel = currentLine.getIndentationLevel();
+
+                string indentation = new string('\t', indentationLevel);
+
+                codeTextBox.AddText(indentation);
+            }
+        }
+
+        // from https://github.com/jacobslusser/ScintillaNET/wiki/Character-Autocompletion#finishing-touch
+        private void codeTextBox_CharAdded(object sender, CharAddedEventArgs e)
+        {
+            int caretPos = codeTextBox.CurrentPosition;
+            bool docStart = caretPos == 1;
+            bool docEnd = caretPos == codeTextBox.Text.Length;
+
+            int charPrev = docStart ? codeTextBox.GetCharAt(caretPos) : codeTextBox.GetCharAt(caretPos - 2);
+            int charNext = codeTextBox.GetCharAt(caretPos);
+
+            bool isCharPrevBlank = charPrev == ' ' || charPrev == '\t' ||
+                                    charPrev == '\n' || charPrev == '\r';
+
+            bool isCharNextBlank = charNext == ' ' || charNext == '\t' ||
+                                    charNext == '\n' || charNext == '\r' ||
+                                    docEnd;
+
+            bool isEnclosed = (charPrev == '(' && charNext == ')') ||
+                                    (charPrev == '{' && charNext == '}') ||
+                                    (charPrev == '[' && charNext == ']');
+
+            bool isSpaceEnclosed = (charPrev == '(' && isCharNextBlank) || (isCharPrevBlank && charNext == ')') ||
+                                    (charPrev == '{' && isCharNextBlank) || (isCharPrevBlank && charNext == '}') ||
+                                    (charPrev == '[' && isCharNextBlank) || (isCharPrevBlank && charNext == ']');
+
+            bool isCharOrString = (isCharPrevBlank && isCharNextBlank) || isEnclosed || isSpaceEnclosed;
+
+            bool charNextIsCharOrString = charNext == '"' || charNext == '\'';
+
+            switch (e.Char)
+            {
+                case '(':
+                    if (charNextIsCharOrString) return;
+                    codeTextBox.InsertText(caretPos, ")");
+                    break;
+                case '{':
+                    if (charNextIsCharOrString) return;
+                    codeTextBox.InsertText(caretPos, "}");
+                    break;
+                case '[':
+                    if (charNextIsCharOrString) return;
+                    codeTextBox.InsertText(caretPos, "]");
+                    break;
+                case '"':
+                    // 0x22 = "
+                    if (charPrev == 0x22 && charNext == 0x22)
+                    {
+                        codeTextBox.DeleteRange(caretPos, 1);
+                        codeTextBox.GotoPosition(caretPos);
+                        return;
+                    }
+
+                    if (isCharOrString)
+                        codeTextBox.InsertText(caretPos, "\"");
+                    break;
+                case '\'':
+                    // 0x27 = '
+                    if (charPrev == 0x27 && charNext == 0x27)
+                    {
+                        codeTextBox.DeleteRange(caretPos, 1);
+                        codeTextBox.GotoPosition(caretPos);
+                        return;
+                    }
+
+                    if (isCharOrString)
+                        codeTextBox.InsertText(caretPos, "'");
+                    break;
+            }
+        }
+
+        private void userChangedSelection()
+        {
+            // ignore when we already undid something
+            if (this.redoStack.Count != 0)
+            {
+                this.lastCursorPosition = codeTextBox.SelectionStart;
+                return;
+            }
+
+            // update undo stack when user selected something or cursor moved by more then one since last time
+            if (codeTextBox.SelectionEnd - codeTextBox.SelectionStart != 0 || Math.Abs(this.lastCursorPosition - codeTextBox.SelectionStart) > 1)
+            {
+                this.updateUndoStack(true);
+            }
+            this.lastCursorPosition = codeTextBox.SelectionStart;
         }
 
         // ---------------------------------------------
@@ -308,6 +368,10 @@ namespace pseudocodeIde
         {
             this.isSaved = true;
             saveMenuItem.Enabled = false;
+            if (Text.EndsWith("*"))
+            {
+                Text = Text.Substring(0, Text.Length - 1);
+            }
         }
 
         private void setFileNotSaved()
@@ -349,7 +413,7 @@ namespace pseudocodeIde
 
         private void saveFile()
         {
-            PseudocodeFile pFile = new PseudocodeFile(Scanner.singleEqualIsCompareOperator, codeTextBox.Lines);
+            PseudocodeFile pFile = new PseudocodeFile(Scanner.singleEqualIsCompareOperator, codeTextBox.Text.Split('\n'));
 
             // write to disk
             using (StreamWriter outputFile = new StreamWriter(this.filePath))
@@ -399,7 +463,7 @@ namespace pseudocodeIde
                     return;
                 }
 
-                codeTextBox.Lines = pFile.fileContent;
+                codeTextBox.Text = string.Join("\n", pFile.fileContent);
                 singleEqualIsCompareOperatorMenuItem.Checked = pFile.singleEqualIsCompareOperator;
 
                 this.resetUndoRedo();
@@ -566,7 +630,7 @@ namespace pseudocodeIde
         /// </summary>
         public int getSelectionEnd()
         {
-            return codeTextBox.SelectionStart + codeTextBox.SelectionLength;
+            return codeTextBox.SelectionEnd;
         }
 
         /// <summary>
@@ -574,7 +638,7 @@ namespace pseudocodeIde
         /// </summary>
         public int getSelectionLength()
         {
-            return codeTextBox.SelectionLength;
+            return codeTextBox.SelectionEnd - codeTextBox.SelectionStart;
         }
 
         /// <summary>
@@ -595,7 +659,7 @@ namespace pseudocodeIde
             Invoke(new Action(() =>
             {
                 codeTextBox.SelectionStart = selectionStart;
-                codeTextBox.SelectionLength = selectionLength;
+                codeTextBox.SelectionEnd = selectionStart + selectionLength;
             }));
         }
 
@@ -607,7 +671,7 @@ namespace pseudocodeIde
         {
             Invoke(new Action(() =>
             {
-                codeTextBox.SelectedText = toReplace;
+                codeTextBox.ReplaceSelection(toReplace);
             }));
         }
 
@@ -653,16 +717,19 @@ namespace pseudocodeIde
 
         private void updatePseudocodeIDEMenuItem_Click(object sender, EventArgs e)
         {
+            // dont show remind later
             this.checkForUpdate(false);
         }
 
         private void PseudocodeIDEForm_Load(object sender, EventArgs e)
         {
+            // on start, copy the updater to the local drive to allow updating on SMB1 network shares
             string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
 
             FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
 
+            // show remind later
             this.checkForUpdate(true);
         }
 
@@ -672,6 +739,7 @@ namespace pseudocodeIde
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
             string tempExePath = Path.Combine(tempExeDir, "pseudocodeIdeUpdater.exe");
 
+            // start the local copied exe
             using (Process compiler = new Process())
             {
                 compiler.StartInfo.FileName = tempExePath;
@@ -679,12 +747,6 @@ namespace pseudocodeIde
                 compiler.StartInfo.Arguments = $"\"{currentDir}\" \"{firstRun}\"";
                 compiler.StartInfo.UseShellExecute = true;
                 compiler.Start();
-
-                if (firstRun)
-                {
-                    compiler.WaitForExit();
-                }
-                
             }
         }
     }

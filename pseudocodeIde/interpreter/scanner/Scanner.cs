@@ -18,6 +18,7 @@ namespace pseudocodeIde.interpreter
 
         private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>();
 
+
         static Scanner()
         {
             keywords.Add("WENN",            IF);

@@ -72,6 +72,9 @@
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework" />
+    <Reference Include="ScintillaNET, Version=3.6.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\jacobslusser.ScintillaNET.3.6.3\lib\net40\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -133,8 +136,8 @@
     <Compile Include="interpreter\parser\Parser.cs" />
     <Compile Include="interpreter\scanner\Scanner.cs" />
     <Compile Include="interpreter\logging\RuntimeError.cs" />
+    <Compile Include="interpreter\scanner\SyntaxHighlightingLexer.cs" />
     <Compile Include="interpreter\scanner\Token.cs" />
-    <Compile Include="interpreter\scanner\Tokens.cs" />
     <Compile Include="interpreter\scanner\TokenType.cs" />
     <Compile Include="PseudocodeFile.cs" />
     <Compile Include="PseudocodeIDEForm.cs">

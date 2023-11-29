@@ -48,9 +48,9 @@
             this.singleEqualIsCompareOperatorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.codeTextBox = new System.Windows.Forms.RichTextBox();
-            this.updatePseudocodeIDEMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.updatePseudocodeIDEMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.codeTextBox = new ScintillaNET.Scintilla();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,8 +66,7 @@
             this.helpMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
-            this.menuStrip.Size = new System.Drawing.Size(1176, 33);
+            this.menuStrip.Size = new System.Drawing.Size(1176, 36);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -85,7 +84,7 @@
             // 
             this.newMenuItem.Name = "newMenuItem";
             this.newMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.newMenuItem.Size = new System.Drawing.Size(257, 34);
             this.newMenuItem.Text = "Neu";
             this.newMenuItem.Click += new System.EventHandler(this.newMenuItem_Click);
             // 
@@ -93,7 +92,7 @@
             // 
             this.openMenuItem.Name = "openMenuItem";
             this.openMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.openMenuItem.Size = new System.Drawing.Size(257, 34);
             this.openMenuItem.Text = "Öffnen";
             this.openMenuItem.Click += new System.EventHandler(this.openMenuItem_Click);
             // 
@@ -102,7 +101,7 @@
             this.saveMenuItem.Enabled = false;
             this.saveMenuItem.Name = "saveMenuItem";
             this.saveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.saveMenuItem.Size = new System.Drawing.Size(257, 34);
             this.saveMenuItem.Text = "Speichern";
             this.saveMenuItem.Click += new System.EventHandler(this.saveMenuItem_Click);
             // 
@@ -234,24 +233,10 @@
             this.showHelpMenuItem.Text = "Hilfe anzeigen";
             this.showHelpMenuItem.Click += new System.EventHandler(this.showHelpMenuItem_Click);
             // 
-            // codeTextBox
+            // toolStripSeparator3
             // 
-            this.codeTextBox.AcceptsTab = true;
-            this.codeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.codeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.codeTextBox.Font = new System.Drawing.Font("Courier New", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.codeTextBox.HideSelection = false;
-            this.codeTextBox.Location = new System.Drawing.Point(0, 33);
-            this.codeTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.codeTextBox.Name = "codeTextBox";
-            this.codeTextBox.Size = new System.Drawing.Size(1176, 676);
-            this.codeTextBox.TabIndex = 1;
-            this.codeTextBox.Text = "";
-            this.codeTextBox.WordWrap = false;
-            this.codeTextBox.SelectionChanged += new System.EventHandler(this.codeTextBox_SelectionChanged);
-            this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
-            this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
-            this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.codeTextBox_KeyPress);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(343, 6);
             // 
             // updatePseudocodeIDEMenuItem
             // 
@@ -260,10 +245,29 @@
             this.updatePseudocodeIDEMenuItem.Text = "Pseudocode IDE aktualisieren";
             this.updatePseudocodeIDEMenuItem.Click += new System.EventHandler(this.updatePseudocodeIDEMenuItem_Click);
             // 
-            // toolStripSeparator3
+            // codeTextBox
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(343, 6);
+            this.codeTextBox.AdditionalSelectionTyping = true;
+            this.codeTextBox.CaretLineBackColor = System.Drawing.Color.LightGray;
+            this.codeTextBox.CaretLineVisible = true;
+            this.codeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.codeTextBox.EolMode = ScintillaNET.Eol.Lf;
+            this.codeTextBox.IndentationGuides = ScintillaNET.IndentView.Real;
+            this.codeTextBox.IndentWidth = 4;
+            this.codeTextBox.Location = new System.Drawing.Point(0, 36);
+            this.codeTextBox.MultiPaste = ScintillaNET.MultiPaste.Each;
+            this.codeTextBox.MultipleSelection = true;
+            this.codeTextBox.Name = "codeTextBox";
+            this.codeTextBox.ScrollWidth = 39;
+            this.codeTextBox.Size = new System.Drawing.Size(1176, 673);
+            this.codeTextBox.TabIndex = 1;
+            this.codeTextBox.UseTabs = true;
+            this.codeTextBox.Zoom = 2;
+            this.codeTextBox.CharAdded += new System.EventHandler<ScintillaNET.CharAddedEventArgs>(this.codeTextBox_CharAdded);
+            this.codeTextBox.UpdateUI += new System.EventHandler<ScintillaNET.UpdateUIEventArgs>(this.codeTextBox_UpdateUI);
+            this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
+            this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
+            this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.codeTextBox_KeyPress);
             // 
             // PseudocodeIDEForm
             // 
@@ -300,7 +304,6 @@
         private System.Windows.Forms.ToolStripMenuItem replaceMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showHelpMenuItem;
-        private System.Windows.Forms.RichTextBox codeTextBox;
         private System.Windows.Forms.ToolStripMenuItem runMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runProgramMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newMenuItem;
@@ -314,6 +317,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem updatePseudocodeIDEMenuItem;
+        private ScintillaNET.Scintilla codeTextBox;
     }
 }
 

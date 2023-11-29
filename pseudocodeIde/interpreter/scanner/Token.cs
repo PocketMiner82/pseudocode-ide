@@ -1,4 +1,6 @@
-﻿namespace pseudocodeIde.interpreter
+﻿using System.Collections.Generic;
+
+namespace pseudocodeIde.interpreter
 {
     public class Token
     {
