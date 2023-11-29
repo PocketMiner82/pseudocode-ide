@@ -6,6 +6,8 @@ namespace pseudocodeIde.interpreter
 {
     public class Scanner
     {
+        public static readonly Dictionary<string, TokenType> KEYWORDS = new Dictionary<string, TokenType>();
+
         public static bool singleEqualIsCompareOperator { get; set; } = false;
 
         private readonly string code;
@@ -16,65 +18,66 @@ namespace pseudocodeIde.interpreter
         private int current = 0;
         private int line = 1;
 
-        private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>();
-
 
         static Scanner()
         {
-            keywords.Add("WENN",            IF);
-            keywords.Add("SONST",           ELSE);
-            keywords.Add("ENDE WENN",       END_IF);
+            KEYWORDS.Add("WENN",            IF);
+            KEYWORDS.Add("SONST",           ELSE);
+            KEYWORDS.Add("ENDE WENN",       END_IF);
                                             
-            keywords.Add("FALLS",           SWITCH_PREFIX);
-            keywords.Add("GLEICH",          SWITCH_SUFFIX);
-            keywords.Add("ENDE FALLS",      END_SWITCH);
+            KEYWORDS.Add("FALLS",           SWITCH_PREFIX);
+            KEYWORDS.Add("GLEICH",          SWITCH_SUFFIX);
+            KEYWORDS.Add("ENDE FALLS",      END_SWITCH);
 
-            keywords.Add("SOLANGE",         WHILE);
-            keywords.Add("ENDE SOLANGE",    END_WHILE);
-            keywords.Add("WIEDERHOLE",      DO);
+            KEYWORDS.Add("SOLANGE",         WHILE);
+            KEYWORDS.Add("ENDE SOLANGE",    END_WHILE);
+            KEYWORDS.Add("WIEDERHOLE",      DO);
 
-            keywords.Add("FÜR",             FOR);
-            keywords.Add("BIS",             FOR_TO);
-            keywords.Add("SCHRITT",         FOR_STEP);
-            keywords.Add("IN",              FOR_IN);
-            keywords.Add("ENDE FÜR",        END_FOR);
+            KEYWORDS.Add("FÜR",             FOR);
+            KEYWORDS.Add("BIS",             FOR_TO);
+            KEYWORDS.Add("SCHRITT",         FOR_STEP);
+            KEYWORDS.Add("IN",              FOR_IN);
+            KEYWORDS.Add("ENDE FÜR",        END_FOR);
 
-            keywords.Add("ABBRUCH",         BREAK);
+            KEYWORDS.Add("ABBRUCH",         BREAK);
                                             
-            keywords.Add("OPERATION",       FUNCTION);
-            keywords.Add("RÜCKGABE",        RETURN);
+            KEYWORDS.Add("OPERATION",       FUNCTION);
+            KEYWORDS.Add("RÜCKGABE",        RETURN);
 
-            keywords.Add("wahr",            TRUE);
-            keywords.Add("true",            TRUE);
-            keywords.Add("falsch",          FALSE);
-            keywords.Add("false",           FALSE);
+            KEYWORDS.Add("wahr",            TRUE);
+            KEYWORDS.Add("true",            TRUE);
+            KEYWORDS.Add("falsch",          FALSE);
+            KEYWORDS.Add("false",           FALSE);
 
-            keywords.Add("UND",             AND);
-            keywords.Add("ODER",            OR);
+            KEYWORDS.Add("UND",             AND);
+            KEYWORDS.Add("ODER",            OR);
 
-            keywords.Add("Boolean",         TYPE_BOOL);
-            keywords.Add("boolean",         TYPE_BOOL);
-            keywords.Add("bool",            TYPE_BOOL);
+            KEYWORDS.Add("Boolean",         TYPE_BOOL);
+            KEYWORDS.Add("boolean",         TYPE_BOOL);
+            KEYWORDS.Add("bool",            TYPE_BOOL);
                                             
-            keywords.Add("GZ",              TYPE_INT);
-            keywords.Add("Integer",         TYPE_INT);
-            keywords.Add("int",             TYPE_INT);
+            KEYWORDS.Add("GZ",              TYPE_INT);
+            KEYWORDS.Add("Integer",         TYPE_INT);
+            KEYWORDS.Add("int",             TYPE_INT);
                                             
-            keywords.Add("FKZ",             TYPE_DOUBLE);
-            keywords.Add("Real",            TYPE_DOUBLE);
-            keywords.Add("double",          TYPE_DOUBLE);
+            KEYWORDS.Add("FKZ",             TYPE_DOUBLE);
+            KEYWORDS.Add("Real",            TYPE_DOUBLE);
+            KEYWORDS.Add("double",          TYPE_DOUBLE);
                                             
-            keywords.Add("Zeichen",         TYPE_CHAR);
-            keywords.Add("char",            TYPE_CHAR);
+            KEYWORDS.Add("Zeichen",         TYPE_CHAR);
+            KEYWORDS.Add("char",            TYPE_CHAR);
                                             
-            keywords.Add("Text",            TYPE_STRING);
-            keywords.Add("String",          TYPE_STRING);
-            keywords.Add("string",          TYPE_STRING);
+            KEYWORDS.Add("Text",            TYPE_STRING);
+            KEYWORDS.Add("String",          TYPE_STRING);
+            KEYWORDS.Add("string",          TYPE_STRING);
 
-            keywords.Add("Liste",           TYPE_LIST);
-            keywords.Add("NEU",             NEW);
+            KEYWORDS.Add("Liste",           TYPE_LIST);
+            KEYWORDS.Add("NEU",             NEW);
                                             
-            keywords.Add("NICHTS",          NULL);
+            KEYWORDS.Add("NICHTS",          NULL);
+
+            KEYWORDS.Add(":=",              NULL);
+            KEYWORDS.Add("<-",              NULL);
         }
 
         public Scanner(string code)
@@ -252,7 +255,7 @@ namespace pseudocodeIde.interpreter
             TokenType type;
             try
             {
-                type = keywords[text];
+                type = KEYWORDS[text];
             }
             catch (KeyNotFoundException)
             {

@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Microsoft.VisualBasic.FileIO;
 using System.Reflection;
 using ScintillaNET;
+using pseudocode_ide.interpreter.scanner;
+using System.Drawing;
 
 namespace pseudocodeIde
 {
@@ -91,17 +93,45 @@ namespace pseudocodeIde
             this.codeTextBox_TextChanged(null, null);
             // on first start, the code is always saved
             this.setFileSaved();
-
-            // set font
-            foreach (Style style in codeTextBox.Styles)
-            {
-                style.Font = "Courier New";
-            }
         }
 
         // ---------------------------------------------
         // COMMON EVENT LISTENERS
         // ---------------------------------------------
+
+        private void PseudocodeIDEForm_Load(object sender, EventArgs e)
+        {
+            // on start, copy the updater to the local drive to allow updating on SMB1 network shares
+            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
+
+            FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
+
+            // show remind later
+            this.checkForUpdate(true);
+
+            // set font
+            codeTextBox.StyleResetDefault();
+            codeTextBox.Styles[Style.Default].Font = "Courier New";
+            codeTextBox.StyleClearAll();
+
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_DEFAULT].ForeColor = Color.Black;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].ForeColor = Color.Blue;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_IDENTIFIER].ForeColor = Color.Teal;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_NUMBER].ForeColor = Color.Peru;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_STRING].ForeColor = Color.Green;
+
+            codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
+            codeTextBox.Lexer = Lexer.Container;
+        }
+
+        private void codeTextBox_StyleNeeded(object sender, StyleNeededEventArgs e)
+        {
+            int startPos = codeTextBox.GetEndStyled();
+            int endPos = e.Position;
+
+            SyntaxHighlightingLexer.style(codeTextBox, startPos, endPos);
+        }
 
         private void wordWrapMenuItem_Click(object sender, EventArgs e)
         {
@@ -111,6 +141,16 @@ namespace pseudocodeIde
         private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
             Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
+
+            if (Scanner.singleEqualIsCompareOperator)
+            {
+                Scanner.KEYWORDS.Remove("=");
+            }
+            else
+            {
+                Scanner.KEYWORDS.Add("=", TokenType.VAR_ASSIGN);
+            }
+
             this.setFileNotSaved();
         }
 
@@ -719,18 +759,6 @@ namespace pseudocodeIde
         {
             // dont show remind later
             this.checkForUpdate(false);
-        }
-
-        private void PseudocodeIDEForm_Load(object sender, EventArgs e)
-        {
-            // on start, copy the updater to the local drive to allow updating on SMB1 network shares
-            string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
-
-            FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
-
-            // show remind later
-            this.checkForUpdate(true);
         }
 
         private void checkForUpdate(bool firstRun)

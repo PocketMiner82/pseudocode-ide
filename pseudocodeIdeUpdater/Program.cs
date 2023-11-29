@@ -1,9 +1,6 @@
 ﻿using AutoUpdaterDotNET;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace pseudocodeIdeUpdater
@@ -54,7 +51,7 @@ namespace pseudocodeIdeUpdater
 
         private static void AutoUpdater_ApplicationExitEvent()
         {
-            foreach (var process in Process.GetProcessesByName("pseudocode-ide"))
+            foreach (Process process in Process.GetProcessesByName("pseudocode-ide"))
             {
                 process.Kill();
             }

@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using pseudocodeIde.interpreter;
-using static pseudocodeIde.interpreter.TokenType;
+using ScintillaNET;
 
 namespace pseudocode_ide.interpreter.scanner
 {
-    public class SyntaxHighlightingLexer
+    // mostly from https://github.com/jacobslusser/ScintillaNET/wiki/Custom-Syntax-Highlighting
+    public static class SyntaxHighlightingLexer
     {
         public const int STYLE_DEFAULT= 0;
         public const int STYLE_KEYWORD = 1;
@@ -14,74 +15,110 @@ namespace pseudocode_ide.interpreter.scanner
         public const int STYLE_STRING = 4;
         public const int STYLE_IGNORE = 5;
 
-        public static readonly Dictionary<TokenType, int> tokenToStyle = new Dictionary<TokenType, int>();
+        private const int STATE_UNKNOWN = 0;
+        private const int STATE_IDENTIFIER = 1;
+        private const int STATE_NUMBER = 2;
+        private const int STATE_STRING = 3;
+        private const int STATE_CHAR = 4;
 
 
-        static SyntaxHighlightingLexer()
+        public static void style(Scintilla scintilla, int startPos, int endPos)
         {
-            //            tokenToStyle.Add(LEFT_PAREN, STYLE_DEFAULT);
-            //            tokenToStyle.Add(RIGHT_PAREN, STYLE_DEFAULT);
-            //            tokenToStyle.Add(LEFT_BRACKET, STYLE_DEFAULT);
-            //            tokenToStyle.Add(RIGHT_BRACKET, STYLE_DEFAULT);
-            //            tokenToStyle.Add(SINGLE_AND, STYLE_DEFAULT);
-            //            tokenToStyle.Add(SINGLE_OR, STYLE_DEFAULT);
-            //            tokenToStyle.Add(COLON, STYLE_DEFAULT);
-            //            tokenToStyle.Add(COMMA, STYLE_DEFAULT);
-            //            tokenToStyle.Add(DOT, STYLE_DEFAULT);
-            //            tokenToStyle.Add(MINUS, STYLE_DEFAULT);
-            //            tokenToStyle.Add(PLUS, STYLE_DEFAULT);
-            //            tokenToStyle.Add(SEMICOLON, STYLE_DEFAULT);
-            //            tokenToStyle.Add(SLASH, STYLE_DEFAULT);
-            //            tokenToStyle.Add(STAR, STYLE_DEFAULT);
-            //            tokenToStyle.Add(BANG, STYLE_DEFAULT);
-            //            tokenToStyle.Add(BANG_EQUAL, STYLE_DEFAULT);
-            //            tokenToStyle.Add(EQUAL, STYLE_DEFAULT);
-            //            tokenToStyle.Add(GREATER, STYLE_DEFAULT);
-            //            tokenToStyle.Add(GREATER_EQUAL, STYLE_DEFAULT);
-            //            tokenToStyle.Add(LESS, STYLE_DEFAULT);
-            //            tokenToStyle.Add(LESS_EQUAL, STYLE_DEFAULT);
+            // back up to the line start
+            int line = scintilla.LineFromPosition(startPos);
+            startPos = scintilla.Lines[line].Position;
 
-            tokenToStyle.Add(STRING, STYLE_STRING);
-            tokenToStyle.Add(CHAR, STYLE_STRING);
+            int length = 0;
+            int state = STATE_UNKNOWN;
 
-            tokenToStyle.Add(NUMBER, STYLE_NUMBER);
+            // start styling
+            scintilla.StartStyling(startPos);
+            while (startPos < endPos)
+            {
+                char c = (char)scintilla.GetCharAt(startPos);
 
-            tokenToStyle.Add(IDENTIFIER, STYLE_IDENTIFIER);
+            REPROCESS:
+                switch (state)
+                {
+                    case STATE_UNKNOWN:
+                        if (c == '"' || c == '\'')
+                        {
+                            // start of "string"
+                            scintilla.SetStyling(1, STYLE_STRING);
+                            state = c == '"' ? STATE_STRING : STATE_CHAR;
+                        }
+                        else if (Char.IsDigit(c))
+                        {
+                            state = STATE_NUMBER;
+                            goto REPROCESS;
+                        }
+                        else if (Char.IsLetter(c))
+                        {
+                            state = STATE_IDENTIFIER;
+                            goto REPROCESS;
+                        }
+                        else
+                        {
+                            // everything else
+                            scintilla.SetStyling(1, STYLE_DEFAULT);
+                        }
+                        break;
 
-            tokenToStyle.Add(VAR_ASSIGN, STYLE_KEYWORD);
-            tokenToStyle.Add(NEW, STYLE_KEYWORD);
-            tokenToStyle.Add(AND, STYLE_KEYWORD);
-            tokenToStyle.Add(OR, STYLE_KEYWORD);
-            tokenToStyle.Add(BREAK, STYLE_KEYWORD);
-            tokenToStyle.Add(DO, STYLE_KEYWORD);
-            tokenToStyle.Add(END_IF, STYLE_KEYWORD);
-            tokenToStyle.Add(END_SWITCH, STYLE_KEYWORD);
-            tokenToStyle.Add(END_WHILE, STYLE_KEYWORD);
-            tokenToStyle.Add(END_FOR, STYLE_KEYWORD);
-            tokenToStyle.Add(TRUE, STYLE_KEYWORD);
-            tokenToStyle.Add(FALSE, STYLE_KEYWORD);
-            tokenToStyle.Add(FUNCTION, STYLE_KEYWORD);
-            tokenToStyle.Add(NULL, STYLE_KEYWORD);
-            tokenToStyle.Add(FOR, STYLE_KEYWORD);
-            tokenToStyle.Add(FOR_TO, STYLE_KEYWORD);
-            tokenToStyle.Add(FOR_STEP, STYLE_KEYWORD);
-            tokenToStyle.Add(FOR_IN, STYLE_KEYWORD);
-            tokenToStyle.Add(IF, STYLE_KEYWORD);
-            tokenToStyle.Add(RETURN, STYLE_KEYWORD);
-            tokenToStyle.Add(SWITCH_PREFIX, STYLE_KEYWORD);
-            tokenToStyle.Add(SWITCH_SUFFIX, STYLE_KEYWORD);
-            tokenToStyle.Add(WHILE, STYLE_KEYWORD);
-            tokenToStyle.Add(ELSE, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_BOOL, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_INT, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_DOUBLE, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_CHAR, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_STRING, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_LIST, STYLE_KEYWORD);
-            tokenToStyle.Add(TYPE_VOID, STYLE_KEYWORD);
+                    case STATE_CHAR:
+                    case STATE_STRING:
+                        if ((c == '"' && state == STATE_STRING) || (c == '\'' && state == STATE_CHAR))
+                        {
+                            length++;
+                            scintilla.SetStyling(length, STYLE_STRING);
+                            length = 0;
+                            state = STATE_UNKNOWN;
+                        }
+                        else
+                        {
+                            length++;
+                        }
+                        break;
 
-            tokenToStyle.Add(EOF, STYLE_IGNORE);
-            tokenToStyle.Add(NEW_LINE, STYLE_IGNORE);
+                    case STATE_NUMBER:
+                        if (Char.IsDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == 'x')
+                        {
+                            length++;
+                        }
+                        else
+                        {
+                            scintilla.SetStyling(length, STYLE_NUMBER);
+                            length = 0;
+                            state = STATE_UNKNOWN;
+                            goto REPROCESS;
+                        }
+                        break;
+
+                    case STATE_IDENTIFIER:
+                        if (Char.IsLetterOrDigit(c) || (scintilla.GetTextRange(startPos - length, length).Equals("ENDE") && c == ' ') && startPos != endPos - 1)
+                        {
+                            length++;
+                        }
+                        else
+                        {
+                            if (startPos == endPos - 1)
+                            {
+                                length++;
+                            }
+                            int style = STYLE_IDENTIFIER;
+                            string identifier = scintilla.GetTextRange(startPos - length, length);
+                            if (Scanner.KEYWORDS.ContainsKey(identifier))
+                                style = STYLE_KEYWORD;
+
+                            scintilla.SetStyling(length, style);
+                            length = 0;
+                            state = STATE_UNKNOWN;
+                            goto REPROCESS;
+                        }
+                        break;
+                }
+
+                startPos++;
+            }
         }
     }
 }
