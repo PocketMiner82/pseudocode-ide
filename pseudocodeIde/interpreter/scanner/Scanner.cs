@@ -75,9 +75,6 @@ namespace pseudocodeIde.interpreter
             KEYWORDS.Add("NEU",             NEW);
                                             
             KEYWORDS.Add("NICHTS",          NULL);
-
-            KEYWORDS.Add(":=",              NULL);
-            KEYWORDS.Add("<-",              NULL);
         }
 
         public Scanner(string code)

@@ -94,31 +94,48 @@ namespace pseudocode_ide.interpreter.scanner
                         break;
 
                     case STATE_IDENTIFIER:
-                        if (Char.IsLetterOrDigit(c) || (scintilla.GetTextRange(startPos - length, length).Equals("ENDE") && c == ' ') && startPos != endPos - 1)
+                        if (isIdentifier(c, scintilla, startPos, length) && startPos != endPos - 1)
                         {
                             length++;
                         }
                         else
                         {
-                            if (startPos == endPos - 1)
+                            string identifier;
+                            if (isIdentifier(c, scintilla, startPos, length) && startPos == endPos - 1)
                             {
                                 length++;
+                                identifier = scintilla.GetTextRange(startPos + 1 - length, length);
                             }
+                            else
+                            {
+                                identifier = scintilla.GetTextRange(startPos - length, length);
+                            }
+
+                            Debug.WriteLine($"'{identifier}'");
+
                             int style = STYLE_IDENTIFIER;
-                            string identifier = scintilla.GetTextRange(startPos - length, length);
                             if (Scanner.KEYWORDS.ContainsKey(identifier))
                                 style = STYLE_KEYWORD;
 
                             scintilla.SetStyling(length, style);
                             length = 0;
                             state = STATE_UNKNOWN;
-                            goto REPROCESS;
+
+                            if (startPos != endPos - 1)
+                            {
+                                goto REPROCESS;
+                            }
                         }
                         break;
                 }
 
                 startPos++;
             }
+        }
+
+        private static bool isIdentifier(char c, Scintilla scintilla, int startPos, int length)
+        {
+            return Char.IsLetterOrDigit(c) || (scintilla.GetTextRange(startPos - length, length).Equals("ENDE") && c == ' ');
         }
     }
 }

@@ -119,7 +119,7 @@ namespace pseudocodeIde
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].ForeColor = Color.Blue;
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_IDENTIFIER].ForeColor = Color.Teal;
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_NUMBER].ForeColor = Color.Peru;
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_STRING].ForeColor = Color.Green;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_STRING].ForeColor = Color.OrangeRed;
 
             codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
             codeTextBox.Lexer = Lexer.Container;
@@ -141,15 +141,6 @@ namespace pseudocodeIde
         private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
             Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
-
-            if (Scanner.singleEqualIsCompareOperator)
-            {
-                Scanner.KEYWORDS.Remove("=");
-            }
-            else
-            {
-                Scanner.KEYWORDS.Add("=", TokenType.VAR_ASSIGN);
-            }
 
             this.setFileNotSaved();
         }
@@ -368,7 +359,7 @@ namespace pseudocodeIde
 
             // create new file
             this.ignoreTextChange = true;
-            codeTextBox.Clear();
+            codeTextBox.ClearAll();
             this.resetUndoRedo();
             Text = "Pseudocode IDE - Neue Datei";
             this.filePath = "";
