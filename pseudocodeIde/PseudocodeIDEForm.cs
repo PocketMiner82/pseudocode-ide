@@ -115,9 +115,9 @@ namespace pseudocodeIde
             codeTextBox.Styles[Style.Default].Font = "Courier New";
             codeTextBox.StyleClearAll();
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_DEFAULT].ForeColor = Color.Black;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_DEFAULT].ForeColor = Color.DarkGray;
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].ForeColor = Color.Blue;
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_IDENTIFIER].ForeColor = Color.Teal;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_IDENTIFIER].ForeColor = Color.Black;
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_NUMBER].ForeColor = Color.Peru;
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_STRING].ForeColor = Color.OrangeRed;
 

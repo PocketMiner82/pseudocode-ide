@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PseudocodeIDEForm));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,7 +67,7 @@
             this.helpMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(1176, 36);
+            this.menuStrip.Size = new System.Drawing.Size(1176, 33);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -248,18 +249,18 @@
             // codeTextBox
             // 
             this.codeTextBox.AdditionalSelectionTyping = true;
-            this.codeTextBox.CaretLineBackColor = System.Drawing.Color.LightGray;
+            this.codeTextBox.CaretLineBackColor = System.Drawing.Color.WhiteSmoke;
             this.codeTextBox.CaretLineVisible = true;
             this.codeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.codeTextBox.EolMode = ScintillaNET.Eol.Lf;
             this.codeTextBox.IndentationGuides = ScintillaNET.IndentView.Real;
             this.codeTextBox.IndentWidth = 4;
-            this.codeTextBox.Location = new System.Drawing.Point(0, 36);
+            this.codeTextBox.Location = new System.Drawing.Point(0, 33);
             this.codeTextBox.MultiPaste = ScintillaNET.MultiPaste.Each;
             this.codeTextBox.MultipleSelection = true;
             this.codeTextBox.Name = "codeTextBox";
             this.codeTextBox.ScrollWidth = 39;
-            this.codeTextBox.Size = new System.Drawing.Size(1176, 673);
+            this.codeTextBox.Size = new System.Drawing.Size(1176, 676);
             this.codeTextBox.TabIndex = 1;
             this.codeTextBox.UseTabs = true;
             this.codeTextBox.Zoom = 2;
@@ -276,6 +277,7 @@
             this.ClientSize = new System.Drawing.Size(1176, 709);
             this.Controls.Add(this.codeTextBox);
             this.Controls.Add(this.menuStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);

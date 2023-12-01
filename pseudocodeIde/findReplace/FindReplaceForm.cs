@@ -149,12 +149,12 @@ namespace pseudocodeIde
             switch (this.findNext())
             {
                 case FindReplaceResult.WRAPPED:
-                    statusLabel.Text = $"Find: The end of the document was reached. Continued at the top.";
+                    statusLabel.Text = $"Suchen: Ende des Dokuments erreicht. Fortsetzung am Anfang.";
                     statusLabel.ForeColor = Color.Green;
                     break;
 
                 case FindReplaceResult.NOTHING_FOUND:
-                    statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
+                    statusLabel.Text = $"Suchen: Konnte \"{this.findWhat}\" nicht finden.";
                     statusLabel.ForeColor = Color.Red;
                     break;
 
@@ -206,7 +206,7 @@ namespace pseudocodeIde
             string code = this.matchCase ? this.mainForm.code : this.mainForm.code.ToLower();
             string findWhat = this.matchCase ? this.findWhat : this.findWhat.ToLower();
 
-            statusLabel.Text = $"Count: Found {code.allIndexesOf(findWhat).Count} occurrences in the code.";
+            statusLabel.Text = $"Zählen: {code.allIndexesOf(findWhat).Count} Vorkommen gefunden.";
             statusLabel.ForeColor = Color.Blue;
         }
 
@@ -219,27 +219,27 @@ namespace pseudocodeIde
             switch (this.replaceNext())
             {
                 case FindReplaceResult.WRAPPED:
-                    statusLabel.Text = $"Find: The end of the document was reached. Continued on the top.";
+                    statusLabel.Text = $"Suchen: Ende des Dokuments erreicht. Fortsetzung am Anfang.";
                     statusLabel.ForeColor = Color.Green;
                     break;
 
                 case FindReplaceResult.REPLACED_WRAPPED:
-                    statusLabel.Text = $"Replace: Replaced 1 occurrence. Continued at the top.";
+                    statusLabel.Text = $"Ersetzen: 1 Vorkommen ersetzt. Fortsetzung am Anfang.";
                     statusLabel.ForeColor = Color.Blue;
                     break;
 
                 case FindReplaceResult.NOTHING_FOUND:
-                    statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
+                    statusLabel.Text = $"Suchen: Konnte \"{this.findWhat}\" nicht finden.";
                     statusLabel.ForeColor = Color.Red;
                     break;
 
                 case FindReplaceResult.NOTHING_MORE_FOUND:
-                    statusLabel.Text = $"Replace: Replaced the last occurence.";
+                    statusLabel.Text = $"Ersetzen: Letztes Vorkommen ersetzt.";
                     statusLabel.ForeColor = Color.Blue;
                     break;
 
                 case FindReplaceResult.REPLACED:
-                    statusLabel.Text = $"Replace: Replaced 1 occurrence.";
+                    statusLabel.Text = $"Ersetzen: 1 Vorkommen ersetzt.";
                     statusLabel.ForeColor = Color.Blue;
                     break;
 
@@ -301,7 +301,7 @@ namespace pseudocodeIde
             // no result found
             if (count == 0)
             {
-                statusLabel.Text = $"Find: Unable to find \"{this.findWhat}\" in the code.";
+                statusLabel.Text = $"Suchen: Konnte \"{this.findWhat}\" nicht finden.";
                 statusLabel.ForeColor = Color.Red;
                 return;
             }
@@ -321,7 +321,7 @@ namespace pseudocodeIde
             this.mainForm.noNewUndoPoint = false;
             this.replaceNext();
 
-            statusLabel.Text = $"Replace: Replaced {count} occurrence(s).";
+            statusLabel.Text = $"Ersetzen: {count} Vorkommen ersetzt.";
             statusLabel.ForeColor = Color.Blue;
         }
     }

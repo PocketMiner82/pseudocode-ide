@@ -45,7 +45,7 @@
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.ShowItemToolTips = true;
-            this.menuStrip.Size = new System.Drawing.Size(1176, 36);
+            this.menuStrip.Size = new System.Drawing.Size(1176, 33);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -55,7 +55,7 @@
             this.startMenuItem.ForeColor = System.Drawing.Color.Green;
             this.startMenuItem.Name = "startMenuItem";
             this.startMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.startMenuItem.Size = new System.Drawing.Size(64, 32);
+            this.startMenuItem.Size = new System.Drawing.Size(64, 29);
             this.startMenuItem.Text = "Start";
             this.startMenuItem.ToolTipText = "Start (F5)";
             this.startMenuItem.Click += new System.EventHandler(this.startMenuItem_Click);
@@ -67,7 +67,7 @@
             this.stopMenuItem.ForeColor = System.Drawing.Color.Red;
             this.stopMenuItem.Name = "stopMenuItem";
             this.stopMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5)));
-            this.stopMenuItem.Size = new System.Drawing.Size(65, 32);
+            this.stopMenuItem.Size = new System.Drawing.Size(65, 29);
             this.stopMenuItem.Text = "Stop";
             this.stopMenuItem.ToolTipText = "Stop (Shift+F5)";
             this.stopMenuItem.Click += new System.EventHandler(this.stopMenuItem_Click);
@@ -76,11 +76,11 @@
             // 
             this.rtbOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtbOutput.Font = new System.Drawing.Font("Courier New", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rtbOutput.Location = new System.Drawing.Point(0, 36);
+            this.rtbOutput.Location = new System.Drawing.Point(0, 33);
             this.rtbOutput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.rtbOutput.Name = "rtbOutput";
             this.rtbOutput.ReadOnly = true;
-            this.rtbOutput.Size = new System.Drawing.Size(1176, 673);
+            this.rtbOutput.Size = new System.Drawing.Size(1176, 676);
             this.rtbOutput.TabIndex = 1;
             this.rtbOutput.Text = "";
             this.rtbOutput.WordWrap = false;
@@ -96,8 +96,9 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MinimumSize = new System.Drawing.Size(514, 354);
             this.Name = "OutputForm";
+            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Output";
+            this.Text = "Ausgabe";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OutputForm_FormClosing);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
