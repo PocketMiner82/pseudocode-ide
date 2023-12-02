@@ -279,27 +279,47 @@ namespace pseudocodeIde
                                     (charPrev == '{' && isCharNextBlank) || (isCharPrevBlank && charNext == '}') ||
                                     (charPrev == '[' && isCharNextBlank) || (isCharPrevBlank && charNext == ']');
 
-            bool isCharOrString = (isCharPrevBlank && isCharNextBlank) || isEnclosed || isSpaceEnclosed;
+            bool isCharOrString = docStart || (isCharPrevBlank && isCharNextBlank) || isEnclosed || isSpaceEnclosed;
 
             bool charNextIsCharOrString = charNext == '"' || charNext == '\'';
 
             switch (e.Char)
             {
                 case '(':
-                    if (charNextIsCharOrString) return;
                     codeTextBox.InsertText(caretPos, ")");
                     break;
+                case ')':
+                    if (charPrev == '(' && charNext == ')')
+                    {
+                        codeTextBox.DeleteRange(caretPos, 1);
+                        codeTextBox.GotoPosition(caretPos);
+                        return;
+                    }
+                    break;
                 case '{':
-                    if (charNextIsCharOrString) return;
                     codeTextBox.InsertText(caretPos, "}");
                     break;
+                case '}':
+                    if (charPrev == '{' && charNext == '}')
+                    {
+                        codeTextBox.DeleteRange(caretPos, 1);
+                        codeTextBox.GotoPosition(caretPos);
+                        return;
+                    }
+                    break;
                 case '[':
-                    if (charNextIsCharOrString) return;
                     codeTextBox.InsertText(caretPos, "]");
                     break;
+                case ']':
+                    if (charPrev == '[' && charNext == ']')
+                    {
+                        codeTextBox.DeleteRange(caretPos, 1);
+                        codeTextBox.GotoPosition(caretPos);
+                        return;
+                    }
+                    break;
                 case '"':
-                    // 0x22 = "
-                    if (charPrev == 0x22 && charNext == 0x22)
+                    if (charPrev == '"' && charNext == '"')
                     {
                         codeTextBox.DeleteRange(caretPos, 1);
                         codeTextBox.GotoPosition(caretPos);
@@ -307,11 +327,12 @@ namespace pseudocodeIde
                     }
 
                     if (isCharOrString)
+                    {
                         codeTextBox.InsertText(caretPos, "\"");
+                    }
                     break;
                 case '\'':
-                    // 0x27 = '
-                    if (charPrev == 0x27 && charNext == 0x27)
+                    if (charPrev == '\'' && charNext == '\'')
                     {
                         codeTextBox.DeleteRange(caretPos, 1);
                         codeTextBox.GotoPosition(caretPos);
@@ -319,7 +340,9 @@ namespace pseudocodeIde
                     }
 
                     if (isCharOrString)
+                    {
                         codeTextBox.InsertText(caretPos, "'");
+                    }
                     break;
             }
         }
