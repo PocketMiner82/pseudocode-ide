@@ -116,10 +116,18 @@ namespace pseudocodeIde
             codeTextBox.StyleClearAll();
 
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_DEFAULT].ForeColor = Color.DarkGray;
+
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].ForeColor = Color.Blue;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].Bold = true;
+
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_IDENTIFIER].ForeColor = Color.Black;
+
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_NUMBER].ForeColor = Color.Peru;
+
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_STRING].ForeColor = Color.OrangeRed;
+
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_ESCAPE].ForeColor = Color.Orange;
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_ESCAPE].Bold = true;
 
             codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
             codeTextBox.Lexer = Lexer.Container;
@@ -254,7 +262,7 @@ namespace pseudocodeIde
             }
         }
 
-        // from https://github.com/jacobslusser/ScintillaNET/wiki/Character-Autocompletion#finishing-touch
+        // adapted from https://github.com/jacobslusser/ScintillaNET/wiki/Character-Autocompletion#finishing-touch
         private void codeTextBox_CharAdded(object sender, CharAddedEventArgs e)
         {
             int caretPos = codeTextBox.CurrentPosition;

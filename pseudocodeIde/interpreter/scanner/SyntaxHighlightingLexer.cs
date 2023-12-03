@@ -13,7 +13,7 @@ namespace pseudocode_ide.interpreter.scanner
         public const int STYLE_IDENTIFIER = 2;
         public const int STYLE_NUMBER = 3;
         public const int STYLE_STRING = 4;
-        public const int STYLE_IGNORE = 5;
+        public const int STYLE_ESCAPE = 5;
 
         private const int STATE_UNKNOWN = 0;
         private const int STATE_IDENTIFIER = 1;
@@ -21,9 +21,15 @@ namespace pseudocode_ide.interpreter.scanner
         private const int STATE_STRING = 3;
         private const int STATE_CHAR = 4;
 
+        private static int startPos;
+        private static int endPos;
 
-        public static void style(Scintilla scintilla, int startPos, int endPos)
+
+        public static void style(Scintilla scintilla, int _startPos, int _endPos)
         {
+            startPos = _startPos;
+            endPos = _endPos;
+
             // back up to the line start
             int line = scintilla.LineFromPosition(startPos);
             startPos = scintilla.Lines[line].Position;
@@ -35,6 +41,7 @@ namespace pseudocode_ide.interpreter.scanner
             scintilla.StartStyling(startPos);
             while (startPos < endPos)
             {
+                char prevC = startPos == 0 ? (char)scintilla.GetCharAt(startPos) : (char)scintilla.GetCharAt(startPos - 1);
                 char c = (char)scintilla.GetCharAt(startPos);
 
             REPROCESS:
@@ -66,7 +73,7 @@ namespace pseudocode_ide.interpreter.scanner
 
                     case STATE_CHAR:
                     case STATE_STRING:
-                        if ((c == '"' && state == STATE_STRING) || (c == '\'' && state == STATE_CHAR))
+                        if ((((c == '"' && state == STATE_STRING) || (c == '\'' && state == STATE_CHAR)) && prevC != '\\') || isAtEnd())
                         {
                             length++;
                             scintilla.SetStyling(length, STYLE_STRING);
@@ -76,32 +83,49 @@ namespace pseudocode_ide.interpreter.scanner
                         else
                         {
                             length++;
+
+                            if (prevC == '\\')
+                            {
+                                length -= 2;
+                                scintilla.SetStyling(length, STYLE_STRING);
+                                scintilla.SetStyling(2, STYLE_ESCAPE);
+                                length = 0;
+                            }
                         }
                         break;
 
                     case STATE_NUMBER:
-                        if (Char.IsDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == 'x')
+                        if (isNumber(c) && !isAtEnd())
                         {
                             length++;
                         }
                         else
                         {
+                            if (isNumber(c) && isAtEnd())
+                            {
+                                length++;
+                            }
+
                             scintilla.SetStyling(length, STYLE_NUMBER);
                             length = 0;
                             state = STATE_UNKNOWN;
-                            goto REPROCESS;
+
+                            if (!isAtEnd())
+                            {
+                                goto REPROCESS;
+                            }
                         }
                         break;
 
                     case STATE_IDENTIFIER:
-                        if (isIdentifier(c, scintilla, startPos, length) && startPos != endPos - 1)
+                        if (isIdentifier(c, scintilla, startPos, length) && !isAtEnd())
                         {
                             length++;
                         }
                         else
                         {
                             string identifier;
-                            if (isIdentifier(c, scintilla, startPos, length) && startPos == endPos - 1)
+                            if (isIdentifier(c, scintilla, startPos, length) && isAtEnd())
                             {
                                 length++;
                                 identifier = scintilla.GetTextRange(startPos + 1 - length, length);
@@ -121,7 +145,7 @@ namespace pseudocode_ide.interpreter.scanner
                             length = 0;
                             state = STATE_UNKNOWN;
 
-                            if (startPos != endPos - 1)
+                            if (!isAtEnd())
                             {
                                 goto REPROCESS;
                             }
@@ -136,6 +160,16 @@ namespace pseudocode_ide.interpreter.scanner
         private static bool isIdentifier(char c, Scintilla scintilla, int startPos, int length)
         {
             return Char.IsLetterOrDigit(c) || (scintilla.GetTextRange(startPos - length, length).Equals("ENDE") && c == ' ');
+        }
+
+        private static bool isNumber(char c)
+        {
+            return Char.IsDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == 'x' || c == '.';
+        }
+
+        private static bool isAtEnd()
+        {
+            return startPos == endPos - 1;
         }
     }
 }
