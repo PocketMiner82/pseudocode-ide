@@ -453,7 +453,7 @@ namespace pseudocodeIde
                 saveFileDialog.Filter = "Pseudocode Datei (*.pseudocode)|*.pseudocode|Alle Dateien (*.*)|*.*";
                 saveFileDialog.FilterIndex = 1;
                 saveFileDialog.RestoreDirectory = true;
-                saveFileDialog.Title = "Neue Pseudocode Datei";
+                saveFileDialog.Title = "Pseudocode Datei speichern";
 
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
