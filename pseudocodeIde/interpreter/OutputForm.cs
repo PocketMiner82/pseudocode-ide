@@ -107,11 +107,6 @@ namespace pseudocodeIde
 
         public void stopMenuItem_Click(object sender, EventArgs e)
         {
-            if (Interpreter.hadError)
-            {
-                // TODO
-            }
-
             Invoke(new Action(() =>
             {
                 startMenuItem.Enabled = true;
