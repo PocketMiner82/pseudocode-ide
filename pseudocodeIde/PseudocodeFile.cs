@@ -3,7 +3,7 @@
     public class PseudocodeFile
     {
         public bool singleEqualIsCompareOperator { get; set; }
-        public string[] fileContent;
+        public string[] fileContent { get; set; }
 
         public PseudocodeFile(bool singleEqualIsCompareOperator, string[] fileContent)
         {

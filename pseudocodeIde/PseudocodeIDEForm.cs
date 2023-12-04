@@ -494,7 +494,7 @@ namespace pseudocodeIde
                 openFileDialog.Filter = "Pseudocode Datei (*.pseudocode)|*.pseudocode|Alle Dateien (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
-                openFileDialog.Title = "Pseudocode Datei öffnen"; ;
+                openFileDialog.Title = "Pseudocode Datei öffnen";
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
