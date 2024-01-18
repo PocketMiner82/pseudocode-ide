@@ -22,3 +22,11 @@ jobs:
      run: nuget restore pseudocodeIde.sln
    - name: Build solution
      run: msbuild pseudocodeIde.sln -t:rebuild -property:Configuration=Release
+   - name: Upload a Build Artifact
+     uses: actions/upload-artifact@v4.1.0
+     with:
+       # Artifact name
+       name: pseudocode-ide
+       # A file, directory or wildcard pattern that describes what to upload
+       path: bin/Release/
+ 
