@@ -16,6 +16,8 @@ namespace pseudocodeIde.interpreter
 
         private Thread programThread = null;
 
+        public CSharpCode cSharpCode { get; private set; } = null;
+
         private string code
         {
             get
@@ -67,14 +69,15 @@ namespace pseudocodeIde.interpreter
             Logger.info($"Generierte Tokens:\n{tokensString}\n\n");
 
             Parser parser = new Parser(tokens);
-            CSharpCode cSharpCode = parser.parseTokens();
+            this.cSharpCode = parser.parseTokens();
+            outputForm.showCopyButton();
 
             if (this.cancelRequestedOrError())
             {
                 return false;
             }
 
-            cSharpCode.compile();
+            this.cSharpCode.compile();
 
             if (this.cancelRequestedOrError())
             {
@@ -84,7 +87,7 @@ namespace pseudocodeIde.interpreter
             Logger.info(LogMessage.RUNNING_PROGRAM);
             Logger.print("");
 
-            this.programThread = new Thread(cSharpCode.execute);
+            this.programThread = new Thread(this.cSharpCode.execute);
             this.programThread.Start();
             return true;
         }

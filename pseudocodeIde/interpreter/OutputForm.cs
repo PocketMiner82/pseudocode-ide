@@ -1,4 +1,5 @@
-﻿using pseudocodeIde.interpreter;
+﻿using pseudocode_ide;
+using pseudocodeIde.interpreter;
 using pseudocodeIde.interpreter.logging;
 using System;
 using System.Threading;
@@ -93,6 +94,7 @@ namespace pseudocodeIde
 
         private void startMenuItem_Click(object sender, EventArgs e)
         {
+            copyCSharpCodeMenuItem.Visible = false;
             this.stopMenuItem_Click(null, null);
 
             startMenuItem.Enabled = false;
@@ -122,6 +124,20 @@ namespace pseudocodeIde
 
             Logger.print("");
             Logger.info(LogMessage.STOPPED_PROGRAM);
+        }
+
+        private void copyCSharpCodeMenuItem_Click(object sender, EventArgs e)
+        {
+            new SetClipboardHelper(DataFormats.UnicodeText, this.interpreter.cSharpCode.codeText).Go();
+            MessageBox.Show("C# Code in Zwischenablage gespeichert.", "Zwischenablage");
+        }
+
+        public void showCopyButton()
+        {
+            Invoke(new Action(() =>
+            {
+                copyCSharpCodeMenuItem.Visible = true;
+            }));
         }
     }
 }

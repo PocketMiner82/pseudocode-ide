@@ -98,6 +98,8 @@ namespace codeOutput {
 
         public string methods { get; set; } = "";
 
+        public string codeText { get; private set; } = "";
+
         private Assembly compiledAssembly;
 
 
@@ -122,20 +124,20 @@ namespace codeOutput {
             parameters.CompilerOptions += "/unsafe /optimize /langversion:9.0";
             
 
-            string code = TEMPLATE_CLASS
+            this.codeText = TEMPLATE_CLASS
                 .Replace("%FIELDS%", this.fields)
                 .Replace("%CONSTRUCTOR%", this.constructor)
                 .Replace("%METHODS%", this.methods);
 
             // pretty print code
-            SyntaxNode node = CSharpSyntaxTree.ParseText(code).GetRoot();
-            code = node.NormalizeWhitespace().ToFullString();
+            SyntaxNode node = CSharpSyntaxTree.ParseText(this.codeText).GetRoot();
+            this.codeText = node.NormalizeWhitespace().ToFullString();
 
             Logger.info(LogMessage.GENERATED_C_SHARP_CODE);
 
             string printCode = "1\t";
             int line = 1;
-            foreach(char c in code)
+            foreach(char c in this.codeText)
             {
                 if (c == '\n')
                 {
@@ -150,7 +152,7 @@ namespace codeOutput {
 
             Logger.info(LogMessage.COMPILING_C_SHARP_CODE);
 
-            CompilerResults result = provider.CompileAssemblyFromSource(parameters, code);
+            CompilerResults result = provider.CompileAssemblyFromSource(parameters, this.codeText);
 
             if (result.Errors.Count > 0)
             {

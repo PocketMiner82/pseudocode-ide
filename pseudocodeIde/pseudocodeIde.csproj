@@ -154,6 +154,7 @@
     <Compile Include="interpreter\OutputForm.Designer.cs">
       <DependentUpon>OutputForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SetClipboardHelper.cs" />
     <EmbeddedResource Include="findReplace\FindReplaceForm.resx">
       <DependentUpon>FindReplaceForm.cs</DependentUpon>
     </EmbeddedResource>
