@@ -1,5 +1,7 @@
 ﻿using pseudocodeIde.interpreter.logging;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using static pseudocodeIde.interpreter.TokenType;
 
 namespace pseudocodeIde.interpreter
@@ -184,17 +186,24 @@ namespace pseudocodeIde.interpreter
                 case '\'': this.handleChar(); break;
 
                 default:
-                    if (this.isDigit(c))
+                    try
                     {
-                        this.handleNumber();
+                        if (this.isDigit(c))
+                        {
+                            this.handleNumber();
+                        }
+                        else if (this.isAlpha(c))
+                        {
+                            this.handleIdentifier();
+                        }
+                        else
+                        {
+                            Logger.error(this.line, $"Unerwartetes Zeichen: '{c}'.");
+                        }
                     }
-                    else if (this.isAlpha(c))
+                    catch (Exception e)
                     {
-                        this.handleIdentifier();
-                    }
-                    else
-                    {
-                        Logger.error(this.line, $"Unerwartetes Zeichen: '{c}'.");
+                        Logger.error(this.line, $"Unerwartete Zeichen nach '{c}'. {e.GetType().Name}: {e.Message}");
                     }
                     break;
             }
@@ -285,6 +294,32 @@ namespace pseudocodeIde.interpreter
                 {
                     this.advance();
                 }
+            }
+            else if (this.peek() == 'x' && this.isHexDigit(this.peekNext()))
+            {
+                // consume the 'x'
+                this.advance();
+
+                while (this.isHexDigit(this.peek()))
+                {
+                    this.advance();
+                }
+                // start + 2 because the '0x' must be removed
+                this.addToken(NUMBER, Convert.ToInt32(this.code.Substring(this.start + 2, this.current - this.start), 16));
+                return;
+            }
+            else if (this.peek() == 'b' && this.isBinaryDigit(this.peekNext()))
+            {
+                // consume the 'b'
+                this.advance();
+
+                while (this.isBinaryDigit(this.peek()))
+                {
+                    this.advance();
+                }
+                // start + 2 because the '0b' must be removed
+                this.addToken(NUMBER, Convert.ToInt32(this.code.Substring(this.start, this.current - this.start).Substring(2), 2));
+                return;
             }
 
             this.addToken(NUMBER, double.Parse(this.code.Substring(this.start, this.current - this.start)));
@@ -392,6 +427,18 @@ namespace pseudocodeIde.interpreter
         private bool isDigit(char c)
         {
             return c >= '0' && c <= '9';
+        }
+
+        private bool isHexDigit(char c)
+        {
+            return isDigit(c) ||
+                (c >= 'a' && c <= 'f') ||
+                (c >= 'A' && c <= 'F');
+        }
+
+        private bool isBinaryDigit(char c)
+        {
+            return c == '0' || c == '1';
         }
 
         private bool isAlpha(char c)

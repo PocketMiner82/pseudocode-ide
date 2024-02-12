@@ -227,8 +227,8 @@ namespace pseudocodeIde
 
         private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            // ignore CTRL[+SHIFT]+(Z/Y/L/R/E)
-            if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E)
+            // ignore CTRL[+SHIFT]+(Z/Y/L/R/E/S)
+            if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E || e.KeyCode == Keys.S)
                 && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
             {
                 e.SuppressKeyPress = true;

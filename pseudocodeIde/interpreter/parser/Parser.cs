@@ -289,7 +289,7 @@ namespace pseudocodeIde.interpreter
             do
             {
                 this.advance();
-                output += this.parseToken(output.LastOrDefault(), true);
+                output += this.parseToken(output.LastOrDefault());
                 currentToken = this.peek();
             }
             while (!this.isAtEnd() && currentToken.type != WHILE);
