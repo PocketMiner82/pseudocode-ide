@@ -129,6 +129,8 @@ namespace pseudocodeIde
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_ESCAPE].ForeColor = Color.Orange;
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_ESCAPE].Bold = true;
 
+            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_COMMENT].ForeColor = Color.Green;
+
             codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
             codeTextBox.Lexer = Lexer.Container;
         }

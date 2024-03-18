@@ -14,12 +14,14 @@ namespace pseudocode_ide.interpreter.scanner
         public const int STYLE_NUMBER = 3;
         public const int STYLE_STRING = 4;
         public const int STYLE_ESCAPE = 5;
+        public const int STYLE_COMMENT = 6;
 
         private const int STATE_UNKNOWN = 0;
         private const int STATE_IDENTIFIER = 1;
         private const int STATE_NUMBER = 2;
         private const int STATE_STRING = 3;
         private const int STATE_CHAR = 4;
+        private const int STATE_COMMENT = 5;
 
         private static int startPos;
         private static int endPos;
@@ -41,7 +43,7 @@ namespace pseudocode_ide.interpreter.scanner
             scintilla.StartStyling(startPos);
             while (startPos < endPos)
             {
-                char prevC = startPos == 0 ? (char)scintilla.GetCharAt(startPos) : (char)scintilla.GetCharAt(startPos - 1);
+                char prevC = startPos == 0 ? (char)0x00 : (char)scintilla.GetCharAt(startPos - 1);
                 char c = (char)scintilla.GetCharAt(startPos);
 
             REPROCESS:
@@ -62,6 +64,13 @@ namespace pseudocode_ide.interpreter.scanner
                         else if (Char.IsLetter(c))
                         {
                             state = STATE_IDENTIFIER;
+                            goto REPROCESS;
+                        }
+                        else if (prevC == '/' && c == '/')
+                        {
+                            startPos = Math.Max(startPos - 1, 0);
+                            scintilla.StartStyling(startPos);
+                            state = STATE_COMMENT;
                             goto REPROCESS;
                         }
                         else
@@ -105,7 +114,7 @@ namespace pseudocode_ide.interpreter.scanner
                             {
                                 length++;
                             }
-
+                            
                             scintilla.SetStyling(length, STYLE_NUMBER);
                             length = 0;
                             state = STATE_UNKNOWN;
@@ -142,6 +151,29 @@ namespace pseudocode_ide.interpreter.scanner
                                 style = STYLE_KEYWORD;
 
                             scintilla.SetStyling(length, style);
+                            length = 0;
+                            state = STATE_UNKNOWN;
+
+                            if (!isAtEnd())
+                            {
+                                goto REPROCESS;
+                            }
+                        }
+                        break;
+
+                    case STATE_COMMENT:
+                        if (c != '\n' && !isAtEnd())
+                        {
+                            length++;
+                        }
+                        else
+                        {
+                            if (c != '\n' && isAtEnd())
+                            {
+                                length++;
+                            }
+
+                            scintilla.SetStyling(length, STYLE_COMMENT);
                             length = 0;
                             state = STATE_UNKNOWN;
 
