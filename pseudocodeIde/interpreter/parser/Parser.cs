@@ -185,6 +185,12 @@ namespace pseudocodeIde.interpreter
                 if (this.peek().type == LEFT_BRACKET)
                 {
                     output += this.handleArrayInit(possibleLeftBracket, true);
+
+                    // the method advances to the next char at the end, which could be the ending bracket for this array definition
+                    if (this.peek().type == RIGHT_BRACKET)
+                    {
+                        break;
+                    }
                 }
 
                 output += this.parseToken(this.advance().lexeme.Last(), true);
