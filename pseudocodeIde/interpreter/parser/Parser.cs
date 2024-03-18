@@ -515,6 +515,13 @@ namespace pseudocodeIde.interpreter
                         Logger.error(possibleVarType.line, $"'>' erwartet, nicht '{possibleGreaterSign.lexeme}'");
                         return "";
                     }
+
+                    while (this.currentToken.NextOrLast().NextOrLast().NextOrLast().Value.type == GREATER)
+                    {
+                        // consume any more greater signs
+                        this.advance();
+                    }
+
                     output += ">";
                 }
                 else
