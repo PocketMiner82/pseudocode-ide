@@ -19,4 +19,4 @@ Dieses Programm ermöglicht die Ausführung von Pseudocode nach der [Formelsamml
   - Rückgabetyp: Der Rückgabetyp ist der in `<` und `>` angegebene `Typ`
 * Nicht implementiert:
   - Unterstützung für mehrere Dateien
-  - Klassen/Objekte - erfordert Unterstützung für mehrere Dateien; außerdem sind Klassen/Objekte nicht in der Formellsammlung definiert.
+  - Klassen/Objekte - erfordert Unterstützung für mehrere Dateien; außerdem sind Klassen/Objekte nicht in der Formelsammlung definiert.
