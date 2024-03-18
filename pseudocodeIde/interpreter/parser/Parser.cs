@@ -145,29 +145,14 @@ namespace pseudocodeIde.interpreter
                     Token possibleLeftBracket = this.peek();
                     if (possibleLeftBracket.type == LEFT_BRACKET)
                     {
-                        this.advance();
-                        output += "new() {";
+                        string arrayInitOutput = handleArrayInit(possibleLeftBracket);
 
-                        while(!this.isAtEnd() && this.peek().type != RIGHT_BRACKET && this.peek().type != NEW_LINE)
+                        if (arrayInitOutput == null)
                         {
-                            output += this.parseToken(this.advance().lexeme.Last(), true);
-                        }
-
-                        if (!this.isAtEnd() && this.peek().type == RIGHT_BRACKET)
-                        {
-                            this.advance();
-                            output += "}";
-
-                            if (this.peek().type == NEW_LINE)
-                            {
-                                output += ";";
-                            }
-                        }
-                        else
-                        {
-                            Logger.error(possibleLeftBracket.line, $"']' erwartet, nicht '{this.currentToken.Value.lexeme}'.\n\n{output}");
                             return "";
                         }
+
+                        output += arrayInitOutput;
                     }
                     return output;
 
@@ -181,6 +166,47 @@ namespace pseudocodeIde.interpreter
                         return token.lexeme;
                     }
             }
+        }
+
+        private string handleArrayInit(Token possibleLeftBracket, bool noSemicolon = false)
+        {
+            this.advance();
+            string output = "new() {";
+
+            while (!this.isAtEnd() && this.peek().type != RIGHT_BRACKET)
+            {
+                // ignore new lines
+                if (this.peek().type == NEW_LINE)
+                {
+                    this.advance();
+                    continue;
+                }
+
+                if (this.peek().type == LEFT_BRACKET)
+                {
+                    output += this.handleArrayInit(possibleLeftBracket, true);
+                }
+
+                output += this.parseToken(this.advance().lexeme.Last(), true);
+            }
+
+            if (!this.isAtEnd() && this.peek().type == RIGHT_BRACKET)
+            {
+                this.advance();
+                output += "}";
+
+                if ((this.peek().type == NEW_LINE || this.currentToken.Next.Value.type == EOF) && !noSemicolon)
+                {
+                    output += ";";
+                }
+            }
+            else
+            {
+                Logger.error(possibleLeftBracket.line, $"']' erwartet, nicht '{this.currentToken.Value.lexeme}'.\n\n{output}");
+                return null;
+            }
+
+            return output;
         }
 
         private string handleFor()
