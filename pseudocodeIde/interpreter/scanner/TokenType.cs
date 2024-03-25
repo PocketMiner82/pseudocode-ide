@@ -3,7 +3,7 @@
     public enum TokenType
     {
         // Single-character tokens.
-        LEFT_PAREN, RIGHT_PAREN, LEFT_BRACKET, RIGHT_BRACKET,
+        LEFT_PAREN, RIGHT_PAREN, LEFT_BRACKET, RIGHT_BRACKET, HASH,
         SINGLE_AND, SINGLE_OR, COLON, COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR, NEW_LINE,
 
         // One or two character tokens.

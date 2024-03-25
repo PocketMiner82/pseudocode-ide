@@ -121,6 +121,7 @@ namespace pseudocodeIde.interpreter
                 case '←': this.addToken(VAR_ASSIGN); break;
                 case '&': this.addToken(SINGLE_AND); break;
                 case '|': this.addToken(SINGLE_OR); break;
+                case '#': this.addToken(HASH); break;
 
                 // single or two char lexems
                 case '!':

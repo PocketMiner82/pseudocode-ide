@@ -8,9 +8,11 @@ namespace pseudocodeIde.interpreter
 {
     public class Parser
     {
-        private const string FUNCTION_HEADER_TEMPLATE = "private %type% %identifier%(%insideParens%) {";
+        private const string FUNCTION_HEADER_TEMPLATE = "%visibility% %type% %identifier%(%insideParens%) {";
 
-        private static readonly Dictionary<TokenType, string> TOKEN_TO_CSHARP = new Dictionary<TokenType, string>();
+        private static readonly Dictionary<TokenType, string> TOKEN_TO_CSHARP = new Dictionary<TokenType, string>(); 
+
+        private static readonly Dictionary<TokenType, string> VISIBILITY = new Dictionary<TokenType, string>();
 
         private static readonly List<char> NO_SEMICOLON_AFTER = new List<char>();
 
@@ -62,6 +64,11 @@ namespace pseudocodeIde.interpreter
             TOKEN_TO_CSHARP.Add(TYPE_LIST,      "Liste");
             TOKEN_TO_CSHARP.Add(NEW,            "new ");
             TOKEN_TO_CSHARP.Add(NULL,           "null");
+
+
+            VISIBILITY.Add(PLUS,                "public");
+            VISIBILITY.Add(MINUS,               "private");
+            VISIBILITY.Add(HASH,                "protected");
 
 
             NO_SEMICOLON_AFTER.Add('}');
@@ -559,11 +566,19 @@ namespace pseudocodeIde.interpreter
         {
             string output = "";
             string insideParens = "";
+            string visibility = "";
             TokenType type = TYPE_VOID;
 
-            Token operationKeyword = this.currentToken.Value;
+            Token functionKeyword = this.currentToken.Value;
 
-            Token possibleIdentifier = this.advance();
+            Token possibleVisibility = this.advance();
+            Token possibleIdentifier = possibleVisibility;
+            if (VISIBILITY.ContainsKey(possibleVisibility.type))
+            {
+                visibility = VISIBILITY[possibleIdentifier.type];
+                possibleIdentifier = this.advance();
+            }
+
             Token possibleLeftParen = this.advance();
 
             Token possibleRightParen = this.advance();
@@ -572,7 +587,7 @@ namespace pseudocodeIde.interpreter
 
             if (possibleIdentifier.type != IDENTIFIER || possibleLeftParen.type != LEFT_PAREN)
             {
-                Logger.error(operationKeyword.line, "Unerwartete Zeichen nach dem OPERATION-Keyword.");
+                Logger.error(functionKeyword.line, "Unerwartete Zeichen nach dem OPERATION-Keyword.");
                 return "";
             }
 
@@ -581,7 +596,7 @@ namespace pseudocodeIde.interpreter
             {
                 if (possibleRightParen.type == NEW_LINE)
                 {
-                    Logger.error(operationKeyword.line, "Neue Zeile vor dem Ende der OPERATION-Definition.");
+                    Logger.error(functionKeyword.line, "Neue Zeile vor dem Ende der OPERATION-Definition.");
                     return "\n";
                 }
                 else if (possibleRightParen.type == RIGHT_PAREN
@@ -605,7 +620,7 @@ namespace pseudocodeIde.interpreter
                 }
                 else
                 {
-                    Logger.error(operationKeyword.line, "Unerwartete Zeichen.");
+                    Logger.error(functionKeyword.line, "Unerwartete Zeichen.");
                     return "";
                 }
             }
@@ -618,6 +633,7 @@ namespace pseudocodeIde.interpreter
             this.isInConstructor = false;
 
             return output + FUNCTION_HEADER_TEMPLATE
+                .Replace("%visibility%", visibility)
                 .Replace("%type%", TOKEN_TO_CSHARP[type])
                 .Replace("%identifier%", "_" + possibleIdentifier.lexeme)
                 .Replace("%insideParens%", insideParens);
