@@ -1,6 +1,7 @@
 ﻿using AutoUpdaterDotNET;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace pseudocodeIdeUpdater
@@ -38,6 +39,9 @@ namespace pseudocodeIdeUpdater
                 AutoUpdater.Synchronous = true;
                 AutoUpdater.ApplicationExitEvent += AutoUpdater_ApplicationExitEvent;
                 AutoUpdater.ExecutablePath = "pseudocode-ide.exe";
+
+                Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}");
 
                 AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
 
