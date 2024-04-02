@@ -1,7 +1,6 @@
 ﻿using pseudocodeIde.interpreter.logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using static pseudocodeIde.interpreter.TokenType;
 
 namespace pseudocodeIde.interpreter
