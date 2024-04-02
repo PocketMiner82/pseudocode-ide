@@ -28,9 +28,10 @@ jobs:
             }
           ]
         extra_plugins: |
-          @semantic-release/changelog
-          @semantic-release/git
-          semantic-release-replace-plugin
+          @semantic-release/changelog@6.0.3
+          @semantic-release/git@10.0.1
+          @saithodev/semantic-release-backmerge@4.0.1
+          semantic-release-replace-plugin@1.2.7
           
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
