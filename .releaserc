@@ -29,12 +29,6 @@
             ],
             "from": "AssemblyVersion\\(\".*\"\\)",
             "to": "AssemblyVersion(\"${nextRelease.version.split('-')[0]}\")",
-            "results": [
-              {
-                "file": "SolutionInfo.cs",
-                "numMatches": 1
-              }
-            ],
             "countMatches": true
           },
           {
@@ -43,12 +37,6 @@
             ],
             "from": "<version>.*</version>",
             "to": "<version>${nextRelease.version.split('-')[0]}</version>",
-            "results": [
-              {
-                "file": "AutoUpdater.xml",
-                "numMatches": 1
-              }
-            ],
             "countMatches": true
           }
         ]
