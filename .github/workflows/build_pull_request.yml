@@ -1,4 +1,4 @@
-name: Build app
+name: Build app on PR
 on:
  workflow_dispatch:
  pull_request:
