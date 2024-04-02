@@ -12,7 +12,11 @@
       {
         "preset": "angular",
         "parserOpts": {
-          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+          "noteKeywords": [
+            "BREAKING CHANGE",
+            "BREAKING CHANGES",
+            "BREAKING"
+          ]
         },
         "releaseRules": [
           {
@@ -23,6 +27,20 @@
         ]
       }
     ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "angular",
+        "parserOpts": {
+          "noteKeywords": [
+            "BREAKING CHANGE",
+            "BREAKING CHANGES",
+            "BREAKING"
+          ]
+        }
+      }
+    ],
+    "@semantic-release/changelog",
     [
       "semantic-release-replace-plugin",
       {
@@ -47,21 +65,11 @@
       }
     ],
     [
-      "@semantic-release/release-notes-generator",
+      "@semantic-release/exec",
       {
-        "preset": "angular",
-        "parserOpts": {
-          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
-        },
-        "writerOpts": {
-          "commitsSort": ["subject", "scope"]
-        }
+        "publishCmd": ".\\build.cmd"
       }
     ],
-    "@semantic-release/changelog",
-    ["@semantic-release/exec", {
-      "publishCmd": ".\\build.cmd"
-    }],
     [
       "@semantic-release/git",
       {
