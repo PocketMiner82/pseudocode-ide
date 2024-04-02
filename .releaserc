@@ -1,0 +1,100 @@
+{
+  "branches": [
+    "main",
+    {
+      "name": "dev",
+      "prerelease": true
+    }
+  ],
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "releaseRules": [
+          {
+            "type": "build",
+            "scope": "Needs bump",
+            "release": "patch"
+          }
+        ]
+      }
+    ],
+    [
+      "semantic-release-replace-plugin",
+      {
+        "replacements": [
+          {
+            "files": [
+              "SolutionInfo.cs"
+            ],
+            "from": "AssemblyVersion\\(\".*\"\\)",
+            "to": "AssemblyVersion(\"${nextRelease.version.split('-')[0]}\")",
+            "results": [
+              {
+                "file": "SolutionInfo.cs",
+                "hasChanged": true,
+                "numMatches": 1,
+                "numReplacements": 1
+              }
+            ],
+            "countMatches": true
+          },
+          {
+            "files": [
+              "AutoUpdater.xml"
+            ],
+            "from": "<version>.*</version>",
+            "to": "<version>${nextRelease.version.split('-')[0]}</version>",
+            "results": [
+              {
+                "file": "AutoUpdater.xml",
+                "hasChanged": true,
+                "numMatches": 1,
+                "numReplacements": 1
+              }
+            ],
+            "countMatches": true
+          }
+        ]
+      }
+    ],
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "README.md",
+          "CHANGELOG.md",
+          "SolutionInfo.cs",
+          "AutoUpdater.xml"
+        ]
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "bin/Release/",
+            "name": "pseudocode-ide"
+          }
+        ],
+        "successComment": false
+      }
+    ],
+    [
+      "@saithodev/semantic-release-backmerge",
+      {
+        "backmergeBranches": [
+          {
+            "from": "main",
+            "to": "dev"
+          }
+        ],
+        "clearWorkspace": true
+      }
+    ]
+  ]
+}
