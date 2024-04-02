@@ -79,8 +79,7 @@
       {
         "assets": [
           {
-            "path": "bin/Release/",
-            "name": "pseudocode-ide"
+            "path": "pseudocode-ide.zip"
           }
         ],
         "successComment": false
