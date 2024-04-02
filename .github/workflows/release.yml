@@ -10,7 +10,7 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -32,6 +32,5 @@ jobs:
           @semantic-release/git@10.0.1
           @saithodev/semantic-release-backmerge@4.0.1
           semantic-release-replace-plugin@1.2.7
-          
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
