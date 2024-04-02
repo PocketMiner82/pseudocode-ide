@@ -14,6 +14,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5  
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.1
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v4
       with:
@@ -32,5 +36,6 @@ jobs:
           @semantic-release/git@10.0.1
           @saithodev/semantic-release-backmerge@4.0.1
           semantic-release-replace-plugin@1.2.7
+          @semantic-release/exec@6.0.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
