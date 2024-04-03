@@ -8,3 +8,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  # Maintain dependencies for NuGet
+  - package-ecosystem: "nuget"
+    # Update dependencies in dev branch only
+    target-branch: dev
+    directory: "/"
+    schedule:
+      interval: "weekly"

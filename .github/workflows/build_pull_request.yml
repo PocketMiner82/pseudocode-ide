@@ -16,7 +16,7 @@ jobs:
    - name: setup-msbuild
      uses: microsoft/setup-msbuild@v1.3
    - name: Restore Packages and build solution
-     run: ".\\build.cmd"
+     run: ".\\build.cmd nozip"
    - name: Upload a Build Artifact
      uses: actions/upload-artifact@v4.3.1
      with:
