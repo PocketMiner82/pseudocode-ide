@@ -47,15 +47,9 @@
         "replacements": [
           {
             "files": [
-              "SolutionInfo.cs"
-            ],
-            "from": "AssemblyVersion\\(\".*\"\\)",
-            "to": "AssemblyVersion(\"${nextRelease.version.split('-')[0]}\")",
-            "countMatches": true
-          },
-          {
-            "files": [
-              "AutoUpdater.xml"
+              "AutoUpdater.xml",
+			  "pseudocodeIdeUpdater/pseudocodeIdeUpdater.csproj",
+			  "pseudocodeIde/pseudocodeIde.csproj"
             ],
             "from": "<version>.*</version>",
             "to": "<version>${nextRelease.version.split('-')[0]}</version>",
