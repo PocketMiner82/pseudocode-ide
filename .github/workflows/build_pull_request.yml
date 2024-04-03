@@ -10,15 +10,15 @@ jobs:
   name: Build app
   runs-on: windows-2019
   steps:
-   - uses: actions/checkout@v2
+   - uses: actions/checkout@v4
    - name: Setup NuGet
-     uses: NuGet/setup-nuget@v1.0.5  
+     uses: NuGet/setup-nuget@v2.0.0  
    - name: setup-msbuild
-     uses: microsoft/setup-msbuild@v1.1
+     uses: microsoft/setup-msbuild@v1.3
    - name: Restore Packages and build solution
      run: ".\\build.cmd"
    - name: Upload a Build Artifact
-     uses: actions/upload-artifact@v4.1.0
+     uses: actions/upload-artifact@v4.3.1
      with:
        # Artifact name
        name: pseudocode-ide

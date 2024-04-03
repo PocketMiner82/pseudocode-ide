@@ -15,9 +15,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5  
+      uses: NuGet/setup-nuget@v2.0.0  
     - name: setup-msbuild
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v1.3
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v4
       with:
