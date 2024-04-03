@@ -70,8 +70,9 @@
         "assets": [
           "README.md",
           "CHANGELOG.md",
-          "SolutionInfo.cs",
-          "AutoUpdater.xml"
+          "AutoUpdater.xml",
+		  "pseudocodeIdeUpdater/pseudocodeIdeUpdater.csproj",
+		  "pseudocodeIde/pseudocodeIde.csproj"
         ]
       }
     ],
