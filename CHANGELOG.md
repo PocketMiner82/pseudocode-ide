@@ -1,3 +1,10 @@
+## [1.2.7-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.6...1.2.7-dev.1) (2024-04-03)
+
+
+### Bug Fixes
+
+* Add issue templates ([#20](https://github.com/PocketMiner82/pseudocode-ide/issues/20)) ([04f1472](https://github.com/PocketMiner82/pseudocode-ide/commit/04f14722d7f633cae67999eeb3c2dd5edddb6a0e))
+
 ## [1.2.6](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.5...1.2.6) (2024-04-03)
 
 ## [1.2.6-dev.3](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.6-dev.2...1.2.6-dev.3) (2024-04-03)
