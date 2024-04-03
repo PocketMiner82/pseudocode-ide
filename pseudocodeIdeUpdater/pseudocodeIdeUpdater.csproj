@@ -24,7 +24,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autoupdater.NET.Official" Version="1.8.4" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework" />
