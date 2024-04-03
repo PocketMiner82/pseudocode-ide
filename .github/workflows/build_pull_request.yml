@@ -10,7 +10,7 @@ jobs:
   name: Build app
   runs-on: windows-2019
   steps:
-   - uses: actions/checkout@v2
+   - uses: actions/checkout@v4
    - name: Setup NuGet
      uses: NuGet/setup-nuget@v2.0.0  
    - name: setup-msbuild
