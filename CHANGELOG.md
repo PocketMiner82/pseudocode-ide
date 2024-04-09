@@ -1,3 +1,10 @@
+# [1.3.0-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0-dev.1...1.3.0-dev.2) (2024-04-09)
+
+
+### Bug Fixes
+
+* point changelog to actual changelog file ([df9c1ba](https://github.com/PocketMiner82/pseudocode-ide/commit/df9c1ba52b7e0a2b2fe7335d16d9f462b2f79c99))
+
 # [1.3.0-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.7...1.3.0-dev.1) (2024-04-09)
 
 
