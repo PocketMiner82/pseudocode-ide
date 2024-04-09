@@ -1,3 +1,10 @@
+# [1.3.0-dev.3](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0-dev.2...1.3.0-dev.3) (2024-04-09)
+
+
+### Features
+
+* add update to beta button ([a85f2f1](https://github.com/PocketMiner82/pseudocode-ide/commit/a85f2f18edcf1e6e592c42e560a539a28f39dc81))
+
 # [1.3.0-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0-dev.1...1.3.0-dev.2) (2024-04-09)
 
 
