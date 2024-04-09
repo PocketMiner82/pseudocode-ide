@@ -124,7 +124,7 @@ namespace pseudocodeIde
             FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
 
             // show remind later
-            this.checkForUpdate(true);
+            this.checkForUpdate(true, false);
 
             // set font
             this.configureCodeTextBox();
@@ -801,13 +801,13 @@ namespace pseudocodeIde
         // (AUTO) UPDATE
         // ---------------------------------------------
 
-        private void updatePseudocodeIDEMenuItem_Click(object sender, EventArgs e)
+        private void updateMenuItem_Click(object sender, EventArgs e)
         {
             // dont show remind later
-            this.checkForUpdate(false);
+            this.checkForUpdate(false, false);
         }
 
-        private void checkForUpdate(bool firstRun)
+        private void checkForUpdate(bool firstRun, bool beta)
         {
             string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
@@ -818,10 +818,15 @@ namespace pseudocodeIde
             {
                 compiler.StartInfo.FileName = tempExePath;
                 compiler.StartInfo.WorkingDirectory = tempExeDir;
-                compiler.StartInfo.Arguments = $"\"{currentDir}\" \"{firstRun}\"";
+                compiler.StartInfo.Arguments = $"\"{currentDir}\" \"{firstRun}\" \"{beta}\"";
                 compiler.StartInfo.UseShellExecute = true;
                 compiler.Start();
             }
+        }
+
+        private void updateBetaMenuItem_Click(object sender, EventArgs e)
+        {
+            this.checkForUpdate(false, true);
         }
     }
 }

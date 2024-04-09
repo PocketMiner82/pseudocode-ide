@@ -52,7 +52,8 @@
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.updatePseudocodeIDEMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateBetaMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.codeTextBox = new ScintillaNET.Scintilla();
             this.autoCompleteMenu = new AutocompleteMenuNS.AutocompleteMenu();
             this.menuStrip.SuspendLayout();
@@ -239,7 +240,8 @@
             this.helpMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showHelpMenuItem,
             this.toolStripSeparator3,
-            this.updatePseudocodeIDEMenuItem});
+            this.updateMenuItem,
+            this.updateBetaMenuItem});
             this.helpMenuItem.Name = "helpMenuItem";
             this.helpMenuItem.Size = new System.Drawing.Size(64, 29);
             this.helpMenuItem.Text = "Hilfe";
@@ -248,21 +250,28 @@
             // 
             this.showHelpMenuItem.Name = "showHelpMenuItem";
             this.showHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.showHelpMenuItem.Size = new System.Drawing.Size(346, 34);
+            this.showHelpMenuItem.Size = new System.Drawing.Size(415, 34);
             this.showHelpMenuItem.Text = "Hilfe anzeigen";
             this.showHelpMenuItem.Click += new System.EventHandler(this.showHelpMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(343, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(412, 6);
             // 
-            // updatePseudocodeIDEMenuItem
+            // updateMenuItem
             // 
-            this.updatePseudocodeIDEMenuItem.Name = "updatePseudocodeIDEMenuItem";
-            this.updatePseudocodeIDEMenuItem.Size = new System.Drawing.Size(346, 34);
-            this.updatePseudocodeIDEMenuItem.Text = "Pseudocode IDE aktualisieren";
-            this.updatePseudocodeIDEMenuItem.Click += new System.EventHandler(this.updatePseudocodeIDEMenuItem_Click);
+            this.updateMenuItem.Name = "updateMenuItem";
+            this.updateMenuItem.Size = new System.Drawing.Size(415, 34);
+            this.updateMenuItem.Text = "Pseudocode IDE aktualisieren";
+            this.updateMenuItem.Click += new System.EventHandler(this.updateMenuItem_Click);
+            // 
+            // updateBetaMenuItem
+            // 
+            this.updateBetaMenuItem.Name = "updateBetaMenuItem";
+            this.updateBetaMenuItem.Size = new System.Drawing.Size(415, 34);
+            this.updateBetaMenuItem.Text = "Pseudocode IDE auf Beta aktualisieren";
+            this.updateBetaMenuItem.Click += new System.EventHandler(this.updateBetaMenuItem_Click);
             // 
             // codeTextBox
             // 
@@ -352,11 +361,12 @@
         private System.Windows.Forms.ToolStripMenuItem openOutputFormMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem updatePseudocodeIDEMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateMenuItem;
         private ScintillaNET.Scintilla codeTextBox;
         private System.Windows.Forms.ToolStripMenuItem goToMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private AutocompleteMenuNS.AutocompleteMenu autoCompleteMenu;
+        private System.Windows.Forms.ToolStripMenuItem updateBetaMenuItem;
     }
 }
 
