@@ -1,3 +1,12 @@
+# [1.3.0-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.7...1.3.0-dev.1) (2024-04-09)
+
+
+### Features
+
+* add autocomplete menu using AutoCompleteMenu-ScintillaNET library ([38b2909](https://github.com/PocketMiner82/pseudocode-ide/commit/38b2909a09149cc3e8c79002ee15a796b6dc7699))
+* add word highlighting on select + use Scintilla5.NET ([b9ec14c](https://github.com/PocketMiner82/pseudocode-ide/commit/b9ec14cb6f5ac1f5651b8cad25c3978bb70914f1))
+* use ScintillaNET-FindReplaceDialog for find/replace ([efac5dc](https://github.com/PocketMiner82/pseudocode-ide/commit/efac5dc811e7188fe2b5f07438a552dbb3529e40))
+
 ## [1.2.7](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.6...1.2.7) (2024-04-03)
 
 
