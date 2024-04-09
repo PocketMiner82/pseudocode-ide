@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using pseudocodeIde.findReplace;
 using pseudocode_ide;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -14,6 +13,7 @@ using System.Reflection;
 using ScintillaNET;
 using pseudocode_ide.interpreter.scanner;
 using System.Drawing;
+using ScintillaNET_FindReplaceDialog;
 
 namespace pseudocodeIde
 {
@@ -72,7 +72,7 @@ namespace pseudocodeIde
         /// </summary>
         private bool isSaved = true;
 
-        private FindReplaceForm findReplaceForm;
+        private FindReplace findReplace;
 
         private OutputForm outputForm;
 
@@ -81,10 +81,11 @@ namespace pseudocodeIde
 
         public PseudocodeIDEForm()
         {
-            this.findReplaceForm = new FindReplaceForm(this);
-            this.outputForm = new OutputForm(this);
-
             InitializeComponent();
+            this.outputForm = new OutputForm(this);
+            this.findReplace = new FindReplace(this.codeTextBox);
+            this.findReplace.KeyPressed += codeTextBox_KeyDown;
+
             this.resetUndoRedo();
 
             // disable right click menu
@@ -163,12 +164,6 @@ namespace pseudocodeIde
         private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
         {
             // main form won't close if child form is not disposed
-            if (!this.findReplaceForm.IsDisposed)
-            {
-                this.findReplaceForm.Close();
-                this.Close();
-                return;
-            }
             if (!this.outputForm.IsDisposed)
             {
                 this.outputForm.Close();
@@ -249,6 +244,16 @@ namespace pseudocodeIde
                 this.updateUndoStack(true);
                 e.SuppressKeyPress = false;
                 return;
+            }
+            else if (e.Shift && e.KeyCode == Keys.F3)
+            {
+                this.findReplace.Window.FindPrevious();
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.F3)
+            {
+                this.findReplace.Window.FindNext();
+                e.SuppressKeyPress = true;
             }
         }
 
@@ -721,70 +726,17 @@ namespace pseudocodeIde
 
         private void findMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplaceForm.Show(FindReplaceTabs.FIND, codeTextBox.SelectedText);
+            this.findReplace.ShowFind();
         }
 
         private void replaceMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplaceForm.Show(FindReplaceTabs.REPLACE, codeTextBox.SelectedText);
+            this.findReplace.ShowReplace();
         }
 
-        /// <summary>
-        /// Get the start of the current selection in the code text box
-        /// </summary>
-        public int getSelectionStart()
+        private void goToMenuItem_Click(object sender, EventArgs e)
         {
-            return codeTextBox.SelectionStart;
-        }
-
-        /// <summary>
-        /// Get the end of the current selection in the code text box
-        /// </summary>
-        public int getSelectionEnd()
-        {
-            return codeTextBox.SelectionEnd;
-        }
-
-        /// <summary>
-        /// Get the selection length in the code text box
-        /// </summary>
-        public int getSelectionLength()
-        {
-            return codeTextBox.SelectionEnd - codeTextBox.SelectionStart;
-        }
-
-        /// <summary>
-        /// Get the currently selected text.
-        /// </summary>
-        public string getSelection()
-        {
-            return codeTextBox.SelectedText;
-        }
-
-        /// <summary>
-        /// Select text in the code text box. Will be invoked on the UI thread.
-        /// </summary>
-        /// <param name="selectionLength">start of the selection</param>
-        /// <param name="selectionStart">length of the selection</param>
-        public void selectText(int selectionStart, int selectionLength)
-        {
-            Invoke(new Action(() =>
-            {
-                codeTextBox.SelectionStart = selectionStart;
-                codeTextBox.SelectionEnd = selectionStart + selectionLength;
-            }));
-        }
-
-        /// <summary>
-        /// Replace the selected text. Will be invoked on the UI thread.
-        /// </summary>
-        /// <param name="toReplace">The new text to replace</param>
-        public void setSelectedText(string toReplace)
-        {
-            Invoke(new Action(() =>
-            {
-                codeTextBox.ReplaceSelection(toReplace);
-            }));
+            new GoTo(codeTextBox).ShowGoToDialog();
         }
 
         // ---------------------------------------------

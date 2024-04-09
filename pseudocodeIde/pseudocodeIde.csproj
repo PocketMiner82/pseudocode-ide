@@ -45,6 +45,7 @@
     <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="4.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Scintilla5.NET" Version="5.3.3.18" />
+    <PackageReference Include="ScintillaNET_FindReplaceDialog" Version="1.5.5" />
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
@@ -67,12 +68,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="findReplace\FindReplaceForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="findReplace\FindReplaceForm.Designer.cs">
-      <DependentUpon>FindReplaceForm.cs</DependentUpon>
-    </Compile>
     <Compile Update="PseudocodeIDEForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,9 +80,6 @@
     <Compile Update="interpreter\OutputForm.Designer.cs">
       <DependentUpon>OutputForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Update="findReplace\FindReplaceForm.resx">
-      <DependentUpon>FindReplaceForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Update="interpreter\OutputForm.resx">
       <DependentUpon>OutputForm.cs</DependentUpon>
     </EmbeddedResource>
