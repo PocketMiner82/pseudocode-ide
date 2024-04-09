@@ -111,6 +111,11 @@ namespace pseudocodeIde
             this.checkForUpdate(true);
 
             // set font
+            this.configureCodeTextBox();
+        }
+
+        private void configureCodeTextBox()
+        {
             codeTextBox.StyleResetDefault();
             codeTextBox.Styles[Style.Default].Font = "Courier New";
             codeTextBox.StyleClearAll();
@@ -131,8 +136,8 @@ namespace pseudocodeIde
 
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_COMMENT].ForeColor = Color.Green;
 
+            codeTextBox.LexerName = "";
             codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
-            codeTextBox.Lexer = Lexer.Container;
         }
 
         private void codeTextBox_StyleNeeded(object sender, StyleNeededEventArgs e)
@@ -372,6 +377,49 @@ namespace pseudocodeIde
                 this.updateUndoStack(true);
             }
             this.lastCursorPosition = codeTextBox.SelectionStart;
+
+            this.highlightWord(codeTextBox.SelectedText);
+        }
+
+        // adapted from https://github.com/desjarlais/Scintilla.NET/wiki/Find-and-Highlight-Words
+        private void highlightWord(string text)
+        {
+            // Indicators 0-7 could be in use by a lexer
+            // so we'll use indicator 8 to highlight words.
+            const int NUM = 8;
+
+            // Remove all uses of our indicator
+            codeTextBox.IndicatorCurrent = NUM;
+            codeTextBox.IndicatorClearRange(0, codeTextBox.TextLength);
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            // Update indicator appearance
+            codeTextBox.Indicators[NUM].Style = IndicatorStyle.StraightBox;
+            codeTextBox.Indicators[NUM].Under = true;
+            codeTextBox.Indicators[NUM].ForeColor = Color.Lime;
+            codeTextBox.Indicators[NUM].OutlineAlpha = 127;
+            codeTextBox.Indicators[NUM].Alpha = 127;
+
+            // Search the document
+            codeTextBox.TargetStart = 0;
+            codeTextBox.TargetEnd = codeTextBox.TextLength;
+            codeTextBox.SearchFlags = SearchFlags.None;
+            while (codeTextBox.SearchInTarget(text) != -1)
+            {
+                if (codeTextBox.TargetStart != codeTextBox.SelectionStart)
+                {
+                    // Mark the search results with the current indicator
+                    codeTextBox.IndicatorFillRange(codeTextBox.TargetStart, codeTextBox.TargetEnd - codeTextBox.TargetStart);
+                }
+
+                // Search the remainder of the document
+                codeTextBox.TargetStart = codeTextBox.TargetEnd;
+                codeTextBox.TargetEnd = codeTextBox.TextLength;
+            }
         }
 
         // ---------------------------------------------
