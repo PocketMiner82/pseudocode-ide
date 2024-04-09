@@ -14,6 +14,7 @@ using ScintillaNET;
 using pseudocode_ide.interpreter.scanner;
 using System.Drawing;
 using ScintillaNET_FindReplaceDialog;
+using AutocompleteMenuNS;
 
 namespace pseudocodeIde
 {
@@ -96,6 +97,20 @@ namespace pseudocodeIde
             this.setFileSaved();
         }
 
+        private void buildAutocompleteMenu()
+        {
+            autoCompleteMenu.TargetControlWrapper = new ScintillaWrapper(codeTextBox);
+
+            List<AutocompleteItem> items = new List<AutocompleteItem>();
+
+            foreach (string item in Scanner.KEYWORDS.Keys)
+            {
+                items.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
+            }
+
+            autoCompleteMenu.SetAutocompleteItems(items);
+        }
+
         // ---------------------------------------------
         // COMMON EVENT LISTENERS
         // ---------------------------------------------
@@ -113,6 +128,7 @@ namespace pseudocodeIde
 
             // set font
             this.configureCodeTextBox();
+            this.buildAutocompleteMenu();
         }
 
         private void configureCodeTextBox()
@@ -229,6 +245,12 @@ namespace pseudocodeIde
 
         private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // hack to allow enter to autocomplete even if down wasnt pressed before
+            if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && e.Modifiers == Keys.None && autoCompleteMenu.SelectedItemIndex < 0)
+            {
+                autoCompleteMenu.ProcessKey((char)Keys.Down, e.Modifiers);
+            }
+
             // ignore CTRL[+SHIFT]+(Z/Y/L/R/E/S)
             if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E || e.KeyCode == Keys.S)
                 && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))

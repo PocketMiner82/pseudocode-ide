@@ -20,7 +20,7 @@ namespace pseudocode_ide
 
         protected override void Work()
         {
-            var obj = new System.Windows.Forms.DataObject(
+            DataObject obj = new System.Windows.Forms.DataObject(
                 _format,
                 _data
             );
@@ -35,7 +35,7 @@ namespace pseudocode_ide
 
         public void Go()
         {
-            var thread = new Thread(new ThreadStart(DoWork))
+            Thread thread = new Thread(new ThreadStart(DoWork))
             {
                 IsBackground = true,
             };

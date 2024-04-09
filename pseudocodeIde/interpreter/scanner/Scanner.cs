@@ -76,6 +76,10 @@ namespace pseudocodeIde.interpreter
             KEYWORDS.Add("NEU",             NEW);
                                             
             KEYWORDS.Add("NICHTS",          NULL);
+
+            KEYWORDS.Add("schreibe",        IDENTIFIER);
+            KEYWORDS.Add("warte",           IDENTIFIER);
+            KEYWORDS.Add("benutzereingabe", IDENTIFIER);
         }
 
         public Scanner(string code)

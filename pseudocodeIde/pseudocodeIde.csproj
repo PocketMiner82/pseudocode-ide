@@ -37,6 +37,7 @@
   </PropertyGroup>
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1823.32\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1823.32\build\Microsoft.Web.WebView2.targets')" />
   <ItemGroup>
+    <PackageReference Include="AutoCompleteMenu-ScintillaNET" Version="2.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
