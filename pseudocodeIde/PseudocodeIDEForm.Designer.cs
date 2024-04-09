@@ -40,6 +40,8 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.findMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.goToMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.wordWrapMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,8 +52,10 @@
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.updatePseudocodeIDEMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateBetaMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.codeTextBox = new ScintillaNET.Scintilla();
+            this.autoCompleteMenu = new AutocompleteMenuNS.AutocompleteMenu();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -113,7 +117,9 @@
             this.redoToolStripMenuItem,
             this.toolStripSeparator1,
             this.findMenuItem,
-            this.replaceMenuItem});
+            this.replaceMenuItem,
+            this.toolStripSeparator4,
+            this.goToMenuItem});
             this.editMenuItem.Name = "editMenuItem";
             this.editMenuItem.Size = new System.Drawing.Size(111, 29);
             this.editMenuItem.Text = "Bearbeiten";
@@ -156,6 +162,19 @@
             this.replaceMenuItem.Size = new System.Drawing.Size(311, 34);
             this.replaceMenuItem.Text = "Ersetzen";
             this.replaceMenuItem.Click += new System.EventHandler(this.replaceMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(308, 6);
+            // 
+            // goToMenuItem
+            // 
+            this.goToMenuItem.Name = "goToMenuItem";
+            this.goToMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
+            this.goToMenuItem.Size = new System.Drawing.Size(311, 34);
+            this.goToMenuItem.Text = "Gehe zu";
+            this.goToMenuItem.Click += new System.EventHandler(this.goToMenuItem_Click);
             // 
             // viewMenuItem
             // 
@@ -221,7 +240,8 @@
             this.helpMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showHelpMenuItem,
             this.toolStripSeparator3,
-            this.updatePseudocodeIDEMenuItem});
+            this.updateMenuItem,
+            this.updateBetaMenuItem});
             this.helpMenuItem.Name = "helpMenuItem";
             this.helpMenuItem.Size = new System.Drawing.Size(64, 29);
             this.helpMenuItem.Text = "Hilfe";
@@ -230,45 +250,68 @@
             // 
             this.showHelpMenuItem.Name = "showHelpMenuItem";
             this.showHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.showHelpMenuItem.Size = new System.Drawing.Size(346, 34);
+            this.showHelpMenuItem.Size = new System.Drawing.Size(415, 34);
             this.showHelpMenuItem.Text = "Hilfe anzeigen";
             this.showHelpMenuItem.Click += new System.EventHandler(this.showHelpMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(343, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(412, 6);
             // 
-            // updatePseudocodeIDEMenuItem
+            // updateMenuItem
             // 
-            this.updatePseudocodeIDEMenuItem.Name = "updatePseudocodeIDEMenuItem";
-            this.updatePseudocodeIDEMenuItem.Size = new System.Drawing.Size(346, 34);
-            this.updatePseudocodeIDEMenuItem.Text = "Pseudocode IDE aktualisieren";
-            this.updatePseudocodeIDEMenuItem.Click += new System.EventHandler(this.updatePseudocodeIDEMenuItem_Click);
+            this.updateMenuItem.Name = "updateMenuItem";
+            this.updateMenuItem.Size = new System.Drawing.Size(415, 34);
+            this.updateMenuItem.Text = "Pseudocode IDE aktualisieren";
+            this.updateMenuItem.Click += new System.EventHandler(this.updateMenuItem_Click);
+            // 
+            // updateBetaMenuItem
+            // 
+            this.updateBetaMenuItem.Name = "updateBetaMenuItem";
+            this.updateBetaMenuItem.Size = new System.Drawing.Size(415, 34);
+            this.updateBetaMenuItem.Text = "Pseudocode IDE auf Beta aktualisieren";
+            this.updateBetaMenuItem.Click += new System.EventHandler(this.updateBetaMenuItem_Click);
             // 
             // codeTextBox
             // 
             this.codeTextBox.AdditionalSelectionTyping = true;
+            this.codeTextBox.AutoCMaxHeight = 9;
+            this.codeTextBox.BiDirectionality = ScintillaNET.BiDirectionalDisplayType.Disabled;
             this.codeTextBox.CaretLineBackColor = System.Drawing.Color.WhiteSmoke;
             this.codeTextBox.CaretLineVisible = true;
             this.codeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.codeTextBox.EolMode = ScintillaNET.Eol.Lf;
             this.codeTextBox.IndentationGuides = ScintillaNET.IndentView.Real;
             this.codeTextBox.IndentWidth = 4;
+            this.codeTextBox.LexerName = null;
             this.codeTextBox.Location = new System.Drawing.Point(0, 33);
             this.codeTextBox.MultiPaste = ScintillaNET.MultiPaste.Each;
             this.codeTextBox.MultipleSelection = true;
             this.codeTextBox.Name = "codeTextBox";
             this.codeTextBox.ScrollWidth = 39;
             this.codeTextBox.Size = new System.Drawing.Size(1176, 676);
+            this.codeTextBox.TabIndents = true;
             this.codeTextBox.TabIndex = 1;
+            this.codeTextBox.UseRightToLeftReadingLayout = false;
             this.codeTextBox.UseTabs = true;
+            this.codeTextBox.WrapMode = ScintillaNET.WrapMode.None;
             this.codeTextBox.Zoom = 2;
             this.codeTextBox.CharAdded += new System.EventHandler<ScintillaNET.CharAddedEventArgs>(this.codeTextBox_CharAdded);
             this.codeTextBox.UpdateUI += new System.EventHandler<ScintillaNET.UpdateUIEventArgs>(this.codeTextBox_UpdateUI);
             this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
             this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
             this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.codeTextBox_KeyPress);
+            // 
+            // autoCompleteMenu
+            // 
+            this.autoCompleteMenu.AllowsTabKey = true;
+            this.autoCompleteMenu.AppearInterval = 50;
+            this.autoCompleteMenu.Colors = ((AutocompleteMenuNS.Colors)(resources.GetObject("autoCompleteMenu.Colors")));
+            this.autoCompleteMenu.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.autoCompleteMenu.ImageList = null;
+            this.autoCompleteMenu.Items = new string[0];
+            this.autoCompleteMenu.TargetControlWrapper = null;
             // 
             // PseudocodeIDEForm
             // 
@@ -318,8 +361,12 @@
         private System.Windows.Forms.ToolStripMenuItem openOutputFormMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem updatePseudocodeIDEMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateMenuItem;
         private ScintillaNET.Scintilla codeTextBox;
+        private System.Windows.Forms.ToolStripMenuItem goToMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private AutocompleteMenuNS.AutocompleteMenu autoCompleteMenu;
+        private System.Windows.Forms.ToolStripMenuItem updateBetaMenuItem;
     }
 }
 

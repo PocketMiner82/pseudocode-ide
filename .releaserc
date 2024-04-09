@@ -52,7 +52,7 @@
 			  "pseudocodeIde/pseudocodeIde.csproj"
             ],
             "from": "<version>.*</version>",
-            "to": "<version>${nextRelease.version.split('-')[0]}</version>",
+            "to": "<version>${nextRelease.version.replace('-dev', '')}</version>",
             "countMatches": true
           }
         ]

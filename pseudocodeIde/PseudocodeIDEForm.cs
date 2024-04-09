@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using pseudocodeIde.findReplace;
 using pseudocode_ide;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -14,6 +13,8 @@ using System.Reflection;
 using ScintillaNET;
 using pseudocode_ide.interpreter.scanner;
 using System.Drawing;
+using ScintillaNET_FindReplaceDialog;
+using AutocompleteMenuNS;
 
 namespace pseudocodeIde
 {
@@ -72,7 +73,7 @@ namespace pseudocodeIde
         /// </summary>
         private bool isSaved = true;
 
-        private FindReplaceForm findReplaceForm;
+        private FindReplace findReplace;
 
         private OutputForm outputForm;
 
@@ -81,10 +82,11 @@ namespace pseudocodeIde
 
         public PseudocodeIDEForm()
         {
-            this.findReplaceForm = new FindReplaceForm(this);
-            this.outputForm = new OutputForm(this);
-
             InitializeComponent();
+            this.outputForm = new OutputForm(this);
+            this.findReplace = new FindReplace(this.codeTextBox);
+            this.findReplace.KeyPressed += codeTextBox_KeyDown;
+
             this.resetUndoRedo();
 
             // disable right click menu
@@ -93,6 +95,20 @@ namespace pseudocodeIde
             this.codeTextBox_TextChanged(null, null);
             // on first start, the code is always saved
             this.setFileSaved();
+        }
+
+        private void buildAutocompleteMenu()
+        {
+            autoCompleteMenu.TargetControlWrapper = new ScintillaWrapper(codeTextBox);
+
+            List<AutocompleteItem> items = new List<AutocompleteItem>();
+
+            foreach (string item in Scanner.KEYWORDS.Keys)
+            {
+                items.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
+            }
+
+            autoCompleteMenu.SetAutocompleteItems(items);
         }
 
         // ---------------------------------------------
@@ -108,9 +124,15 @@ namespace pseudocodeIde
             FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
 
             // show remind later
-            this.checkForUpdate(true);
+            this.checkForUpdate(true, false);
 
             // set font
+            this.configureCodeTextBox();
+            this.buildAutocompleteMenu();
+        }
+
+        private void configureCodeTextBox()
+        {
             codeTextBox.StyleResetDefault();
             codeTextBox.Styles[Style.Default].Font = "Courier New";
             codeTextBox.StyleClearAll();
@@ -131,8 +153,8 @@ namespace pseudocodeIde
 
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_COMMENT].ForeColor = Color.Green;
 
+            codeTextBox.LexerName = "";
             codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
-            codeTextBox.Lexer = Lexer.Container;
         }
 
         private void codeTextBox_StyleNeeded(object sender, StyleNeededEventArgs e)
@@ -158,12 +180,6 @@ namespace pseudocodeIde
         private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
         {
             // main form won't close if child form is not disposed
-            if (!this.findReplaceForm.IsDisposed)
-            {
-                this.findReplaceForm.Close();
-                this.Close();
-                return;
-            }
             if (!this.outputForm.IsDisposed)
             {
                 this.outputForm.Close();
@@ -229,6 +245,12 @@ namespace pseudocodeIde
 
         private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // hack to allow enter to autocomplete even if down wasnt pressed before
+            if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && e.Modifiers == Keys.None && autoCompleteMenu.SelectedItemIndex < 0)
+            {
+                autoCompleteMenu.ProcessKey((char)Keys.Down, e.Modifiers);
+            }
+
             // ignore CTRL[+SHIFT]+(Z/Y/L/R/E/S)
             if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E || e.KeyCode == Keys.S)
                 && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
@@ -244,6 +266,16 @@ namespace pseudocodeIde
                 this.updateUndoStack(true);
                 e.SuppressKeyPress = false;
                 return;
+            }
+            else if (e.Shift && e.KeyCode == Keys.F3)
+            {
+                this.findReplace.Window.FindPrevious();
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.F3)
+            {
+                this.findReplace.Window.FindNext();
+                e.SuppressKeyPress = true;
             }
         }
 
@@ -372,6 +404,49 @@ namespace pseudocodeIde
                 this.updateUndoStack(true);
             }
             this.lastCursorPosition = codeTextBox.SelectionStart;
+
+            this.highlightWord(codeTextBox.SelectedText);
+        }
+
+        // adapted from https://github.com/desjarlais/Scintilla.NET/wiki/Find-and-Highlight-Words
+        private void highlightWord(string text)
+        {
+            // Indicators 0-7 could be in use by a lexer
+            // so we'll use indicator 8 to highlight words.
+            const int NUM = 8;
+
+            // Remove all uses of our indicator
+            codeTextBox.IndicatorCurrent = NUM;
+            codeTextBox.IndicatorClearRange(0, codeTextBox.TextLength);
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            // Update indicator appearance
+            codeTextBox.Indicators[NUM].Style = IndicatorStyle.StraightBox;
+            codeTextBox.Indicators[NUM].Under = true;
+            codeTextBox.Indicators[NUM].ForeColor = Color.Lime;
+            codeTextBox.Indicators[NUM].OutlineAlpha = 127;
+            codeTextBox.Indicators[NUM].Alpha = 127;
+
+            // Search the document
+            codeTextBox.TargetStart = 0;
+            codeTextBox.TargetEnd = codeTextBox.TextLength;
+            codeTextBox.SearchFlags = SearchFlags.None;
+            while (codeTextBox.SearchInTarget(text) != -1)
+            {
+                if (codeTextBox.TargetStart != codeTextBox.SelectionStart)
+                {
+                    // Mark the search results with the current indicator
+                    codeTextBox.IndicatorFillRange(codeTextBox.TargetStart, codeTextBox.TargetEnd - codeTextBox.TargetStart);
+                }
+
+                // Search the remainder of the document
+                codeTextBox.TargetStart = codeTextBox.TargetEnd;
+                codeTextBox.TargetEnd = codeTextBox.TextLength;
+            }
         }
 
         // ---------------------------------------------
@@ -673,70 +748,17 @@ namespace pseudocodeIde
 
         private void findMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplaceForm.Show(FindReplaceTabs.FIND, codeTextBox.SelectedText);
+            this.findReplace.ShowFind();
         }
 
         private void replaceMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplaceForm.Show(FindReplaceTabs.REPLACE, codeTextBox.SelectedText);
+            this.findReplace.ShowReplace();
         }
 
-        /// <summary>
-        /// Get the start of the current selection in the code text box
-        /// </summary>
-        public int getSelectionStart()
+        private void goToMenuItem_Click(object sender, EventArgs e)
         {
-            return codeTextBox.SelectionStart;
-        }
-
-        /// <summary>
-        /// Get the end of the current selection in the code text box
-        /// </summary>
-        public int getSelectionEnd()
-        {
-            return codeTextBox.SelectionEnd;
-        }
-
-        /// <summary>
-        /// Get the selection length in the code text box
-        /// </summary>
-        public int getSelectionLength()
-        {
-            return codeTextBox.SelectionEnd - codeTextBox.SelectionStart;
-        }
-
-        /// <summary>
-        /// Get the currently selected text.
-        /// </summary>
-        public string getSelection()
-        {
-            return codeTextBox.SelectedText;
-        }
-
-        /// <summary>
-        /// Select text in the code text box. Will be invoked on the UI thread.
-        /// </summary>
-        /// <param name="selectionLength">start of the selection</param>
-        /// <param name="selectionStart">length of the selection</param>
-        public void selectText(int selectionStart, int selectionLength)
-        {
-            Invoke(new Action(() =>
-            {
-                codeTextBox.SelectionStart = selectionStart;
-                codeTextBox.SelectionEnd = selectionStart + selectionLength;
-            }));
-        }
-
-        /// <summary>
-        /// Replace the selected text. Will be invoked on the UI thread.
-        /// </summary>
-        /// <param name="toReplace">The new text to replace</param>
-        public void setSelectedText(string toReplace)
-        {
-            Invoke(new Action(() =>
-            {
-                codeTextBox.ReplaceSelection(toReplace);
-            }));
+            new GoTo(codeTextBox).ShowGoToDialog();
         }
 
         // ---------------------------------------------
@@ -779,13 +801,13 @@ namespace pseudocodeIde
         // (AUTO) UPDATE
         // ---------------------------------------------
 
-        private void updatePseudocodeIDEMenuItem_Click(object sender, EventArgs e)
+        private void updateMenuItem_Click(object sender, EventArgs e)
         {
             // dont show remind later
-            this.checkForUpdate(false);
+            this.checkForUpdate(false, false);
         }
 
-        private void checkForUpdate(bool firstRun)
+        private void checkForUpdate(bool firstRun, bool beta)
         {
             string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
@@ -796,10 +818,15 @@ namespace pseudocodeIde
             {
                 compiler.StartInfo.FileName = tempExePath;
                 compiler.StartInfo.WorkingDirectory = tempExeDir;
-                compiler.StartInfo.Arguments = $"\"{currentDir}\" \"{firstRun}\"";
+                compiler.StartInfo.Arguments = $"\"{currentDir}\" \"{firstRun}\" \"{beta}\"";
                 compiler.StartInfo.UseShellExecute = true;
                 compiler.Start();
             }
+        }
+
+        private void updateBetaMenuItem_Click(object sender, EventArgs e)
+        {
+            this.checkForUpdate(false, true);
         }
     }
 }

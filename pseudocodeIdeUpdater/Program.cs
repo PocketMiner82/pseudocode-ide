@@ -24,6 +24,7 @@ namespace pseudocodeIdeUpdater
             {
                 string path = args[0];
                 bool firstRun = bool.Parse(args[1]);
+                bool beta = bool.Parse(args[2]);
 
                 if (!firstRun)
                 {
@@ -41,9 +42,25 @@ namespace pseudocodeIdeUpdater
                 AutoUpdater.ExecutablePath = "pseudocode-ide.exe";
 
                 Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}");
+                
+                if (assemblyVersion.Revision > 0)
+                {
+                    // beta release
+                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}");
+                }
+                else if (assemblyVersion.Revision > 0 && !beta)
+                {
+                    // hack to allow to go back to stable release, as the last version tag (pre release count) will be missing
+                    // without this hack, the AutoUpdater would think that the new release is a lower version than this
+                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major - 1}.{assemblyVersion.Minor}.{assemblyVersion.Build}");
+                }
+                else
+                {
+                    // stable release
+                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}");
+                }
 
-                AutoUpdater.Start("https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/main/AutoUpdater.xml");
+                AutoUpdater.Start($"https://raw.githubusercontent.com/PocketMiner82/pseudocode-ide/{(beta ? "dev" : "main")}/AutoUpdater.xml");
 
             }
             catch
