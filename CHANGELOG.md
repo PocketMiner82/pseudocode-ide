@@ -1,3 +1,10 @@
+## [1.3.1-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0...1.3.1-dev.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* it was impossible to go back from beta to release ([3fd18b0](https://github.com/PocketMiner82/pseudocode-ide/commit/3fd18b0b13ea86d12706d10b6090bd595f89c342))
+
 # [1.3.0](https://github.com/PocketMiner82/pseudocode-ide/compare/1.2.7...1.3.0) (2024-04-09)
 
 
