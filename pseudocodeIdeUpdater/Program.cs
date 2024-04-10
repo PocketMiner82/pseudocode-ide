@@ -57,16 +57,16 @@ namespace pseudocodeIdeUpdater
 
                 Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
-                if (assemblyVersion.Revision > 0)
-                {
-                    // beta release
-                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}");
-                }
-                else if (assemblyVersion.Revision > 0 && !beta)
+                if (assemblyVersion.Revision > 0 && !beta && !firstRun)
                 {
                     // hack to allow to go back to stable release, as the last version tag (pre release count) will be missing
                     // without this hack, the AutoUpdater would think that the new release is a lower version than this
-                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major - 1}.{assemblyVersion.Minor}.{assemblyVersion.Build}");
+                    AutoUpdater.InstalledVersion = new Version($"0.0.0");
+                }
+                else if (assemblyVersion.Revision > 0)
+                {
+                    // beta release
+                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}");
                 }
                 else
                 {
