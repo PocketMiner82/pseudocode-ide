@@ -1,4 +1,15 @@
-﻿using pseudocodeIde.interpreter.logging;
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using pseudocodeIde.interpreter.logging;
 using pseudocodeIde.interpreter.parser;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,67 +19,80 @@ namespace pseudocodeIde.interpreter
 {
     public class Parser
     {
+        // Template for function header in C# code generation
         private const string FUNCTION_HEADER_TEMPLATE = "%visibility% %type% %identifier%(%insideParens%) {";
 
-        private static readonly Dictionary<TokenType, string> TOKEN_TO_CSHARP = new Dictionary<TokenType, string>(); 
+        // Mapping of pseudocode tokens to C# code
+        private static readonly Dictionary<TokenType, string> TOKEN_TO_C_SHARP = new Dictionary<TokenType, string>();
 
+        // Mapping of visibility tokens to C# visibility modifiers
         private static readonly Dictionary<TokenType, string> VISIBILITY = new Dictionary<TokenType, string>();
 
+        // Characters that do not require a semicolon after them
         private static readonly List<char> NO_SEMICOLON_AFTER = new List<char>();
 
-        private LinkedList<Token> tokens;
+        // Linked list of tokens to be parsed
+        private readonly LinkedList<Token> TOKENS;
 
-        private CSharpCode cSharpCode = new CSharpCode();
+        // Manager for generated C# code
+        private readonly CSharpCodeManager C_SHARP_CODE = new CSharpCodeManager();
 
-        LinkedListNode<Token> currentToken;
+        // Current token being processed
+        LinkedListNode<Token> _currentToken;
 
-        private bool isInConstructor = true;
+        // Flag indicating if the parser is currently in a constructor
+        private bool _isInConstructor = true;
 
-        private string currentVarIdentifier;
+        // Identifier for the current variable being processed
+        private string _currentVarIdentifier;
 
-        private int forVarCount = -1;
+        // Counter for variables in 'for' loops
+        private int _forVarCount = -1;
 
+        /// <summary>
+        /// Initializes static members of the class.
+        /// </summary>
         static Parser()
         {
-            TOKEN_TO_CSHARP.Add(TYPE_BOOL,      "bool?");
-            TOKEN_TO_CSHARP.Add(TYPE_INT,       "int?");
-            TOKEN_TO_CSHARP.Add(TYPE_DOUBLE,    "double?");
-            TOKEN_TO_CSHARP.Add(TYPE_CHAR,      "char?");
-            TOKEN_TO_CSHARP.Add(TYPE_STRING,    "string");
-            TOKEN_TO_CSHARP.Add(TYPE_VOID,      "void");
+            TOKEN_TO_C_SHARP.Add(TYPE_BOOL, "bool?");
+            TOKEN_TO_C_SHARP.Add(TYPE_INT, "int?");
+            TOKEN_TO_C_SHARP.Add(TYPE_DOUBLE, "double?");
+            TOKEN_TO_C_SHARP.Add(TYPE_CHAR, "char?");
+            TOKEN_TO_C_SHARP.Add(TYPE_STRING, "string");
+            TOKEN_TO_C_SHARP.Add(TYPE_VOID, "void");
 
-            TOKEN_TO_CSHARP.Add(END_IF,         "}");
-            TOKEN_TO_CSHARP.Add(END_FOR,        "}");
-            TOKEN_TO_CSHARP.Add(END_WHILE,      "}");
-            TOKEN_TO_CSHARP.Add(END_SWITCH,     "}");
+            TOKEN_TO_C_SHARP.Add(END_IF, "}");
+            TOKEN_TO_C_SHARP.Add(END_FOR, "}");
+            TOKEN_TO_C_SHARP.Add(END_WHILE, "}");
+            TOKEN_TO_C_SHARP.Add(END_SWITCH, "}");
 
-            TOKEN_TO_CSHARP.Add(IF,             "if");
-            TOKEN_TO_CSHARP.Add(ELSE,           "} else {");
+            TOKEN_TO_C_SHARP.Add(IF, "if");
+            TOKEN_TO_C_SHARP.Add(ELSE, "} else {");
 
-            TOKEN_TO_CSHARP.Add(WHILE,          "while");
+            TOKEN_TO_C_SHARP.Add(WHILE, "while");
 
-            TOKEN_TO_CSHARP.Add(AND,            "&&");
-            TOKEN_TO_CSHARP.Add(OR,             "||");
+            TOKEN_TO_C_SHARP.Add(AND, "&&");
+            TOKEN_TO_C_SHARP.Add(OR, "||");
 
-            TOKEN_TO_CSHARP.Add(TRUE,           "true");
-            TOKEN_TO_CSHARP.Add(FALSE,          "false");
+            TOKEN_TO_C_SHARP.Add(TRUE, "true");
+            TOKEN_TO_C_SHARP.Add(FALSE, "false");
 
-            TOKEN_TO_CSHARP.Add(BREAK,          "break");
+            TOKEN_TO_C_SHARP.Add(BREAK, "break");
 
-            TOKEN_TO_CSHARP.Add(RETURN,         "return ");
+            TOKEN_TO_C_SHARP.Add(RETURN, "return ");
 
-            TOKEN_TO_CSHARP.Add(VAR_ASSIGN,     "=");
+            TOKEN_TO_C_SHARP.Add(VAR_ASSIGN, "=");
 
-            TOKEN_TO_CSHARP.Add(EQUAL,          "==");
+            TOKEN_TO_C_SHARP.Add(EQUAL, "==");
 
-            TOKEN_TO_CSHARP.Add(TYPE_LIST,      "Liste");
-            TOKEN_TO_CSHARP.Add(NEW,            "new ");
-            TOKEN_TO_CSHARP.Add(NULL,           "null");
+            TOKEN_TO_C_SHARP.Add(TYPE_LIST, "Liste");
+            TOKEN_TO_C_SHARP.Add(NEW, "new ");
+            TOKEN_TO_C_SHARP.Add(NULL, "null");
 
 
-            VISIBILITY.Add(PLUS,                "public");
-            VISIBILITY.Add(MINUS,               "private");
-            VISIBILITY.Add(HASH,                "protected");
+            VISIBILITY.Add(PLUS, "public");
+            VISIBILITY.Add(MINUS, "private");
+            VISIBILITY.Add(HASH, "protected");
 
 
             NO_SEMICOLON_AFTER.Add('}');
@@ -76,83 +100,93 @@ namespace pseudocodeIde.interpreter
             NO_SEMICOLON_AFTER.Add('\n');
             NO_SEMICOLON_AFTER.Add('\r');
             NO_SEMICOLON_AFTER.Add(';');
-            NO_SEMICOLON_AFTER.Add(default(char));
+            NO_SEMICOLON_AFTER.Add(default);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Parser"/> class.
+        /// </summary>
+        /// <param name="tokens">The tokens to parse.</param>
         public Parser(LinkedList<Token> tokens)
         {
-            this.tokens = tokens;
+            TOKENS = tokens;
 
             for (int i = 0; i < 3; i++)
             {
-                this.tokens.AddLast(Token.eof(this.tokens.Last.Value.line));
+                TOKENS.AddLast(Token.CreateEofToken(TOKENS.Last.Value.LINE));
             }
         }
 
-        public CSharpCode parseTokens()
+        /// <summary>
+        /// Parses the tokens and generate C# code.
+        /// </summary>
+        /// <returns>The code manager for the generated code</returns>
+        public CSharpCodeManager ParseTokens()
         {
-            while (!this.isAtEnd())
+            while (!IsAtEnd())
             {
-                if (OutputForm.runTaskCancelToken.IsCancellationRequested)
-                {
-                    return this.cSharpCode;
-                }
-
                 // we are at the beginning of the next token
-                this.advance();
+                Advance();
 
-                this.addCode(this.parseToken(this.isInConstructor
-                                           ? this.cSharpCode.constructor.LastOrDefault()
-                                           : this.cSharpCode.methods.LastOrDefault()));
+                AddCode(ParseToken(_isInConstructor
+                                           ? C_SHARP_CODE.Constructor.LastOrDefault()
+                                           : C_SHARP_CODE.Methods.LastOrDefault()));
             }
 
-            this.cSharpCode.constructor += (NO_SEMICOLON_AFTER.Contains(this.cSharpCode.constructor.LastOrDefault()) ? "" : ";");
+            C_SHARP_CODE.Constructor += (NO_SEMICOLON_AFTER.Contains(C_SHARP_CODE.Constructor.LastOrDefault()) ? "" : ";");
 
-            if (!this.isInConstructor)
+            if (!_isInConstructor)
             {
                 // function end
-                this.addCode((NO_SEMICOLON_AFTER.Contains(this.cSharpCode.methods.LastOrDefault()) ? "" : ";") + "\n}\n");
+                AddCode((NO_SEMICOLON_AFTER.Contains(C_SHARP_CODE.Methods.LastOrDefault()) ? "" : ";") + "\n}\n");
             }
 
-            return this.cSharpCode;
+            return C_SHARP_CODE;
         }
 
-        private string parseToken(char prevChar, bool ignoreSpecialCases=false, bool isInForLoopVarDef = false)
+        /// <summary>
+        /// Parses a single token based on its type and context.
+        /// </summary>
+        /// <param name="prevChar">The previous character.</param>
+        /// <param name="ignoreSpecialCases">If set to <c>true</c>, special cases are ignored.</param>
+        /// <param name="isInForLoopVarDef">If set to <c>true</c>, the token is being defined in a 'for' loop.</param>
+        /// <returns>The parsed token as a c# code string.</returns>
+        private string ParseToken(char prevChar, bool ignoreSpecialCases = false, bool isInForLoopVarDef = false)
         {
-            Token token = this.currentToken.Value;
+            Token token = _currentToken.Value;
 
             if (!ignoreSpecialCases)
             {
-                switch (token.type)
+                switch (token.TYPE)
                 {
                     case IF:
                     case WHILE:
-                        return this.handleSimpleHeader();
+                        return HandleSimpleHeader();
                     case FUNCTION:
-                        return this.handleFunction();
+                        return HandleFunction();
                     case SWITCH_PREFIX:
-                        return this.handleSwitchCase();
+                        return HandleSwitchCase();
                     case DO:
-                        return this.handleDoWhile();
+                        return HandleDoWhile();
                     case FOR:
-                        return this.handleFor();
+                        return HandleFor();
                 }
             }
 
-            switch (token.type)
+            switch (token.TYPE)
             {
                 case IDENTIFIER:
-                    return this.tryHandleVarDef(ignoreSpecialCases, isInForLoopVarDef);
+                    return TryHandleVarDef(ignoreSpecialCases, isInForLoopVarDef);
 
                 case NEW_LINE:
                     return (NO_SEMICOLON_AFTER.Contains(prevChar) ? "" : ";") + "\n";
 
                 case VAR_ASSIGN:
-                    string output = TOKEN_TO_CSHARP[token.type];
-                    Token possibleLeftBracket = this.peek();
-                    if (possibleLeftBracket.type == LEFT_BRACKET)
+                    string output = TOKEN_TO_C_SHARP[token.TYPE];
+                    Token possibleLeftBracket = Peek();
+                    if (possibleLeftBracket.TYPE == LEFT_BRACKET)
                     {
-                        string arrayInitOutput = handleArrayInit(possibleLeftBracket);
+                        string arrayInitOutput = HandleArrayInit(possibleLeftBracket);
 
                         if (arrayInitOutput == null)
                         {
@@ -164,65 +198,70 @@ namespace pseudocodeIde.interpreter
                     return output;
 
                 default:
-                    if (TOKEN_TO_CSHARP.ContainsKey(token.type))
-                    {
-                        return TOKEN_TO_CSHARP[token.type];
-                    }
-                    else
-                    {
-                        return token.lexeme;
-                    }
+                    return TOKEN_TO_C_SHARP.ContainsKey(token.TYPE)
+                        ? TOKEN_TO_C_SHARP[token.TYPE]
+                        : token.LEXEME;
             }
         }
 
-        private string handleArrayInit(Token possibleLeftBracket, bool noSemicolon = false)
+        /// <summary>
+        /// Handles the initialization of pseudocode List.
+        /// </summary>
+        /// <param name="possibleLeftBracket">The token, which could be a left bracket.</param>
+        /// <param name="noSemicolon">If set to <c>true</c>, no semicolon is added at the end.</param>
+        /// <returns>The array initialization c# code.</returns>
+        private string HandleArrayInit(Token possibleLeftBracket, bool noSemicolon = false)
         {
-            this.advance();
+            Advance();
             string output = "new() {";
 
-            while (!this.isAtEnd() && this.peek().type != RIGHT_BRACKET)
+            while (!IsAtEnd() && Peek().TYPE != RIGHT_BRACKET)
             {
                 // ignore new lines
-                if (this.peek().type == NEW_LINE)
+                if (Peek().TYPE == NEW_LINE)
                 {
-                    this.advance();
+                    Advance();
                     continue;
                 }
 
-                if (this.peek().type == LEFT_BRACKET)
+                if (Peek().TYPE == LEFT_BRACKET)
                 {
-                    output += this.handleArrayInit(possibleLeftBracket, true);
+                    output += HandleArrayInit(possibleLeftBracket, true);
 
                     // the method advances to the next char at the end, which could be the ending bracket for this array definition
-                    if (this.peek().type == RIGHT_BRACKET)
+                    if (Peek().TYPE == RIGHT_BRACKET)
                     {
                         break;
                     }
                 }
 
-                output += this.parseToken(this.advance().lexeme.Last(), true);
+                output += ParseToken(Advance().LEXEME.Last(), true);
             }
 
-            if (!this.isAtEnd() && this.peek().type == RIGHT_BRACKET)
+            if (!IsAtEnd() && Peek().TYPE == RIGHT_BRACKET)
             {
-                this.advance();
+                Advance();
                 output += "}";
 
-                if ((this.peek().type == NEW_LINE || this.currentToken.Next.Value.type == EOF) && !noSemicolon)
+                if ((Peek().TYPE == NEW_LINE || _currentToken.Next.Value.TYPE == EOF) && !noSemicolon)
                 {
                     output += ";";
                 }
             }
             else
             {
-                Logger.error(possibleLeftBracket.line, $"']' erwartet, nicht '{this.currentToken.Value.lexeme}'.\n\n{output}");
+                Logger.Error(possibleLeftBracket.LINE, $"']' erwartet, nicht '{_currentToken.Value.LEXEME}'.\n\n{output}");
                 return null;
             }
 
             return output;
         }
 
-        private string handleFor()
+        /// <summary>
+        /// Handles the parsing of a 'for' loop.
+        /// </summary>
+        /// <returns>The 'for' loop c# code.</returns>
+        private string HandleFor()
         {
             string output = "";
 
@@ -230,54 +269,54 @@ namespace pseudocodeIde.interpreter
 
             do
             {
-                this.advance();
-                output += this.parseToken(output.LastOrDefault(), true, true);
-                currentToken = this.peek();
+                Advance();
+                output += ParseToken(output.LastOrDefault(), true, true);
+                currentToken = Peek();
             }
-            while (!this.isAtEnd() && currentToken.type != NEW_LINE && currentToken.type != FOR_TO && currentToken.type != FOR_IN);
+            while (!IsAtEnd() && currentToken.TYPE != NEW_LINE && currentToken.TYPE != FOR_TO && currentToken.TYPE != FOR_IN);
 
-            if (this.isAtEnd() || currentToken.type == NEW_LINE)
+            if (IsAtEnd() || currentToken.TYPE == NEW_LINE)
             {
-                Logger.error(currentToken.line, "IN oder BIS in der FÜR-Definition erwartet.");
+                Logger.Error(currentToken.LINE, "IN oder BIS in der FÜR-Definition erwartet.");
                 return "";
             }
 
             // skip the to/in
-            this.advance();
+            Advance();
 
-            if (currentToken.type == FOR_TO)
+            if (currentToken.TYPE == FOR_TO)
             {
-                output += $"; {this.currentVarIdentifier} != ((";
+                output += $"; {_currentVarIdentifier} != ((";
 
                 do
                 {
-                    this.advance();
-                    output += this.parseToken(output.LastOrDefault(), true);
-                    currentToken = this.peek();
+                    Advance();
+                    output += ParseToken(output.LastOrDefault(), true);
+                    currentToken = Peek();
                 }
-                while (!this.isAtEnd() && currentToken.type != NEW_LINE && currentToken.type != FOR_STEP);
+                while (!IsAtEnd() && currentToken.TYPE != NEW_LINE && currentToken.TYPE != FOR_STEP);
 
-                if (this.isAtEnd() || currentToken.type == NEW_LINE)
+                if (IsAtEnd() || currentToken.TYPE == NEW_LINE)
                 {
-                    Logger.error(currentToken.line, "SCHRITT in der FÜR-Definition erwartet.");
+                    Logger.Error(currentToken.LINE, "SCHRITT in der FÜR-Definition erwartet.");
                     return "";
                 }
 
                 // skip the step
-                this.advance();
+                Advance();
 
-                output += $") + forStep{++this.forVarCount}); {this.currentVarIdentifier} += forStep{this.forVarCount}";
+                output += $") + forStep{++_forVarCount}); {_currentVarIdentifier} += forStep{_forVarCount}";
 
                 string step = "";
                 do
                 {
-                    this.advance();
-                    step += this.parseToken(output.LastOrDefault(), true);
-                    currentToken = this.peek();
+                    Advance();
+                    step += ParseToken(output.LastOrDefault(), true);
+                    currentToken = Peek();
                 }
-                while (!this.isAtEnd() && currentToken.type != NEW_LINE);
+                while (!IsAtEnd() && currentToken.TYPE != NEW_LINE);
 
-                output = $"var forStep{this.forVarCount} = {step};\nfor ({output}) {{";
+                output = $"var forStep{_forVarCount} = {step};\nfor ({output}) {{";
             }
             else // currentToken.type == FOR_IN
             {
@@ -285,121 +324,134 @@ namespace pseudocodeIde.interpreter
 
                 do
                 {
-                    this.advance();
-                    output += this.parseToken(output.LastOrDefault(), true);
-                    currentToken = this.peek();
+                    Advance();
+                    output += ParseToken(output.LastOrDefault(), true);
+                    currentToken = Peek();
                 }
-                while (!this.isAtEnd() && currentToken.type != NEW_LINE);
+                while (!IsAtEnd() && currentToken.TYPE != NEW_LINE);
 
                 output = $"foreach ({output}) {{";
 
-                if (output.StartsWith($"foreach (var forEachVar{this.forVarCount}"))
+                if (output.StartsWith($"foreach (var forEachVar{_forVarCount}"))
                 {
-                    output += $"\n{this.currentVarIdentifier} = forEachVar{this.forVarCount};";
+                    output += $"\n{_currentVarIdentifier} = forEachVar{_forVarCount};";
                 }
             }
 
             return output;
         }
 
-        private string handleSimpleHeader()
+        /// <summary>
+        /// Handles the parsing of simple control flow statements like 'WENN' and 'SOLANGE'.
+        /// </summary>
+        /// <returns>The control flow statement c# code.</returns>
+        private string HandleSimpleHeader()
         {
             string output = "";
 
-            Token currentToken = this.currentToken.Value;
-            string keyword = TOKEN_TO_CSHARP[currentToken.type];
+            Token currentToken = _currentToken.Value;
+            string keyword = TOKEN_TO_C_SHARP[currentToken.TYPE];
 
             do
             {
-                this.advance();
-                output += this.parseToken(output.LastOrDefault(), true);
-                currentToken = this.peek();
+                Advance();
+                output += ParseToken(output.LastOrDefault(), true);
+                currentToken = Peek();
             }
-            while (!this.isAtEnd() && currentToken.type != NEW_LINE);
+            while (!IsAtEnd() && currentToken.TYPE != NEW_LINE);
 
             return $"{keyword} ({output}) {{";
         }
 
-        private string handleDoWhile()
+        /// <summary>
+        /// Handles the parsing of a 'WIEDERHOLE ... SOLANGE' loop.
+        /// </summary>
+        /// <returns>The do-while loop c# code.</returns>
+        private string HandleDoWhile()
         {
             string output = "";
             Token currentToken;
 
             do
             {
-                this.advance();
-                output += this.parseToken(output.LastOrDefault());
-                currentToken = this.peek();
+                Advance();
+                output += ParseToken(output.LastOrDefault());
+                currentToken = Peek();
             }
-            while (!this.isAtEnd() && currentToken.type != WHILE);
+            while (!IsAtEnd() && currentToken.TYPE != WHILE);
 
-            if (this.isAtEnd())
+            if (IsAtEnd())
             {
-                Logger.error(currentToken.line, "SOLANGE vor Dateiende erwartet.");
+                Logger.Error(currentToken.LINE, "SOLANGE vor Dateiende erwartet.");
                 return "";
             }
 
             // skip while keyword
-            this.advance();
+            Advance();
 
             output += "} while (";
 
             do
             {
-                this.advance();
-                output += this.parseToken(output.LastOrDefault(), true);
-                currentToken = this.peek();
+                Advance();
+                output += ParseToken(output.LastOrDefault(), true);
+                currentToken = Peek();
             }
-            while (!this.isAtEnd() && currentToken.type != NEW_LINE);
+            while (!IsAtEnd() && currentToken.TYPE != NEW_LINE);
 
             return "do {" + output + ")";
         }
 
-        private string handleSwitchCase()
+        /// <summary>
+        /// Handles the parsing of a 'FALLS' statement.
+        /// </summary>
+        /// <returns>The switch statement c# code.</returns>
+        private string HandleSwitchCase()
         {
             string output = "";
-            Token switchKeyword = this.currentToken.Value;
+            Token switchKeyword = _currentToken.Value;
 
-            Token currentToken = this.advance();
+            Advance();
+            Token currentToken;
 
             do
             {
-                output += this.parseToken(output.LastOrDefault(), true);
-                currentToken = this.advance();
+                output += ParseToken(output.LastOrDefault(), true);
+                currentToken = Advance();
 
-                if (this.isAtEnd() || currentToken.type == NEW_LINE)
+                if (IsAtEnd() || currentToken.TYPE == NEW_LINE)
                 {
-                    Logger.error(switchKeyword.line, "GLEICH vor Zeilenende erwartet.");
+                    Logger.Error(switchKeyword.LINE, "GLEICH vor Zeilenende erwartet.");
                     return "";
                 }
             }
-            while (currentToken.type != SWITCH_SUFFIX);
+            while (currentToken.TYPE != SWITCH_SUFFIX);
 
             output = "switch (" + output + ") {\n";
 
-            if (this.peek().type == NEW_LINE)
+            if (Peek().TYPE == NEW_LINE)
             {
-                currentToken = this.advance();
+                currentToken = Advance();
             }
 
             string currentLine = "";
             bool firstCase = true;
-            while (currentToken.type != END_SWITCH)
+            while (currentToken.TYPE != END_SWITCH)
             {
-                currentToken = this.advance();
+                currentToken = Advance();
 
-                if (this.isAtEnd())
+                if (IsAtEnd())
                 {
-                    Logger.error(currentToken.line, "ENDE FALLS vor Dateiende erwartet.");
+                    Logger.Error(currentToken.LINE, "ENDE FALLS vor Dateiende erwartet.");
                     return "";
                 }
 
-                switch (currentToken.type)
+                switch (currentToken.TYPE)
                 {
                     case ELSE:
-                        if (currentLine.Equals("") && this.peek().type == COLON)
+                        if (currentLine.Equals("") && Peek().TYPE == COLON)
                         {
-                            this.advance();
+                            Advance();
 
                             if (!firstCase)
                             {
@@ -410,7 +462,7 @@ namespace pseudocodeIde.interpreter
                         }
                         else
                         {
-                            currentLine += this.parseToken(currentLine.LastOrDefault());
+                            currentLine += ParseToken(currentLine.LastOrDefault());
                         }
                         break;
                     case COLON:
@@ -424,11 +476,11 @@ namespace pseudocodeIde.interpreter
                         currentLine = "";
                         break;
                     case NEW_LINE:
-                        output += currentLine + this.parseToken(currentLine.LastOrDefault());
+                        output += currentLine + ParseToken(currentLine.LastOrDefault());
                         currentLine = "";
                         break;
                     default:
-                        currentLine += this.parseToken(currentLine.LastOrDefault());
+                        currentLine += ParseToken(currentLine.LastOrDefault());
                         break;
                 }
             }
@@ -441,98 +493,108 @@ namespace pseudocodeIde.interpreter
             return output + "}";
         }
 
-        private string tryHandleVarDef(bool insideFunctionParens, bool isInForLoopVarDef = false)
+        /// <summary>
+        /// Attempts to handle variable definitions within the pseudocode.
+        /// </summary>
+        /// <param name="insideFunctionParens">If set to <c>true</c>, the variable is being defined inside function parentheses.</param>
+        /// <param name="isInForLoopVarDef">If set to <c>true</c>, the variable is being defined in a 'FÜR' loop.</param>
+        /// <returns>The variable definition c# code.</returns>
+        private string TryHandleVarDef(bool insideFunctionParens, bool isInForLoopVarDef = false)
         {
             string output = "";
 
-            Token identifier = this.currentToken.Value;
-            Token possibleColon = this.currentToken.NextOrLast().Value;
-            Token possibleVarType = this.currentToken.NextOrLast().NextOrLast().Value;
-            Token possibleVarAssign = this.currentToken.NextOrLast().NextOrLast().NextOrLast().Value;
+            Token identifier = _currentToken.Value;
+            Token possibleColon = _currentToken.NextOrLast().Value;
+            Token possibleVarType = _currentToken.NextOrLast().NextOrLast().Value;
+            Token possibleVarAssign = _currentToken.NextOrLast().NextOrLast().NextOrLast().Value;
 
-            if (possibleColon.type == COLON)
+            if (possibleColon.TYPE == COLON)
             {
                 if (isInForLoopVarDef)
                 {
-                    this.currentVarIdentifier = "_" + identifier.lexeme;
+                    _currentVarIdentifier = "_" + identifier.LEXEME;
                 }
 
-                if (this.isVarType(possibleVarType.type))
+                if (IsVarType(possibleVarType.TYPE))
                 {
-                    string type = TOKEN_TO_CSHARP[possibleVarType.type];
-                    if (possibleVarAssign.type == LESS)
+                    string type = TOKEN_TO_C_SHARP[possibleVarType.TYPE];
+                    if (possibleVarAssign.TYPE == LESS)
                     {
-                        this.advance();
-                        type = this.tryHandleTypedVarType();
-                        possibleVarAssign = this.currentToken.NextOrLast().NextOrLast().NextOrLast().Value;
+                        Advance();
+                        type = TryHandleTypedVarType();
+                        possibleVarAssign = _currentToken.NextOrLast().NextOrLast().NextOrLast().Value;
                     }
 
-                    if (this.isInConstructor && !insideFunctionParens)
+                    if (_isInConstructor && !insideFunctionParens)
                     {
-                        this.cSharpCode.fields += $"private {type} _{identifier.lexeme};\n";
+                        C_SHARP_CODE.Fields += $"private {type} _{identifier.LEXEME};\n";
 
-                        if (possibleVarAssign.type == VAR_ASSIGN)
+                        if (possibleVarAssign.TYPE == VAR_ASSIGN)
                         {
-                            output += $"_{identifier.lexeme}";
+                            output += $"_{identifier.LEXEME}";
                         }
                     }
                     else
                     {
-                        output += $"{type} _{identifier.lexeme}";
+                        output += $"{type} _{identifier.LEXEME}";
                     }
 
-                    this.advance(2);
+                    Advance(2);
                     return output;
                 }
                 else
                 {
-                    Logger.error(possibleVarType.line, $"Für die Variablendefinition wurde die Angabe eines Typs erwartet, nicht '{possibleVarType.lexeme}'");
+                    Logger.Error(possibleVarType.LINE, $"Für die Variablendefinition wurde die Angabe eines Typs erwartet, nicht '{possibleVarType.LEXEME}'");
                 }
             }
             // special case for for loop
-            else if (possibleColon.type == VAR_ASSIGN && isInForLoopVarDef)
+            else if (possibleColon.TYPE == VAR_ASSIGN && isInForLoopVarDef)
             {
-                this.currentVarIdentifier = "_" + identifier.lexeme;
-                return "var " + "_" + identifier.lexeme;
+                _currentVarIdentifier = "_" + identifier.LEXEME;
+                return "var " + "_" + identifier.LEXEME;
             }
             // special case for foreach loop
             else if (isInForLoopVarDef)
             {
-                this.currentVarIdentifier = "_" + identifier.lexeme;
-                return "var forEachVar" + ++this.forVarCount;
+                _currentVarIdentifier = "_" + identifier.LEXEME;
+                return "var forEachVar" + ++_forVarCount;
             }
 
-            return "_" + identifier.lexeme;
+            return "_" + identifier.LEXEME;
         }
 
-        private string tryHandleTypedVarType()
+        /// <summary>
+        /// Tries to handle a typed variable type, including generic types.
+        /// </summary>
+        /// <returns>The C# code representation of the typed variable type.</returns>
+        private string TryHandleTypedVarType()
         {
             string output = "";
 
-            Token possibleVarType = this.currentToken.NextOrLast().Value;
-            Token possibleLessSign = this.currentToken.NextOrLast().NextOrLast().Value;
+            Token possibleVarType = _currentToken.NextOrLast().Value;
+            Token possibleLessSign = _currentToken.NextOrLast().NextOrLast().Value;
 
-            if (this.isVarType(possibleVarType.type))
+            if (IsVarType(possibleVarType.TYPE))
             {
-                string type = TOKEN_TO_CSHARP[possibleVarType.type];
-                if (possibleLessSign.type == LESS)
+                string type = TOKEN_TO_C_SHARP[possibleVarType.TYPE];
+                if (possibleLessSign.TYPE == LESS)
                 {
                     output += type + "<";
 
-                    this.advance(2);
-                    output += this.tryHandleTypedVarType();
+                    Advance(2);
+                    output += TryHandleTypedVarType();
 
-                    Token possibleGreaterSign = this.currentToken.NextOrLast().NextOrLast().Value;
-                    if (possibleGreaterSign.type != GREATER)
+                    Token possibleGreaterSign = _currentToken.NextOrLast().NextOrLast().Value;
+                    if (possibleGreaterSign.TYPE != GREATER)
                     {
-                        Logger.error(possibleVarType.line, $"'>' erwartet, nicht '{possibleGreaterSign.lexeme}'");
+                        Logger.Error(possibleVarType.LINE, $"'>' erwartet, nicht '{possibleGreaterSign.LEXEME}'");
                         return "";
                     }
 
-                    while (this.currentToken.NextOrLast().NextOrLast().NextOrLast().Value.type == GREATER)
+                    while (_currentToken.NextOrLast().NextOrLast().NextOrLast().Value.TYPE == GREATER)
                     {
                         // consume any more greater signs
-                        this.advance();
+                        Advance();
                     }
 
                     output += ">";
@@ -546,7 +608,12 @@ namespace pseudocodeIde.interpreter
             return output;
         }
 
-        private bool isVarType(TokenType type)
+        /// <summary>
+        /// Determines whether the specified token type represents a variable type.
+        /// </summary>
+        /// <param name="type">The token type to check.</param>
+        /// <returns><c>true</c> if the token type represents a variable type; otherwise, <c>false</c>.</returns>
+        private bool IsVarType(TokenType type)
         {
             switch (type)
             {
@@ -562,127 +629,156 @@ namespace pseudocodeIde.interpreter
             }
         }
 
-        private string handleFunction()
+        /// <summary>
+        /// Handles the parsing of a 'OPERATION' definition.
+        /// </summary>
+        /// <returns>The function definition C# code.</returns>
+        private string HandleFunction()
         {
             string output = "";
             string insideParens = "";
             string visibility = "";
             TokenType type = TYPE_VOID;
 
-            Token functionKeyword = this.currentToken.Value;
+            Token functionKeyword = _currentToken.Value;
 
-            Token possibleVisibility = this.advance();
+            Token possibleVisibility = Advance();
             Token possibleIdentifier = possibleVisibility;
-            if (VISIBILITY.ContainsKey(possibleVisibility.type))
+            if (Parser.VISIBILITY.ContainsKey(possibleVisibility.TYPE))
             {
-                visibility = VISIBILITY[possibleIdentifier.type];
-                possibleIdentifier = this.advance();
+                visibility = Parser.VISIBILITY[possibleIdentifier.TYPE];
+                possibleIdentifier = Advance();
             }
 
-            Token possibleLeftParen = this.advance();
+            Token possibleLeftParen = Advance();
 
-            Token possibleRightParen = this.advance();
-            Token possibleColon = this.currentToken.NextOrLast().Value;
-            Token possibleType = this.currentToken.NextOrLast().NextOrLast().Value;
+            Token possibleRightParen = Advance();
+            Token possibleColon = _currentToken.NextOrLast().Value;
+            Token possibleType = _currentToken.NextOrLast().NextOrLast().Value;
 
-            if (possibleIdentifier.type != IDENTIFIER || possibleLeftParen.type != LEFT_PAREN)
+            if (possibleIdentifier.TYPE != IDENTIFIER || possibleLeftParen.TYPE != LEFT_PAREN)
             {
-                Logger.error(functionKeyword.line, "Unerwartete Zeichen nach dem OPERATION-Keyword.");
+                Logger.Error(functionKeyword.LINE, "Unerwartete Zeichen nach dem OPERATION-Keyword.");
                 return "";
             }
 
 
-            while (!this.isAtEnd())
+            while (!IsAtEnd())
             {
-                if (possibleRightParen.type == NEW_LINE)
+                if (possibleRightParen.TYPE == NEW_LINE)
                 {
-                    Logger.error(functionKeyword.line, "Neue Zeile vor dem Ende der OPERATION-Definition.");
+                    Logger.Error(functionKeyword.LINE, "Neue Zeile vor dem Ende der OPERATION-Definition.");
                     return "\n";
                 }
-                else if (possibleRightParen.type == RIGHT_PAREN
-                      && possibleColon.type == COLON
-                      && this.isVarType(possibleType.type))
+                else if (possibleRightParen.TYPE == RIGHT_PAREN
+                      && possibleColon.TYPE == COLON
+                      && IsVarType(possibleType.TYPE))
                 {
-                    type = possibleType.type;
-                    this.advance(2);
+                    type = possibleType.TYPE;
+                    Advance(2);
                     break;
                 }
-                else if (possibleRightParen.type == RIGHT_PAREN)
+                else if (possibleRightParen.TYPE == RIGHT_PAREN)
                 {
                     break;
                 }
-                else if (possibleRightParen.type != RIGHT_PAREN)
+                else if (possibleRightParen.TYPE != RIGHT_PAREN)
                 {
-                    insideParens += this.parseToken(insideParens.LastOrDefault(), true);
-                    possibleRightParen = this.advance();
-                    possibleColon = this.currentToken.NextOrLast().Value;
-                    possibleType = this.currentToken.NextOrLast().NextOrLast().Value;
+                    insideParens += ParseToken(insideParens.LastOrDefault(), true);
+                    possibleRightParen = Advance();
+                    possibleColon = _currentToken.NextOrLast().Value;
+                    possibleType = _currentToken.NextOrLast().NextOrLast().Value;
                 }
                 else
                 {
-                    Logger.error(functionKeyword.line, "Unerwartete Zeichen.");
+                    Logger.Error(functionKeyword.LINE, "Unerwartete Zeichen.");
                     return "";
                 }
             }
 
-            if (!this.isInConstructor)
+            if (!_isInConstructor)
             {
-                output += (NO_SEMICOLON_AFTER.Contains(output.LastOrDefault()) ? "" : ";")  + "}\n\n";
+                output += (NO_SEMICOLON_AFTER.Contains(output.LastOrDefault()) ? "" : ";") + "}\n\n";
             }
 
-            this.isInConstructor = false;
+            _isInConstructor = false;
 
             return output + FUNCTION_HEADER_TEMPLATE
                 .Replace("%visibility%", visibility)
-                .Replace("%type%", TOKEN_TO_CSHARP[type])
-                .Replace("%identifier%", "_" + possibleIdentifier.lexeme)
+                .Replace("%type%", TOKEN_TO_C_SHARP[type])
+                .Replace("%identifier%", "_" + possibleIdentifier.LEXEME)
                 .Replace("%insideParens%", insideParens);
         }
 
-        private Token advance()
+        /// <summary>
+        /// Advances to the next token in the linked list.
+        /// </summary>
+        /// <returns>The next token.</returns>
+        private Token Advance()
         {
-            this.currentToken = this.peekLinkedList();
+            _currentToken = PeekLinkedList();
 
-            return this.currentToken.Value;
+            return _currentToken.Value;
         }
 
-        private Token advance(int count)
+        /// <summary>
+        /// Advances a specified number of tokens in the linked list.
+        /// </summary>
+        /// <param name="count">The number of tokens to advance.</param>
+        /// <returns>The token after advancing the specified number of tokens.</returns>
+        private Token Advance(int count)
         {
             Token current = null;
             for (int i = 0; i < count; i++)
             {
-                current = this.advance();
+                current = Advance();
             }
 
             return current;
         }
 
-        private Token peek()
+        /// <summary>
+        /// Peeks at the next token in the linked list without advancing.
+        /// </summary>
+        /// <returns>The next token.</returns>
+        private Token Peek()
         {
-            return this.peekLinkedList().Value;
+            return PeekLinkedList().Value;
         }
 
-        private LinkedListNode<Token> peekLinkedList()
+        /// <summary>
+        /// Peeks at the next linked list node in the linked list without advancing.
+        /// </summary>
+        /// <returns>The next linked list node.</returns>
+        private LinkedListNode<Token> PeekLinkedList()
         {
-            return this.currentToken == null
-                ? this.tokens.First
-                : this.currentToken.NextOrLast();
+            return _currentToken == null
+                ? TOKENS.First
+                : _currentToken.NextOrLast();
         }
 
-        private bool isAtEnd()
+        /// <summary>
+        /// Determines whether the parser has reached the end of the tokens.
+        /// </summary>
+        /// <returns><c>true</c> if the parser has reached the end of the tokens; otherwise, <c>false</c>.</returns>
+        private bool IsAtEnd()
         {
-            return this.currentToken != null && this.currentToken.Value.type == EOF;
+            return _currentToken != null && _currentToken.Value.TYPE == EOF;
         }
 
-        private void addCode(string code)
+        /// <summary>
+        /// Adds the specified code to the appropriate section of the C# code manager.
+        /// </summary>
+        /// <param name="code">The code to add.</param>
+        private void AddCode(string code)
         {
-            if (this.isInConstructor)
+            if (_isInConstructor)
             {
-                this.cSharpCode.constructor += code;
+                C_SHARP_CODE.Constructor += code;
             }
             else
             {
-                this.cSharpCode.methods += code;
+                C_SHARP_CODE.Methods += code;
             }
         }
     }

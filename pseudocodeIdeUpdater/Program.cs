@@ -1,4 +1,15 @@
-﻿using AutoUpdaterDotNET;
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using AutoUpdaterDotNET;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -15,7 +26,10 @@ namespace pseudocodeIdeUpdater
         static void Main(string[] args)
         {
             // allow automatic scaling
-            if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
+                SetProcessDPIAware();
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -42,7 +56,7 @@ namespace pseudocodeIdeUpdater
                 AutoUpdater.ExecutablePath = "pseudocode-ide.exe";
 
                 Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                
+
                 if (assemblyVersion.Revision > 0)
                 {
                     // beta release
@@ -67,7 +81,6 @@ namespace pseudocodeIdeUpdater
             {
                 MessageBox.Show("Bitte führe pseudecode-ide.exe aus, nicht dieses Tool.", "Fehler");
             }
-            
         }
 
         private static void AutoUpdater_ApplicationExitEvent()

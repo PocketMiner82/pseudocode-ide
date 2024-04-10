@@ -91,7 +91,7 @@
             this.newMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.newMenuItem.Size = new System.Drawing.Size(257, 34);
             this.newMenuItem.Text = "Neu";
-            this.newMenuItem.Click += new System.EventHandler(this.newMenuItem_Click);
+            this.newMenuItem.Click += new System.EventHandler(this.NewMenuItem_Click);
             // 
             // openMenuItem
             // 
@@ -99,7 +99,7 @@
             this.openMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.openMenuItem.Size = new System.Drawing.Size(257, 34);
             this.openMenuItem.Text = "Öffnen";
-            this.openMenuItem.Click += new System.EventHandler(this.openMenuItem_Click);
+            this.openMenuItem.Click += new System.EventHandler(this.OpenMenuItem_Click);
             // 
             // saveMenuItem
             // 
@@ -108,7 +108,7 @@
             this.saveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.saveMenuItem.Size = new System.Drawing.Size(257, 34);
             this.saveMenuItem.Text = "Speichern";
-            this.saveMenuItem.Click += new System.EventHandler(this.saveMenuItem_Click);
+            this.saveMenuItem.Click += new System.EventHandler(this.SaveMenuItem_Click);
             // 
             // editMenuItem
             // 
@@ -131,7 +131,7 @@
             this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
             this.undoToolStripMenuItem.Size = new System.Drawing.Size(311, 34);
             this.undoToolStripMenuItem.Text = "Rückgängig";
-            this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+            this.undoToolStripMenuItem.Click += new System.EventHandler(this.UndoToolStripMenuItem_Click);
             // 
             // redoToolStripMenuItem
             // 
@@ -140,7 +140,7 @@
             this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(311, 34);
             this.redoToolStripMenuItem.Text = "Wiederherstellen";
-            this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
+            this.redoToolStripMenuItem.Click += new System.EventHandler(this.RedoToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -153,7 +153,7 @@
             this.findMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.findMenuItem.Size = new System.Drawing.Size(311, 34);
             this.findMenuItem.Text = "Suchen";
-            this.findMenuItem.Click += new System.EventHandler(this.findMenuItem_Click);
+            this.findMenuItem.Click += new System.EventHandler(this.FindMenuItem_Click);
             // 
             // replaceMenuItem
             // 
@@ -161,7 +161,7 @@
             this.replaceMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
             this.replaceMenuItem.Size = new System.Drawing.Size(311, 34);
             this.replaceMenuItem.Text = "Ersetzen";
-            this.replaceMenuItem.Click += new System.EventHandler(this.replaceMenuItem_Click);
+            this.replaceMenuItem.Click += new System.EventHandler(this.ReplaceMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
@@ -174,7 +174,7 @@
             this.goToMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
             this.goToMenuItem.Size = new System.Drawing.Size(311, 34);
             this.goToMenuItem.Text = "Gehe zu";
-            this.goToMenuItem.Click += new System.EventHandler(this.goToMenuItem_Click);
+            this.goToMenuItem.Click += new System.EventHandler(this.GoToMenuItem_Click);
             // 
             // viewMenuItem
             // 
@@ -190,7 +190,7 @@
             this.wordWrapMenuItem.Name = "wordWrapMenuItem";
             this.wordWrapMenuItem.Size = new System.Drawing.Size(320, 34);
             this.wordWrapMenuItem.Text = "Zeilenumbrüche aktivieren";
-            this.wordWrapMenuItem.Click += new System.EventHandler(this.wordWrapMenuItem_Click);
+            this.wordWrapMenuItem.Click += new System.EventHandler(this.WordWrapMenuItem_Click);
             // 
             // runMenuItem
             // 
@@ -209,7 +209,7 @@
             this.runProgramMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.runProgramMenuItem.Size = new System.Drawing.Size(706, 34);
             this.runProgramMenuItem.Text = "Programm starten";
-            this.runProgramMenuItem.Click += new System.EventHandler(this.runProgramMenuItem_Click);
+            this.runProgramMenuItem.Click += new System.EventHandler(this.RunProgramMenuItem_Click);
             // 
             // openOutputFormMenuItem
             // 
@@ -217,7 +217,7 @@
             this.openOutputFormMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F5)));
             this.openOutputFormMenuItem.Size = new System.Drawing.Size(706, 34);
             this.openOutputFormMenuItem.Text = "Ausgabefenster öffnen";
-            this.openOutputFormMenuItem.Click += new System.EventHandler(this.openOutputFormMenuItem_Click);
+            this.openOutputFormMenuItem.Click += new System.EventHandler(this.OpenOutputFormMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -233,7 +233,7 @@
             | System.Windows.Forms.Keys.D0)));
             this.singleEqualIsCompareOperatorMenuItem.Size = new System.Drawing.Size(706, 34);
             this.singleEqualIsCompareOperatorMenuItem.Text = "Einfaches \'=\' wird als Vergleichsoperator verwendet";
-            this.singleEqualIsCompareOperatorMenuItem.Click += new System.EventHandler(this.singleEqualIsCompareOperatorMenuItem_Click);
+            this.singleEqualIsCompareOperatorMenuItem.Click += new System.EventHandler(this.SingleEqualIsCompareOperatorMenuItem_Click);
             // 
             // helpMenuItem
             // 
@@ -252,7 +252,7 @@
             this.showHelpMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
             this.showHelpMenuItem.Size = new System.Drawing.Size(415, 34);
             this.showHelpMenuItem.Text = "Hilfe anzeigen";
-            this.showHelpMenuItem.Click += new System.EventHandler(this.showHelpMenuItem_Click);
+            this.showHelpMenuItem.Click += new System.EventHandler(this.ShowHelpMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -264,14 +264,14 @@
             this.updateMenuItem.Name = "updateMenuItem";
             this.updateMenuItem.Size = new System.Drawing.Size(415, 34);
             this.updateMenuItem.Text = "Pseudocode IDE aktualisieren";
-            this.updateMenuItem.Click += new System.EventHandler(this.updateMenuItem_Click);
+            this.updateMenuItem.Click += new System.EventHandler(this.UpdateMenuItem_Click);
             // 
             // updateBetaMenuItem
             // 
             this.updateBetaMenuItem.Name = "updateBetaMenuItem";
             this.updateBetaMenuItem.Size = new System.Drawing.Size(415, 34);
             this.updateBetaMenuItem.Text = "Pseudocode IDE auf Beta aktualisieren";
-            this.updateBetaMenuItem.Click += new System.EventHandler(this.updateBetaMenuItem_Click);
+            this.updateBetaMenuItem.Click += new System.EventHandler(this.UpdateBetaMenuItem_Click);
             // 
             // codeTextBox
             // 
@@ -297,11 +297,11 @@
             this.codeTextBox.UseTabs = true;
             this.codeTextBox.WrapMode = ScintillaNET.WrapMode.None;
             this.codeTextBox.Zoom = 2;
-            this.codeTextBox.CharAdded += new System.EventHandler<ScintillaNET.CharAddedEventArgs>(this.codeTextBox_CharAdded);
-            this.codeTextBox.UpdateUI += new System.EventHandler<ScintillaNET.UpdateUIEventArgs>(this.codeTextBox_UpdateUI);
-            this.codeTextBox.TextChanged += new System.EventHandler(this.codeTextBox_TextChanged);
-            this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.codeTextBox_KeyDown);
-            this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.codeTextBox_KeyPress);
+            this.codeTextBox.CharAdded += new System.EventHandler<ScintillaNET.CharAddedEventArgs>(this.CodeTextBox_CharAdded);
+            this.codeTextBox.UpdateUI += new System.EventHandler<ScintillaNET.UpdateUIEventArgs>(this.CodeTextBox_UpdateUI);
+            this.codeTextBox.TextChanged += new System.EventHandler(this.CodeTextBox_TextChanged);
+            this.codeTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CodeTextBox_KeyDown);
+            this.codeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.CodeTextBox_KeyPress);
             // 
             // autoCompleteMenu
             // 

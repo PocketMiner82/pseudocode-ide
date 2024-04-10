@@ -1,30 +1,62 @@
-﻿namespace pseudocodeIde.interpreter.logging
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace pseudocodeIde.interpreter.logging
 {
     public static class Logger
     {
-        public static OutputForm outputForm { get; set; }
+        /// <summary>
+        /// The output form, where log messages will be printed
+        /// </summary>
+        public static OutputForm OutputForm { get; set; }
 
-        public static void info(string msg)
+        /// <summary>
+        /// Log an information
+        /// </summary>
+        /// <param name="msg">the message to log</param>
+        public static void Info(string msg)
         {
-            print(LogPrefix.TIMESTAMP + LogPrefix.INFO + msg);
+            Print(LogPrefix.Timestamp + LogPrefix.INFO + msg);
         }
 
-        public static void error(string msg)
+        /// <summary>
+        /// Log an error. This will prevent the compiler from running the pseudocode
+        /// </summary>
+        /// <param name="msg">the message to log</param>
+        public static void Error(string msg)
         {
-            print(LogPrefix.TIMESTAMP + LogPrefix.ERROR + msg);
-            Interpreter.hadError = true;
+            Print(LogPrefix.Timestamp + LogPrefix.ERROR + msg);
+            Interpreter.HadError = true;
         }
 
-        public static void error(int line, string msg)
+        /// <summary>
+        /// log an error in a specific line
+        /// </summary>
+        /// <param name="line">the line where the error occured</param>
+        /// <param name="msg">the message to log</param>
+        public static void Error(int line, string msg)
         {
-            error($"Zeile {line}: {msg}");
+            Error($"Zeile {line}: {msg}");
         }
 
-        public static void print(string message, bool newLine = true)
+        /// <summary>
+        /// Print a message to the log, without timestamp or prefix
+        /// </summary>
+        /// <param name="msg">the message to log</param>
+        /// <param name="newLine">whether a new line should be appended to the message</param>
+        public static void Print(string msg, bool newLine = true)
         {
-            if (outputForm != null)
+            if (OutputForm != null)
             {
-                outputForm.outputText += message + (newLine ? "\n" : "");
+                OutputForm.OutputText += msg + (newLine ? "\n" : "");
             }
         }
     }
