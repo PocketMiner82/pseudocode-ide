@@ -1,3 +1,5 @@
+## [1.3.1-dev.5](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.4...1.3.1-dev.5) (2024-04-11)
+
 ## [1.3.1-dev.4](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.3...1.3.1-dev.4) (2024-04-11)
 
 
