@@ -38,7 +38,7 @@ namespace pseudocodeIdeUpdater
             {
                 string path = args[0];
                 bool firstRun = bool.Parse(args[1]);
-                bool beta = bool.Parse(args[2]);
+                bool betaButton = bool.Parse(args[2]);
 
                 if (!firstRun)
                 {
@@ -57,7 +57,8 @@ namespace pseudocodeIdeUpdater
 
                 Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
-                if (assemblyVersion.Revision > 0 && !beta && !firstRun)
+                bool beta = false;
+                if (assemblyVersion.Revision > 0 && !betaButton && !firstRun)
                 {
                     // hack to allow to go back to stable release, as the last version tag (pre release count) will be missing
                     // without this hack, the AutoUpdater would think that the new release is a lower version than this
@@ -67,6 +68,7 @@ namespace pseudocodeIdeUpdater
                 {
                     // beta release
                     AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}");
+                    beta = true;
                 }
                 else
                 {
