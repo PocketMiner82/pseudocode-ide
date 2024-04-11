@@ -1,3 +1,10 @@
+## [1.3.1-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.1...1.3.1-dev.2) (2024-04-11)
+
+
+### Bug Fixes
+
+* updating to beta release always downloaded the latest (non-beta) release and the changelog always was the changelog in the main branch and not dynamic ([fe05fb6](https://github.com/PocketMiner82/pseudocode-ide/commit/fe05fb6d15b9500dcbf8973902d78892625f0fd5))
+
 ## [1.3.1-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0...1.3.1-dev.1) (2024-04-10)
 
 
