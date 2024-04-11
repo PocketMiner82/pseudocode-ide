@@ -1,4 +1,15 @@
-﻿using AutoUpdaterDotNET;
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using AutoUpdaterDotNET;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -15,7 +26,10 @@ namespace pseudocodeIdeUpdater
         static void Main(string[] args)
         {
             // allow automatic scaling
-            if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
+                SetProcessDPIAware();
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -24,7 +38,7 @@ namespace pseudocodeIdeUpdater
             {
                 string path = args[0];
                 bool firstRun = bool.Parse(args[1]);
-                bool beta = bool.Parse(args[2]);
+                bool betaButton = bool.Parse(args[2]);
 
                 if (!firstRun)
                 {
@@ -42,17 +56,19 @@ namespace pseudocodeIdeUpdater
                 AutoUpdater.ExecutablePath = "pseudocode-ide.exe";
 
                 Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                
-                if (assemblyVersion.Revision > 0)
-                {
-                    // beta release
-                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}");
-                }
-                else if (assemblyVersion.Revision > 0 && !beta)
+
+                bool beta = false;
+                if (assemblyVersion.Revision > 0 && !betaButton && !firstRun)
                 {
                     // hack to allow to go back to stable release, as the last version tag (pre release count) will be missing
                     // without this hack, the AutoUpdater would think that the new release is a lower version than this
-                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major - 1}.{assemblyVersion.Minor}.{assemblyVersion.Build}");
+                    AutoUpdater.InstalledVersion = new Version($"0.0.0");
+                }
+                else if (assemblyVersion.Revision > 0)
+                {
+                    // beta release
+                    AutoUpdater.InstalledVersion = new Version($"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}.{assemblyVersion.Revision}");
+                    beta = true;
                 }
                 else
                 {
@@ -67,7 +83,6 @@ namespace pseudocodeIdeUpdater
             {
                 MessageBox.Show("Bitte führe pseudecode-ide.exe aus, nicht dieses Tool.", "Fehler");
             }
-            
         }
 
         private static void AutoUpdater_ApplicationExitEvent()

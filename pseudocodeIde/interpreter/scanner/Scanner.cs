@@ -1,4 +1,15 @@
-﻿using pseudocodeIde.interpreter.logging;
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using pseudocodeIde.interpreter.logging;
 using System;
 using System.Collections.Generic;
 using static pseudocodeIde.interpreter.TokenType;
@@ -7,175 +18,207 @@ namespace pseudocodeIde.interpreter
 {
     public class Scanner
     {
+        /// <summary>
+        /// All the defined keywords in pseudocode and their corresponding token.
+        /// </summary>
         public static readonly Dictionary<string, TokenType> KEYWORDS = new Dictionary<string, TokenType>();
 
-        public static bool singleEqualIsCompareOperator { get; set; } = false;
+        /// <summary>
+        /// If '=' is used to compare values (e.g. 1=1 would be true)
+        /// or if it is used to define variables (e.g. i:int = 1)
+        /// </summary>
+        public static bool SingleEqualIsCompareOperator { get; set; } = false;
 
-        private readonly string code;
+        /// <summary>
+        /// User-written Pseudocode
+        /// </summary>
+        private readonly string CODE;
 
-        private LinkedList<Token> tokens = new LinkedList<Token>();
+        /// <summary>
+        /// The list of tokens that will be generated from the CODE.
+        /// </summary>
+        private readonly LinkedList<Token> TOKENS = new LinkedList<Token>();
 
-        private int start = 0;
-        private int current = 0;
-        private int line = 1;
+        /// <summary>
+        /// start position of the current lexeme
+        /// </summary>
+        private int _start = 0;
 
+        /// <summary>
+        /// current position in the lexeme (relative to the whole text)
+        /// </summary>
+        private int _current = 0;
 
+        /// <summary>
+        /// current line of the CODE
+        /// </summary>
+        private int _line = 1;
+
+        /// <summary>
+        /// Add the keywords contents to the readonly static list
+        /// </summary>
         static Scanner()
         {
-            KEYWORDS.Add("WENN",            IF);
-            KEYWORDS.Add("SONST",           ELSE);
-            KEYWORDS.Add("ENDE WENN",       END_IF);
-                                            
-            KEYWORDS.Add("FALLS",           SWITCH_PREFIX);
-            KEYWORDS.Add("GLEICH",          SWITCH_SUFFIX);
-            KEYWORDS.Add("ENDE FALLS",      END_SWITCH);
+            KEYWORDS.Add("WENN", IF);
+            KEYWORDS.Add("SONST", ELSE);
+            KEYWORDS.Add("ENDE WENN", END_IF);
 
-            KEYWORDS.Add("SOLANGE",         WHILE);
-            KEYWORDS.Add("ENDE SOLANGE",    END_WHILE);
-            KEYWORDS.Add("WIEDERHOLE",      DO);
+            KEYWORDS.Add("FALLS", SWITCH_PREFIX);
+            KEYWORDS.Add("GLEICH", SWITCH_SUFFIX);
+            KEYWORDS.Add("ENDE FALLS", END_SWITCH);
 
-            KEYWORDS.Add("FÜR",             FOR);
-            KEYWORDS.Add("BIS",             FOR_TO);
-            KEYWORDS.Add("SCHRITT",         FOR_STEP);
-            KEYWORDS.Add("IN",              FOR_IN);
-            KEYWORDS.Add("ENDE FÜR",        END_FOR);
+            KEYWORDS.Add("SOLANGE", WHILE);
+            KEYWORDS.Add("ENDE SOLANGE", END_WHILE);
+            KEYWORDS.Add("WIEDERHOLE", DO);
 
-            KEYWORDS.Add("ABBRUCH",         BREAK);
-                                            
-            KEYWORDS.Add("OPERATION",       FUNCTION);
-            KEYWORDS.Add("RÜCKGABE",        RETURN);
+            KEYWORDS.Add("FÜR", FOR);
+            KEYWORDS.Add("BIS", FOR_TO);
+            KEYWORDS.Add("SCHRITT", FOR_STEP);
+            KEYWORDS.Add("IN", FOR_IN);
+            KEYWORDS.Add("ENDE FÜR", END_FOR);
 
-            KEYWORDS.Add("wahr",            TRUE);
-            KEYWORDS.Add("true",            TRUE);
-            KEYWORDS.Add("falsch",          FALSE);
-            KEYWORDS.Add("false",           FALSE);
+            KEYWORDS.Add("ABBRUCH", BREAK);
 
-            KEYWORDS.Add("UND",             AND);
-            KEYWORDS.Add("ODER",            OR);
+            KEYWORDS.Add("OPERATION", FUNCTION);
+            KEYWORDS.Add("RÜCKGABE", RETURN);
 
-            KEYWORDS.Add("Boolean",         TYPE_BOOL);
-            KEYWORDS.Add("boolean",         TYPE_BOOL);
-            KEYWORDS.Add("bool",            TYPE_BOOL);
-                                            
-            KEYWORDS.Add("GZ",              TYPE_INT);
-            KEYWORDS.Add("Integer",         TYPE_INT);
-            KEYWORDS.Add("int",             TYPE_INT);
-                                            
-            KEYWORDS.Add("FKZ",             TYPE_DOUBLE);
-            KEYWORDS.Add("Real",            TYPE_DOUBLE);
-            KEYWORDS.Add("double",          TYPE_DOUBLE);
-                                            
-            KEYWORDS.Add("Zeichen",         TYPE_CHAR);
-            KEYWORDS.Add("char",            TYPE_CHAR);
-                                            
-            KEYWORDS.Add("Text",            TYPE_STRING);
-            KEYWORDS.Add("String",          TYPE_STRING);
-            KEYWORDS.Add("string",          TYPE_STRING);
+            KEYWORDS.Add("wahr", TRUE);
+            KEYWORDS.Add("true", TRUE);
+            KEYWORDS.Add("falsch", FALSE);
+            KEYWORDS.Add("false", FALSE);
 
-            KEYWORDS.Add("Liste",           TYPE_LIST);
-            KEYWORDS.Add("NEU",             NEW);
-                                            
-            KEYWORDS.Add("NICHTS",          NULL);
+            KEYWORDS.Add("UND", AND);
+            KEYWORDS.Add("ODER", OR);
 
-            KEYWORDS.Add("schreibe",        IDENTIFIER);
-            KEYWORDS.Add("warte",           IDENTIFIER);
+            KEYWORDS.Add("Boolean", TYPE_BOOL);
+            KEYWORDS.Add("boolean", TYPE_BOOL);
+            KEYWORDS.Add("bool", TYPE_BOOL);
+
+            KEYWORDS.Add("GZ", TYPE_INT);
+            KEYWORDS.Add("Integer", TYPE_INT);
+            KEYWORDS.Add("int", TYPE_INT);
+
+            KEYWORDS.Add("FKZ", TYPE_DOUBLE);
+            KEYWORDS.Add("Real", TYPE_DOUBLE);
+            KEYWORDS.Add("double", TYPE_DOUBLE);
+
+            KEYWORDS.Add("Zeichen", TYPE_CHAR);
+            KEYWORDS.Add("char", TYPE_CHAR);
+
+            KEYWORDS.Add("Text", TYPE_STRING);
+            KEYWORDS.Add("String", TYPE_STRING);
+            KEYWORDS.Add("string", TYPE_STRING);
+
+            KEYWORDS.Add("Liste", TYPE_LIST);
+            KEYWORDS.Add("NEU", NEW);
+
+            KEYWORDS.Add("NICHTS", NULL);
+
+            KEYWORDS.Add("schreibe", IDENTIFIER);
+            KEYWORDS.Add("warte", IDENTIFIER);
             KEYWORDS.Add("benutzereingabe", IDENTIFIER);
         }
 
+        /// <summary>
+        /// This class converts Pseudocode to Tokens
+        /// </summary>
+        /// <param name="code">the Pseudocode text string</param>
         public Scanner(string code)
         {
-            this.code = code;
+            this.CODE = code;
         }
 
-        public LinkedList<Token> scanTokens()
+        /// <summary>
+        /// Scan the CODE to get the tokens
+        /// </summary>
+        /// <returns></returns>
+        public LinkedList<Token> ScanTokens()
         {
-            while (!this.isAtEnd())
+            while (!IsAtEnd())
             {
-                if (OutputForm.runTaskCancelToken.IsCancellationRequested)
-                {
-                    return this.tokens;
-                }
-
                 // we are at the beginning of the next lexeme
-                this.start = this.current;
-                this.scanToken();
+                _start = _current;
+                ScanToken();
             }
 
-            this.tokens.AddLast(Token.eof(this.line));
-            return this.tokens;
+            TOKENS.AddLast(Token.CreateEofToken(_line));
+            return TOKENS;
         }
 
-        private void scanToken()
+        /// <summary>
+        /// Scan for a token
+        /// </summary>
+        private void ScanToken()
         {
-            char c = this.advance();
+            char c = Advance();
             switch (c)
             {
                 // single char lexems
-                case '(': this.addToken(LEFT_PAREN); break;
-                case ')': this.addToken(RIGHT_PAREN); break;
-                case '[': this.addToken(LEFT_BRACKET); break;
-                case ']': this.addToken(RIGHT_BRACKET); break;
-                case ',': this.addToken(COMMA); break;
-                case '.': this.addToken(DOT); break;
-                case '-': this.addToken(MINUS); break;
-                case '+': this.addToken(PLUS); break;
-                case ';': this.addToken(SEMICOLON); break;
-                case '*': this.addToken(STAR); break;
-                case '←': this.addToken(VAR_ASSIGN); break;
-                case '&': this.addToken(SINGLE_AND); break;
-                case '|': this.addToken(SINGLE_OR); break;
-                case '#': this.addToken(HASH); break;
+                case '(': AddToken(LEFT_PAREN); break;
+                case ')': AddToken(RIGHT_PAREN); break;
+                case '[': AddToken(LEFT_BRACKET); break;
+                case ']': AddToken(RIGHT_BRACKET); break;
+                case ',': AddToken(COMMA); break;
+                case '.': AddToken(DOT); break;
+                case '-': AddToken(MINUS); break;
+                case '+': AddToken(PLUS); break;
+                case ';': AddToken(SEMICOLON); break;
+                case '*': AddToken(STAR); break;
+                case '←': AddToken(VAR_ASSIGN); break;
+                case '&': AddToken(SINGLE_AND); break;
+                case '|': AddToken(SINGLE_OR); break;
+                case '#': AddToken(HASH); break;
 
                 // single or two char lexems
                 case '!':
-                    this.addToken(this.match('=') ? BANG_EQUAL : BANG);
+                    AddToken(Match('=') ? BANG_EQUAL : BANG);
                     break;
                 case '=':
-                    if (singleEqualIsCompareOperator)
+                    if (SingleEqualIsCompareOperator)
                     {
-                        this.match('=');
-                        this.addToken(EQUAL);
+                        Match('=');
+                        AddToken(EQUAL);
                     }
                     else
                     {
-                        this.addToken(this.match('=') ? EQUAL : VAR_ASSIGN);
+                        AddToken(Match('=') ? EQUAL : VAR_ASSIGN);
                     }
-                    
+
                     break;
                 case '<':
-                    if (this.match('='))
+                    if (Match('='))
                     {
-                        this.addToken(LESS_EQUAL);
+                        AddToken(LESS_EQUAL);
                     }
-                    else if (this.match('-'))
+                    else if (Match('-'))
                     {
-                        this.addToken(VAR_ASSIGN);
+                        AddToken(VAR_ASSIGN);
                     }
                     else
                     {
-                        this.addToken(LESS);
+                        AddToken(LESS);
                     }
                     break;
                 case '>':
-                    this.addToken(this.match('=') ? GREATER_EQUAL : GREATER);
+                    AddToken(Match('=') ? GREATER_EQUAL : GREATER);
                     break;
                 case ':':
-                    this.addToken(this.match('=') ? VAR_ASSIGN : COLON);
+                    AddToken(Match('=') ? VAR_ASSIGN : COLON);
                     break;
 
                 // allow comments with '//'
                 case '/':
-                    if (this.match('/'))
+                    if (Match('/'))
                     {
                         // a comment is until the end of a line
-                        while (this.peek() != '\n' && !this.isAtEnd())
+                        while (Peek() != '\n' && !IsAtEnd())
                         {
-                            this.advance();
+                            Advance();
                         }
                     }
                     else
                     {
-                        this.addToken(SLASH);
+                        AddToken(SLASH);
                     }
                     break;
 
@@ -183,82 +226,92 @@ namespace pseudocodeIde.interpreter
                 case '\r':
                 case '\t':
                 case '\n':
-                    this.handleWhitspace(c == '\n');
+                    HandleWhitspace(c == '\n');
                     break;
 
-                case '"': this.handleString(); break;
-                case '\'': this.handleChar(); break;
+                case '"': HandleString(); break;
+                case '\'': HandleChar(); break;
 
                 default:
                     try
                     {
-                        if (this.isDigit(c))
+                        if (IsDigit(c))
                         {
-                            this.handleNumber();
+                            HandleNumber();
                         }
-                        else if (this.isAlpha(c))
+                        else if (IsAlpha(c))
                         {
-                            this.handleIdentifier();
+                            HandleIdentifier();
                         }
                         else
                         {
-                            Logger.error(this.line, $"Unerwartetes Zeichen: '{c}'.");
+                            Logger.Error(_line, $"Unerwartetes Zeichen: '{c}'.");
                         }
                     }
                     catch (Exception e)
                     {
-                        Logger.error(this.line, $"Unerwartete Zeichen nach '{c}'. {e.GetType().Name}: {e.Message}");
+                        Logger.Error(_line, $"Unerwartete Zeichen nach '{c}'. {e.GetType().Name}: {e.Message}");
                     }
                     break;
             }
         }
 
-        private void handleWhitspace(bool isNewLine)
+        /// <summary>
+        /// Handle the occurence of whitespaces
+        /// </summary>
+        /// <param name="isNewLine">is the whitespace a new line character?</param>
+        private void HandleWhitspace(bool isNewLine)
         {
             if (isNewLine)
             {
-                this.addToken(NEW_LINE);
-                this.line++;
+                AddToken(NEW_LINE);
+                _line++;
             }
 
-            if (!this.isAtEnd())
+            if (!IsAtEnd())
             {
-                switch (this.peek())
+                switch (Peek())
                 {
                     // Ignore whitespace
                     case ' ':
                     case '\r':
                     case '\t':
                     case '\n':
-                        this.start = this.current;
-                        this.handleWhitspace(this.advance() == '\n');
+                        _start = _current;
+                        HandleWhitspace(Advance() == '\n');
                         return;
                 }
             }
 
-            if (!isNewLine)
-            {
-                //this.addToken(WHITESPACE);
-            }
+            // currently, whitespaces often don't influence the behavior of the parser,
+            // we don't need to create a token for it
+            //if (!isNewLine)
+            //{
+            //    this.addToken(WHITESPACE);
+            //}
         }
 
-        private void handleIdentifier(bool textEmpty = true)
+        /// <summary>
+        /// Handle the occurence of an identifier literal
+        /// </summary>
+        /// <param name="textEmpty">false if we are checking for text after the ENDE keyword</param>
+        private void HandleIdentifier(bool textEmpty = true)
         {
-            while (this.isAlphaNumeric(this.peek()))
+            while (IsAlphaNumeric(Peek()))
             {
-                this.advance();
+                Advance();
             }
 
-            string text = this.code.Substring(this.start, this.current - this.start);
+            string text = CODE.Substring(_start, _current - _start);
 
             // allow something like "ENDE WENN"; when text is ENDE and the next char is a space, allow the space in the identifier
-            if (textEmpty && text.Equals("ENDE") && (this.isAtEnd() || this.peek() == ' ' || this.peek() == '\t') )
+            if (textEmpty && text.Equals("ENDE") && (IsAtEnd() || Peek() == ' ' || Peek() == '\t'))
             {
-                if (!this.isAtEnd())
+                if (!IsAtEnd())
                 {
-                    this.advance();
+                    Advance();
                 }
-                this.handleIdentifier(false);
+                HandleIdentifier(false);
                 return;
             }
 
@@ -271,79 +324,85 @@ namespace pseudocodeIde.interpreter
             {
                 if (!textEmpty)
                 {
-                    Logger.error(this.line, "Nach 'ENDE' muss die zu schließende Anweisung stehen.");
+                    Logger.Error(_line, "Nach 'ENDE' muss die zu schließende Anweisung stehen.");
                     return;
                 }
 
                 type = IDENTIFIER;
             }
 
-            this.addToken(type);
+            AddToken(type);
         }
 
-        private void handleNumber()
+        /// <summary>
+        /// Handle the occurence of a number literal
+        /// </summary>
+        private void HandleNumber()
         {
-            while (this.isDigit(this.peek()))
+            while (IsDigit(Peek()))
             {
-                this.advance();
+                Advance();
             }
 
             // look for a decimal
-            if (this.peek() == '.' && this.isDigit(this.peekNext()))
+            if (Peek() == '.' && IsDigit(PeekNext()))
             {
                 // consume the '.'
-                this.advance();
+                Advance();
 
-                while (this.isDigit(this.peek()))
+                while (IsDigit(Peek()))
                 {
-                    this.advance();
+                    Advance();
                 }
             }
-            else if (this.peek() == 'x' && this.isHexDigit(this.peekNext()))
+            else if (Peek() == 'x' && IsHexDigit(PeekNext()))
             {
                 // consume the 'x'
-                this.advance();
+                Advance();
 
-                while (this.isHexDigit(this.peek()))
+                while (IsHexDigit(Peek()))
                 {
-                    this.advance();
+                    Advance();
                 }
                 // start + 2 because the '0x' must be removed
-                this.addToken(NUMBER, Convert.ToInt32(this.code.Substring(this.start + 2, this.current - this.start), 16));
+                AddToken(NUMBER, Convert.ToInt32(CODE.Substring(_start + 2, _current - _start), 16));
                 return;
             }
-            else if (this.peek() == 'b' && this.isBinaryDigit(this.peekNext()))
+            else if (Peek() == 'b' && IsBinaryDigit(PeekNext()))
             {
                 // consume the 'b'
-                this.advance();
+                Advance();
 
-                while (this.isBinaryDigit(this.peek()))
+                while (IsBinaryDigit(Peek()))
                 {
-                    this.advance();
+                    Advance();
                 }
                 // start + 2 because the '0b' must be removed
-                this.addToken(NUMBER, Convert.ToInt32(this.code.Substring(this.start, this.current - this.start).Substring(2), 2));
+                AddToken(NUMBER, Convert.ToInt32(CODE.Substring(_start, _current - _start).Substring(2), 2));
                 return;
             }
 
-            this.addToken(NUMBER, double.Parse(this.code.Substring(this.start, this.current - this.start)));
+            AddToken(NUMBER, double.Parse(CODE.Substring(_start, _current - _start)));
         }
 
-        private void handleChar()
+        /// <summary>
+        /// Handle the occurence of a char literal
+        /// </summary>
+        private void HandleChar()
         {
-            if (this.peek() != '\'' && this.peek() != '\n' && !this.isAtEnd())
+            if (Peek() != '\'' && Peek() != '\n' && !IsAtEnd())
             {
-                this.advance();
+                Advance();
             }
 
             int i = 0;
             while (true)
             {
                 // todo
-                if (this.peek() != '\'' && !this.isAtEnd())
+                if (Peek() != '\'' && !IsAtEnd())
                 {
                     i++;
-                    this.advance();
+                    Advance();
                 }
                 else
                 {
@@ -353,99 +412,126 @@ namespace pseudocodeIde.interpreter
 
             if (i > 0)
             {
-                Logger.error(this.line, "Zu viele Zeichen im Zeichenliteral.");
+                Logger.Error(_line, "Zu viele Zeichen im Zeichenliteral.");
                 return;
             }
-            else if (this.isAtEnd())
+            else if (IsAtEnd())
             {
-                Logger.error(this.line, "Nicht abgeschlossenes Zeichenliteral.");
-                return;
-            }
-
-            // the next char must be the closing "
-            this.advance();
-
-            // trim the surrounding quotes
-            string value = this.code.Substring(this.start + 1, this.current - this.start - 2);
-            this.addToken(CHAR, value);
-        }
-
-        private void handleString()
-        {
-            while (this.peek() != '"' && !this.isAtEnd())
-            {
-                if (this.peek() == '\n') this.line++;
-                this.advance();
-            }
-
-            if (this.isAtEnd())
-            {
-                Logger.error(line, "Nicht abgeschlossene Zeichenkette.");
+                Logger.Error(_line, "Nicht abgeschlossenes Zeichenliteral.");
                 return;
             }
 
             // the next char must be the closing "
-            this.advance();
+            Advance();
 
             // trim the surrounding quotes
-            string value = this.code.Substring(this.start + 1, this.current - this.start - 2);
-            this.addToken(STRING, value);
+            string value = CODE.Substring(_start + 1, _current - _start - 2);
+            AddToken(CHAR, value);
         }
 
-        private bool match(char expected)
+        /// <summary>
+        /// Handle occurence of a string literal
+        /// </summary>
+        private void HandleString()
         {
-            if (this.isAtEnd())
+            while (Peek() != '"' && !IsAtEnd())
+            {
+                if (Peek() == '\n')
+                {
+                    _line++;
+                }
+
+                Advance();
+            }
+
+            if (IsAtEnd())
+            {
+                Logger.Error(_line, "Nicht abgeschlossene Zeichenkette.");
+                return;
+            }
+
+            // the next char must be the closing "
+            Advance();
+
+            // trim the surrounding quotes
+            string value = CODE.Substring(_start + 1, _current - _start - 2);
+            AddToken(STRING, value);
+        }
+
+        /// <summary>
+        /// Check if the current char matches the expected char
+        /// </summary>
+        /// <param name="expected">the expected char</param>
+        /// <returns></returns>
+        private bool Match(char expected)
+        {
+            if (IsAtEnd())
             {
                 return false;
             }
 
-            if (this.code[current] != expected)
+            if (CODE[_current] != expected)
             {
                 return false;
             }
 
             // if it matches, we need to increase the current scanning position
-            this.current++;
+            _current++;
             return true;
         }
 
-        private char peek()
+        /// <summary>
+        /// Peek at the current char
+        /// </summary>
+        /// <returns></returns>
+        private char Peek()
         {
-            if (this.isAtEnd())
-            {
-                return '\0';
-            }
-            return this.code[current];
+            return IsAtEnd() ? '\0' : CODE[_current];
         }
 
-        private char peekNext()
+        /// <summary>
+        /// Peek at the next char
+        /// </summary>
+        /// <returns></returns>
+        private char PeekNext()
         {
-            if (this.current + 1 >= this.code.Length)
-            {
-                return '\0';
-            }
-
-            return this.code[current + 1];
+            return _current + 1 >= CODE.Length ? '\0' : CODE[_current + 1];
         }
 
-        private bool isDigit(char c)
+        /// <summary>
+        /// check if a char is a digit
+        /// </summary>
+        /// <returns></returns>
+        private bool IsDigit(char c)
         {
             return c >= '0' && c <= '9';
         }
 
-        private bool isHexDigit(char c)
+        /// <summary>
+        /// Check if a char is a hex digit
+        /// </summary>
+        /// <returns></returns>
+        private bool IsHexDigit(char c)
         {
-            return isDigit(c) ||
+            return IsDigit(c) ||
                 (c >= 'a' && c <= 'f') ||
                 (c >= 'A' && c <= 'F');
         }
 
-        private bool isBinaryDigit(char c)
+        /// <summary>
+        /// Check if a char is a binary digit
+        /// </summary>
+        /// <returns></returns>
+        private bool IsBinaryDigit(char c)
         {
             return c == '0' || c == '1';
         }
 
-        private bool isAlpha(char c)
+        /// <summary>
+        /// Check if a char is in the (German) alphabet
+        /// </summary>
+        /// <returns></returns>
+        private bool IsAlpha(char c)
         {
             return (c >= 'a' && c <= 'z') ||
                    (c >= 'A' && c <= 'Z') ||
@@ -454,25 +540,42 @@ namespace pseudocodeIde.interpreter
                     c == 'Ä' || c == 'Ö' || c == 'Ü';
         }
 
-        private bool isAlphaNumeric(char c)
+        /// <summary>
+        /// Check if a char is alphanumeric
+        /// </summary>
+        /// <returns></returns>
+        private bool IsAlphaNumeric(char c)
         {
-            return this.isAlpha(c) || this.isDigit(c);
+            return IsAlpha(c) || IsDigit(c);
         }
 
-        private bool isAtEnd()
+        /// <summary>
+        /// Check if we reaced the end
+        /// </summary>
+        /// <returns></returns>
+        private bool IsAtEnd()
         {
-            return this.current >= this.code.Length;
+            return _current >= CODE.Length;
         }
 
-        private char advance()
+        /// <summary>
+        /// Advance one and return the current char
+        /// </summary>
+        /// <returns></returns>
+        private char Advance()
         {
-            return this.code[current++];
+            return CODE[_current++];
         }
 
-        private void addToken(TokenType type, object literal = null)
+        /// <summary>
+        /// Add a new token to the list
+        /// </summary>
+        /// <param name="type">the token type</param>
+        /// <param name="literal">the literal object</param>
+        private void AddToken(TokenType type, object literal = null)
         {
-            string text = this.code.Substring(this.start, this.current - this.start);
-            this.tokens.AddLast(new Token(type, text, literal, this.line));
+            string text = CODE.Substring(_start, _current - _start);
+            TOKENS.AddLast(new Token(type, text, literal, _line));
         }
     }
 }

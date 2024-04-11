@@ -38,6 +38,7 @@
             // 
             // menuStrip
             // 
+            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startMenuItem,
@@ -45,9 +46,9 @@
             this.copyCSharpCodeMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Padding = new System.Windows.Forms.Padding(4, 1, 0, 1);
+            this.menuStrip.Padding = new System.Windows.Forms.Padding(6, 2, 0, 2);
             this.menuStrip.ShowItemToolTips = true;
-            this.menuStrip.Size = new System.Drawing.Size(784, 24);
+            this.menuStrip.Size = new System.Drawing.Size(1176, 36);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -57,10 +58,10 @@
             this.startMenuItem.ForeColor = System.Drawing.Color.Green;
             this.startMenuItem.Name = "startMenuItem";
             this.startMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.startMenuItem.Size = new System.Drawing.Size(43, 22);
+            this.startMenuItem.Size = new System.Drawing.Size(64, 32);
             this.startMenuItem.Text = "Start";
             this.startMenuItem.ToolTipText = "Start (F5)";
-            this.startMenuItem.Click += new System.EventHandler(this.startMenuItem_Click);
+            this.startMenuItem.Click += new System.EventHandler(this.StartMenuItem_Click);
             // 
             // stopMenuItem
             // 
@@ -69,40 +70,42 @@
             this.stopMenuItem.ForeColor = System.Drawing.Color.Red;
             this.stopMenuItem.Name = "stopMenuItem";
             this.stopMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5)));
-            this.stopMenuItem.Size = new System.Drawing.Size(43, 22);
+            this.stopMenuItem.Size = new System.Drawing.Size(65, 32);
             this.stopMenuItem.Text = "Stop";
             this.stopMenuItem.ToolTipText = "Stop (Shift+F5)";
-            this.stopMenuItem.Click += new System.EventHandler(this.stopMenuItem_Click);
+            this.stopMenuItem.Click += new System.EventHandler(this.StopMenuItem_Click);
             // 
             // copyCSharpCodeMenuItem
             // 
             this.copyCSharpCodeMenuItem.Name = "copyCSharpCodeMenuItem";
-            this.copyCSharpCodeMenuItem.Size = new System.Drawing.Size(114, 22);
+            this.copyCSharpCodeMenuItem.Size = new System.Drawing.Size(171, 29);
             this.copyCSharpCodeMenuItem.Text = "C# Code kopieren";
             this.copyCSharpCodeMenuItem.Visible = false;
-            this.copyCSharpCodeMenuItem.Click += new System.EventHandler(this.copyCSharpCodeMenuItem_Click);
+            this.copyCSharpCodeMenuItem.Click += new System.EventHandler(this.CopyCSharpCodeMenuItem_Click);
             // 
             // rtbOutput
             // 
             this.rtbOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtbOutput.Font = new System.Drawing.Font("Courier New", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rtbOutput.Location = new System.Drawing.Point(0, 24);
+            this.rtbOutput.Location = new System.Drawing.Point(0, 36);
+            this.rtbOutput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.rtbOutput.Name = "rtbOutput";
             this.rtbOutput.ReadOnly = true;
-            this.rtbOutput.Size = new System.Drawing.Size(784, 437);
+            this.rtbOutput.Size = new System.Drawing.Size(1176, 673);
             this.rtbOutput.TabIndex = 1;
             this.rtbOutput.Text = "";
             this.rtbOutput.WordWrap = false;
             // 
             // OutputForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 461);
+            this.ClientSize = new System.Drawing.Size(1176, 709);
             this.Controls.Add(this.rtbOutput);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
-            this.MinimumSize = new System.Drawing.Size(348, 244);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.MinimumSize = new System.Drawing.Size(511, 345);
             this.Name = "OutputForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

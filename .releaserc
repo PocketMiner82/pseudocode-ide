@@ -48,11 +48,19 @@
           {
             "files": [
               "AutoUpdater.xml",
-			  "pseudocodeIdeUpdater/pseudocodeIdeUpdater.csproj",
-			  "pseudocodeIde/pseudocodeIde.csproj"
+              "pseudocodeIdeUpdater/pseudocodeIdeUpdater.csproj",
+              "pseudocodeIde/pseudocodeIde.csproj"
             ],
             "from": "<version>.*</version>",
             "to": "<version>${nextRelease.version.replace('-dev', '')}</version>",
+            "countMatches": true
+          },
+          {
+            "files": [
+              "AutoUpdater.xml"
+            ],
+            "from": "https://github\\.com/PocketMiner82/pseudocode-ide/(.*)/.*/(.*)/",
+            "to": "https://github.com/PocketMiner82/pseudocode-ide/$1/${nextRelease.version}/$2/",
             "countMatches": true
           }
         ]
@@ -71,8 +79,8 @@
           "README.md",
           "CHANGELOG.md",
           "AutoUpdater.xml",
-		  "pseudocodeIdeUpdater/pseudocodeIdeUpdater.csproj",
-		  "pseudocodeIde/pseudocodeIde.csproj"
+          "pseudocodeIdeUpdater/pseudocodeIdeUpdater.csproj",
+          "pseudocodeIde/pseudocodeIde.csproj"
         ]
       }
     ],

@@ -1,22 +1,25 @@
-﻿using pseudocode_ide;
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using pseudocode_ide;
 using pseudocodeIde.interpreter;
 using pseudocodeIde.interpreter.logging;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace pseudocodeIde
 {
     public partial class OutputForm : Form
     {
-        private Task runTask = Task.CompletedTask;
-
-        public static CancellationTokenSource runTaskCancelTokenSource { get; set; }
-
-        public static CancellationToken runTaskCancelToken { get; set; }
-
-        public PseudocodeIDEForm mainForm
+        public PseudocodeIDEForm MainForm
         {
             get
             {
@@ -24,11 +27,11 @@ namespace pseudocodeIde
             }
         }
 
-        public string outputText
+        public string OutputText
         {
             get
             {
-                return (string)Invoke((Func<string>) delegate
+                return (string)Invoke((Func<string>)delegate
                 {
                     return rtbOutput.Text;
                 });
@@ -44,14 +47,14 @@ namespace pseudocodeIde
             }
         }
 
-        private Interpreter interpreter;
+        private readonly Interpreter INTERPRETER;
 
 
         public OutputForm(PseudocodeIDEForm mainForm)
         {
             Owner = mainForm;
-            this.interpreter = new Interpreter(this);
-            Logger.outputForm = this;
+            INTERPRETER = new Interpreter(this);
+            Logger.OutputForm = this;
 
             InitializeComponent();
         }
@@ -77,7 +80,7 @@ namespace pseudocodeIde
             }
             else
             {
-                this.interpreter.stopProgram();
+                INTERPRETER.Stop();
             }
         }
 
@@ -87,27 +90,24 @@ namespace pseudocodeIde
 
         public void ShowAndRun()
         {
-            this.Show();
+            Show();
 
-            this.startMenuItem_Click(null, null);
+            StartMenuItem_Click(null, null);
         }
 
-        private void startMenuItem_Click(object sender, EventArgs e)
+        private void StartMenuItem_Click(object sender, EventArgs e)
         {
             copyCSharpCodeMenuItem.Visible = false;
-            this.stopMenuItem_Click(null, null);
+            StopMenuItem_Click(null, null);
 
             startMenuItem.Enabled = false;
             stopMenuItem.Enabled = true;
 
-            runTaskCancelTokenSource = new CancellationTokenSource();
-            runTaskCancelToken = runTaskCancelTokenSource.Token;
-
-            outputText = "";
-            this.runTask = Task.Run(() => this.interpreter.run());
+            OutputText = "";
+            INTERPRETER.Run();
         }
 
-        public void stopMenuItem_Click(object sender, EventArgs e)
+        public void StopMenuItem_Click(object sender, EventArgs e)
         {
             Invoke(new Action(() =>
             {
@@ -115,29 +115,21 @@ namespace pseudocodeIde
                 stopMenuItem.Enabled = false;
             }));
 
-            if (!this.runTask.IsCompleted)
-            {
-                runTaskCancelTokenSource.Cancel();
-            }
+            INTERPRETER.Stop();
 
-            this.interpreter.stopProgram();
-
-            Logger.print("");
-            Logger.info(LogMessage.STOPPED_PROGRAM);
+            Logger.Print("");
+            Logger.Info(LogMessage.STOPPED_PROGRAM);
         }
 
-        private void copyCSharpCodeMenuItem_Click(object sender, EventArgs e)
+        private void CopyCSharpCodeMenuItem_Click(object sender, EventArgs e)
         {
-            new SetClipboardHelper(DataFormats.UnicodeText, this.interpreter.cSharpCode.codeText).Go();
+            new SetClipboardHelper(DataFormats.UnicodeText, INTERPRETER.CodeManager.CodeText).Go();
             MessageBox.Show("C# Code in Zwischenablage gespeichert.", "Zwischenablage");
         }
 
-        public void showCopyButton()
+        public void ShowCopyButton()
         {
-            Invoke(new Action(() =>
-            {
-                copyCSharpCodeMenuItem.Visible = true;
-            }));
+            Invoke(new Action(() => copyCSharpCodeMenuItem.Visible = true));
         }
     }
 }

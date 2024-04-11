@@ -1,20 +1,31 @@
-﻿using pseudocodeIde.interpreter;
-using System.Windows.Forms;
-using System.IO;
+﻿// Pseudocode IDE - Execute Pseudocode for the German (BW) 2024 Abitur
+// Copyright (C) 2024  PocketMiner82
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using AutocompleteMenuNS;
+using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json;
+using pseudocode_ide;
+using pseudocode_ide.interpreter.scanner;
+using pseudocodeIde.interpreter;
+using ScintillaNET;
+using ScintillaNET_FindReplaceDialog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using pseudocode_ide;
-using Newtonsoft.Json;
 using System.Diagnostics;
-using Microsoft.VisualBasic.FileIO;
-using System.Reflection;
-using ScintillaNET;
-using pseudocode_ide.interpreter.scanner;
 using System.Drawing;
-using ScintillaNET_FindReplaceDialog;
-using AutocompleteMenuNS;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace pseudocodeIde
 {
@@ -33,13 +44,13 @@ namespace pseudocodeIde
         /// <summary>
         /// the code currently in the textbox
         /// </summary>
-        public string code
+        public string Code
         {
             get
             {
                 return (string)Invoke((Func<string>)delegate
                 {
-                    return codeTextBox.Text == null ? "" : codeTextBox.Text;
+                    return codeTextBox.Text ?? "";
                 });
             }
         }
@@ -47,57 +58,69 @@ namespace pseudocodeIde
         /// <summary>
         /// if the textbox update event should be ignored the next time
         /// </summary>
-        public bool ignoreTextChange { get; set; } = false;
+        public bool IgnoreTextChange { get; set; } = false;
 
         /// <summary>
         /// if the undo events should be ignored
         /// </summary>
-        public bool noNewUndoPoint { get; set; } = false;
+        public bool NoNewUndoPoint { get; set; } = false;
 
         /// <summary>
         /// last cursor position before cursor move
         /// </summary>
-        private int lastCursorPosition = 0;
+        private int _lastCursorPosition = 0;
 
         // undo and redo stacks
-        private Stack<string> undoStack = new Stack<string>();
-        private Stack<string> redoStack = new Stack<string>();
+        private Stack<string> _undoStack = new Stack<string>();
+        private readonly Stack<string> REDO_STACK = new Stack<string>();
 
         /// <summary>
         /// the path where this file is saved
         /// </summary>
-        private string filePath;
+        private string _filePath;
 
         /// <summary>
         /// is the code saved?
         /// </summary>
-        private bool isSaved = true;
+        private bool _isSaved = true;
 
-        private FindReplace findReplace;
+        /// <summary>
+        /// The find and replace forms for the code textbox.
+        /// </summary>
+        private readonly FindReplace FIND_REPLACE;
 
-        private OutputForm outputForm;
+        /// <summary>
+        /// The output form where the pseudocode execution logs are displayed.
+        /// </summary>
+        private readonly OutputForm OUTPUT_FORM;
 
-        private int maxLineNumberCharLength;
+        /// <summary>
+        /// The maximum length of the line number characters.
+        /// </summary>
+        private int _maxLineNumberCharLength;
 
 
         public PseudocodeIDEForm()
         {
             InitializeComponent();
-            this.outputForm = new OutputForm(this);
-            this.findReplace = new FindReplace(this.codeTextBox);
-            this.findReplace.KeyPressed += codeTextBox_KeyDown;
+            OUTPUT_FORM = new OutputForm(this);
+            FIND_REPLACE = new FindReplace(codeTextBox);
+            FIND_REPLACE.KeyPressed += CodeTextBox_KeyDown;
 
-            this.resetUndoRedo();
+            ResetUndoRedo();
 
             // disable right click menu
             codeTextBox.UsePopup(false);
 
-            this.codeTextBox_TextChanged(null, null);
+            CodeTextBox_TextChanged(null, null);
             // on first start, the code is always saved
-            this.setFileSaved();
+            SetFileSaved();
         }
 
-        private void buildAutocompleteMenu()
+        /// <summary>
+        /// Builds the autocomplete menu with keywords from the scanner.
+        /// </summary>
+        private void BuildAutocompleteMenu()
         {
             autoCompleteMenu.TargetControlWrapper = new ScintillaWrapper(codeTextBox);
 
@@ -124,14 +147,17 @@ namespace pseudocodeIde
             FileSystem.CopyDirectory(Path.Combine(currentDir, "updater"), tempExeDir, true);
 
             // show remind later
-            this.checkForUpdate(true, false);
+            CheckForUpdate(true, false);
 
             // set font
-            this.configureCodeTextBox();
-            this.buildAutocompleteMenu();
+            ConfigureCodeTextBox();
+            BuildAutocompleteMenu();
         }
 
-        private void configureCodeTextBox()
+        /// <summary>
+        /// Configures the code text box with default styles and settings.
+        /// </summary>
+        private void ConfigureCodeTextBox()
         {
             codeTextBox.StyleResetDefault();
             codeTextBox.Styles[Style.Default].Font = "Courier New";
@@ -154,44 +180,44 @@ namespace pseudocodeIde
             codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_COMMENT].ForeColor = Color.Green;
 
             codeTextBox.LexerName = "";
-            codeTextBox.StyleNeeded += codeTextBox_StyleNeeded;
+            codeTextBox.StyleNeeded += CodeTextBox_StyleNeeded;
         }
 
-        private void codeTextBox_StyleNeeded(object sender, StyleNeededEventArgs e)
+        private void CodeTextBox_StyleNeeded(object sender, StyleNeededEventArgs e)
         {
             int startPos = codeTextBox.GetEndStyled();
             int endPos = e.Position;
 
-            SyntaxHighlightingLexer.style(codeTextBox, startPos, endPos);
+            SyntaxHighlightingLexer.Style(codeTextBox, startPos, endPos);
         }
 
-        private void wordWrapMenuItem_Click(object sender, EventArgs e)
+        private void WordWrapMenuItem_Click(object sender, EventArgs e)
         {
             codeTextBox.WrapMode = wordWrapMenuItem.Checked ? WrapMode.Word : WrapMode.None;
         }
 
-        private void singleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
+        private void SingleEqualIsCompareOperatorMenuItem_Click(object sender, EventArgs e)
         {
-            Scanner.singleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
+            Scanner.SingleEqualIsCompareOperator = singleEqualIsCompareOperatorMenuItem.Checked;
 
-            this.setFileNotSaved();
+            SetFileNotSaved();
         }
 
         private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
         {
             // main form won't close if child form is not disposed
-            if (!this.outputForm.IsDisposed)
+            if (!OUTPUT_FORM.IsDisposed)
             {
-                this.outputForm.Close();
-                this.Close();
+                OUTPUT_FORM.Close();
+                Close();
                 return;
             }
 
-            if (!this.isSaved)
+            if (!_isSaved)
             {
                 if (MessageBox.Show("Möchtest du deine ungespeicherten Änderungen speichern?", "Ungespeicherte Änderungen", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    this.saveMenuItem_Click(null, null);
+                    SaveMenuItem_Click(null, null);
                 }
             }
         }
@@ -200,50 +226,52 @@ namespace pseudocodeIde
         // CODE TEXTBOX EVENT LISTENERS
         // ---------------------------------------------
 
-        private void userUpdatedText()
+        private void UserUpdatedText()
         {
             // only update undo stack if next event not ignored
-            if (this.ignoreTextChange)
+            if (IgnoreTextChange)
             {
-                this.ignoreTextChange = false;
+                IgnoreTextChange = false;
             }
             else
             {
-                this.updateUndoStack(false);
+                UpdateUndoStack(false);
             }
         }
 
-        private void codeTextBox_UpdateUI(object sender, UpdateUIEventArgs e)
+        private void CodeTextBox_UpdateUI(object sender, UpdateUIEventArgs e)
         {
             switch (e.Change)
             {
                 case UpdateChange.Content:
-                    this.userUpdatedText();
+                    UserUpdatedText();
                     break;
                 case UpdateChange.Selection:
-                    this.userChangedSelection();
+                    UserChangedSelection();
                     break;
             }
         }
 
-        private void codeTextBox_TextChanged(object sender, EventArgs e)
+        private void CodeTextBox_TextChanged(object sender, EventArgs e)
         {
             // when the code is modified, the code is no longer saved in the file
-            this.setFileNotSaved();
+            SetFileNotSaved();
 
             // Did the number of characters in the line number display change?
             int maxLineNumberCharLength = codeTextBox.Lines.Count.ToString().Length;
-            if (maxLineNumberCharLength == this.maxLineNumberCharLength)
+            if (maxLineNumberCharLength == _maxLineNumberCharLength)
+            {
                 return;
+            }
 
             // calculate the width required to display the last line number
             // + include some padding for good measure
-            const int padding = 2;
-            codeTextBox.Margins[0].Width = codeTextBox.TextWidth(Style.LineNumber, new string('9', maxLineNumberCharLength + 1)) + padding;
-            this.maxLineNumberCharLength = maxLineNumberCharLength;
+            const int PADDING = 2;
+            codeTextBox.Margins[0].Width = codeTextBox.TextWidth(Style.LineNumber, new string('9', maxLineNumberCharLength + 1)) + PADDING;
+            _maxLineNumberCharLength = maxLineNumberCharLength;
         }
 
-        private void codeTextBox_KeyDown(object sender, KeyEventArgs e)
+        private void CodeTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             // hack to allow enter to autocomplete even if down wasnt pressed before
             if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && e.Modifiers == Keys.None && autoCompleteMenu.SelectedItemIndex < 0)
@@ -262,24 +290,24 @@ namespace pseudocodeIde
             // deleting always updates undo stack
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
-                this.ignoreTextChange = true;
-                this.updateUndoStack(true);
+                IgnoreTextChange = true;
+                UpdateUndoStack(true);
                 e.SuppressKeyPress = false;
                 return;
             }
             else if (e.Shift && e.KeyCode == Keys.F3)
             {
-                this.findReplace.Window.FindPrevious();
+                FIND_REPLACE.Window.FindPrevious();
                 e.SuppressKeyPress = true;
             }
             else if (e.KeyCode == Keys.F3)
             {
-                this.findReplace.Window.FindNext();
+                FIND_REPLACE.Window.FindNext();
                 e.SuppressKeyPress = true;
             }
         }
 
-        private void codeTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void CodeTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             // keep tab indentation from previous line on new line
             if (e.KeyChar == (char)Keys.Enter)
@@ -288,7 +316,7 @@ namespace pseudocodeIde
 
                 int currentLineIndex = codeTextBox.CurrentLine - 1;
                 string currentLine = codeTextBox.Lines[currentLineIndex].Text;
-                int indentationLevel = currentLine.getIndentationLevel();
+                int indentationLevel = currentLine.GetIndentationLevel();
 
                 string indentation = new string('\t', indentationLevel);
 
@@ -297,7 +325,7 @@ namespace pseudocodeIde
         }
 
         // adapted from https://github.com/jacobslusser/ScintillaNET/wiki/Character-Autocompletion#finishing-touch
-        private void codeTextBox_CharAdded(object sender, CharAddedEventArgs e)
+        private void CodeTextBox_CharAdded(object sender, CharAddedEventArgs e)
         {
             int caretPos = codeTextBox.CurrentPosition;
             bool docStart = caretPos == 1;
@@ -322,8 +350,6 @@ namespace pseudocodeIde
                                     (charPrev == '[' && isCharNextBlank) || (isCharPrevBlank && charNext == ']');
 
             bool isCharOrString = docStart || (isCharPrevBlank && isCharNextBlank) || isEnclosed || isSpaceEnclosed;
-
-            bool charNextIsCharOrString = charNext == '"' || charNext == '\'';
 
             switch (e.Char)
             {
@@ -389,27 +415,27 @@ namespace pseudocodeIde
             }
         }
 
-        private void userChangedSelection()
+        private void UserChangedSelection()
         {
             // ignore when we already undid something
-            if (this.redoStack.Count != 0)
+            if (REDO_STACK.Count != 0)
             {
-                this.lastCursorPosition = codeTextBox.SelectionStart;
+                _lastCursorPosition = codeTextBox.SelectionStart;
                 return;
             }
 
             // update undo stack when user selected something or cursor moved by more then one since last time
-            if (codeTextBox.SelectionEnd - codeTextBox.SelectionStart != 0 || Math.Abs(this.lastCursorPosition - codeTextBox.SelectionStart) > 1)
+            if (codeTextBox.SelectionEnd - codeTextBox.SelectionStart != 0 || Math.Abs(_lastCursorPosition - codeTextBox.SelectionStart) > 1)
             {
-                this.updateUndoStack(true);
+                UpdateUndoStack(true);
             }
-            this.lastCursorPosition = codeTextBox.SelectionStart;
+            _lastCursorPosition = codeTextBox.SelectionStart;
 
-            this.highlightWord(codeTextBox.SelectedText);
+            HighlightWord(codeTextBox.SelectedText);
         }
 
         // adapted from https://github.com/desjarlais/Scintilla.NET/wiki/Find-and-Highlight-Words
-        private void highlightWord(string text)
+        private void HighlightWord(string text)
         {
             // Indicators 0-7 could be in use by a lexer
             // so we'll use indicator 8 to highlight words.
@@ -429,7 +455,7 @@ namespace pseudocodeIde
             codeTextBox.Indicators[NUM].Under = true;
             codeTextBox.Indicators[NUM].ForeColor = Color.Lime;
             codeTextBox.Indicators[NUM].OutlineAlpha = 127;
-            codeTextBox.Indicators[NUM].Alpha = 127;
+            codeTextBox.Indicators[NUM].Alpha = 100;
 
             // Search the document
             codeTextBox.TargetStart = 0;
@@ -453,9 +479,9 @@ namespace pseudocodeIde
         // NEW/OPEN/SAVE
         // ---------------------------------------------
 
-        private void newMenuItem_Click(object sender, EventArgs e)
+        private void NewMenuItem_Click(object sender, EventArgs e)
         {
-            if (!this.isSaved)
+            if (!_isSaved)
             {
                 if (MessageBox.Show("Möchtest du wirklich eine neue Datei erstellen?\n" +
                     "Alle ungespeicherten Änderungen gehen verloren!", "Ungespeicherte Änderungen",
@@ -466,17 +492,17 @@ namespace pseudocodeIde
             }
 
             // create new file
-            this.ignoreTextChange = true;
+            IgnoreTextChange = true;
             codeTextBox.ClearAll();
-            this.resetUndoRedo();
+            ResetUndoRedo();
             Text = "Pseudocode IDE - Neue Datei";
-            this.filePath = "";
-            this.setFileSaved();
+            _filePath = "";
+            SetFileSaved();
         }
 
-        private void openMenuItem_Click(object sender, EventArgs e)
+        private void OpenMenuItem_Click(object sender, EventArgs e)
         {
-            if (!this.isSaved)
+            if (!_isSaved)
             {
                 if (MessageBox.Show("Möchtest du wirklich eine andere Datei öffnen?\n" +
                     "Alle ungespeicherten Änderungen gehen verloren!", "Ungespeicherte Änderungen",
@@ -486,26 +512,28 @@ namespace pseudocodeIde
                 }
             }
 
-            this.openFileDialog();
+            OpenFileDialog();
         }
 
-        private void saveMenuItem_Click(object sender, EventArgs e)
+        private void SaveMenuItem_Click(object sender, EventArgs e)
         {
             // if this is a new file
-            if (this.filePath == null || this.filePath.Trim() == "")
+            if (_filePath == null || _filePath.Trim() == "")
             {
-                saveFileDialog();
+                SaveFileDialog();
             }
             else
             {
-                saveFile();
+                SaveFile();
             }
-
         }
 
-        private void setFileSaved()
+        /// <summary>
+        /// Sets the application state to indicate that the file is saved.
+        /// </summary>
+        private void SetFileSaved()
         {
-            this.isSaved = true;
+            _isSaved = true;
             saveMenuItem.Enabled = false;
             if (Text.EndsWith("*"))
             {
@@ -513,9 +541,12 @@ namespace pseudocodeIde
             }
         }
 
-        private void setFileNotSaved()
+        /// <summary>
+        /// Sets the application state to indicate that the file is not saved.
+        /// </summary>
+        private void SetFileNotSaved()
         {
-            this.isSaved = false;
+            _isSaved = false;
             if (!Text.EndsWith("*"))
             {
                 Text += "*";
@@ -523,7 +554,11 @@ namespace pseudocodeIde
             saveMenuItem.Enabled = true;
         }
 
-        public bool saveFileDialog()
+        /// <summary>
+        /// Opens a save file dialog and saves the current pseudocode file.
+        /// </summary>
+        /// <returns>True if the file was saved successfully, false otherwise.</returns>
+        public bool SaveFileDialog()
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
@@ -539,32 +574,38 @@ namespace pseudocodeIde
                     {
                         File.Delete(saveFileDialog.FileName);
                     }
-                    
-                    this.filePath = saveFileDialog.FileName;
+
+                    _filePath = saveFileDialog.FileName;
 
                     // save the file
-                    this.saveFile();
+                    SaveFile();
                     return true;
                 }
                 return false;
             }
         }
 
-        private void saveFile()
+        /// <summary>
+        /// Saves the current pseudocode file to the specified file path.
+        /// </summary>
+        private void SaveFile()
         {
-            PseudocodeFile pFile = new PseudocodeFile(Scanner.singleEqualIsCompareOperator, codeTextBox.Text.Split('\n'));
+            PseudocodeFile pFile = new PseudocodeFile(Scanner.SingleEqualIsCompareOperator, codeTextBox.Text.Split('\n'));
 
             // write to disk
-            using (StreamWriter outputFile = new StreamWriter(this.filePath))
+            using (StreamWriter outputFile = new StreamWriter(_filePath))
             {
                 outputFile.Write(JsonConvert.SerializeObject(pFile, Formatting.Indented));
             }
 
-            this.setFileSaved();
-            Text = "Pseudocode IDE - " + this.filePath;
+            SetFileSaved();
+            Text = "Pseudocode IDE - " + _filePath;
         }
 
-        public void openFileDialog()
+        /// <summary>
+        /// Opens an open file dialog and loads the selected pseudocode file.
+        /// </summary>
+        public void OpenFileDialog()
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -575,20 +616,23 @@ namespace pseudocodeIde
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    this.filePath = openFileDialog.FileName;
+                    _filePath = openFileDialog.FileName;
 
                     // open the file
-                    this.openFile();
+                    OpenFile();
                 }
             }
         }
 
-        private void openFile()
+        /// <summary>
+        /// Loads the specified pseudocode file into the editor.
+        /// </summary>
+        private void OpenFile()
         {
             // read from disk
-            using (StreamReader file = new StreamReader(this.filePath))
+            using (StreamReader file = new StreamReader(_filePath))
             {
-                this.ignoreTextChange = true;
+                IgnoreTextChange = true;
                 PseudocodeFile pFile;
                 try
                 {
@@ -596,20 +640,20 @@ namespace pseudocodeIde
                 }
                 catch
                 {
-                    MessageBox.Show("Konnte den JSON Code in '" + this.filePath + "' nicht parsen.", "Fehler");
-                    this.filePath = "";
-                    this.ignoreTextChange = false;
+                    MessageBox.Show("Konnte den JSON Code in '" + _filePath + "' nicht parsen.", "Fehler");
+                    _filePath = "";
+                    IgnoreTextChange = false;
                     return;
                 }
 
-                codeTextBox.Text = string.Join("\n", pFile.fileContent);
-                singleEqualIsCompareOperatorMenuItem.Checked = pFile.singleEqualIsCompareOperator;
+                codeTextBox.Text = string.Join("\n", pFile.FileContent);
+                singleEqualIsCompareOperatorMenuItem.Checked = pFile.SingleEqualIsCompareOperator;
 
-                this.resetUndoRedo();
+                ResetUndoRedo();
             }
 
-            this.setFileSaved();
-            Text = "Pseudocode IDE - " + this.filePath;
+            SetFileSaved();
+            Text = "Pseudocode IDE - " + _filePath;
         }
 
         // ---------------------------------------------
@@ -619,11 +663,11 @@ namespace pseudocodeIde
         /// <summary>
         /// Resets the undo and redo system 
         /// </summary>
-        private void resetUndoRedo()
+        private void ResetUndoRedo()
         {
-            this.undoStack.Clear();
-            this.redoStack.Clear();
-            this.undoStack.Push(codeTextBox.Text);
+            _undoStack.Clear();
+            REDO_STACK.Clear();
+            _undoStack.Push(codeTextBox.Text);
             undoToolStripMenuItem.Enabled = false;
             redoToolStripMenuItem.Enabled = false;
         }
@@ -632,19 +676,19 @@ namespace pseudocodeIde
         /// Updates the undo stack
         /// </summary>
         /// <param name="forceUpdate">if the update should be done without checking for whole word</param>
-        public void updateUndoStack(bool forceUpdate)
+        public void UpdateUndoStack(bool forceUpdate)
         {
             // undo currently disabled?
-            if (this.noNewUndoPoint)
+            if (NoNewUndoPoint)
             {
                 return;
             }
 
             // when user writes something new, the redo stack will be cleared
             undoToolStripMenuItem.Enabled = true;
-            if (this.redoStack.Count != 0)
+            if (REDO_STACK.Count != 0)
             {
-                this.redoStack.Clear();
+                REDO_STACK.Clear();
                 redoToolStripMenuItem.Enabled = false;
             }
 
@@ -667,35 +711,35 @@ namespace pseudocodeIde
             // don't update when the last char matches the NO_UPDATE_AFTER regex and the update is caused by text change.
             // also don't update, when the new undo text is already in the stack
             if ((codeTextBox.SelectionStart > 1 && !forceUpdate && NO_UPDATE_AFTER.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
-                || this.undoStack.Peek().Equals(undoText))
+                || _undoStack.Peek().Equals(undoText))
             {
                 return;
             }
 
             // again, make sure that the redo stack is empty
-            this.redoStack.Clear();
+            REDO_STACK.Clear();
 
             // and update the undo stack, limit max undo size
-            this.undoStack.Push(undoText);
-            this.undoStack = this.undoStack.trim(MAX_UNDO_SIZE);
+            _undoStack.Push(undoText);
+            _undoStack = _undoStack.Trim(MAX_UNDO_SIZE);
         }
 
-        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        private void UndoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // put current text in redo if not already in there
-            if (this.redoStack.Count == 0 || !this.redoStack.Peek().Equals(codeTextBox.Text))
+            if (REDO_STACK.Count == 0 || !REDO_STACK.Peek().Equals(codeTextBox.Text))
             {
-                this.redoStack.Push(codeTextBox.Text);
+                REDO_STACK.Push(codeTextBox.Text);
                 redoToolStripMenuItem.Enabled = true;
             }
 
             // the undo stack always has at least one item in it
-            if (this.undoStack.Count <= 1)
+            if (_undoStack.Count <= 1)
             {
                 // set the textbox text to the item without removing it from the stack
-                this.ignoreTextChange = true;
+                IgnoreTextChange = true;
                 int oldSelectionStart = codeTextBox.SelectionStart;
-                codeTextBox.Text = this.undoStack.Peek();
+                codeTextBox.Text = _undoStack.Peek();
                 codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
 
                 // no more things to undo
@@ -709,34 +753,34 @@ namespace pseudocodeIde
                 // set the textbox text to the first item that doesn't match the current text. also remove them from the undo stack
                 do
                 {
-                    this.ignoreTextChange = true;
-                    codeTextBox.Text = this.undoStack.Peek();
-                } while (this.undoStack.Count > 1 && currentText.Equals(this.undoStack.Pop()));
+                    IgnoreTextChange = true;
+                    codeTextBox.Text = _undoStack.Peek();
+                } while (_undoStack.Count > 1 && currentText.Equals(_undoStack.Pop()));
 
                 codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
         }
 
-        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             undoToolStripMenuItem.Enabled = true;
             // put current text in undo if not already in there
-            if (!this.undoStack.Peek().Equals(codeTextBox.Text))
+            if (!_undoStack.Peek().Equals(codeTextBox.Text))
             {
-                this.undoStack.Push(codeTextBox.Text);
+                _undoStack.Push(codeTextBox.Text);
             }
 
             // set the textbox text to the top item of the redo stack. also remove it from the stack
-            if (this.redoStack.Count > 0)
+            if (REDO_STACK.Count > 0)
             {
-                this.ignoreTextChange = true;
+                IgnoreTextChange = true;
                 int oldSelectionStart = codeTextBox.SelectionStart;
-                codeTextBox.Text = this.redoStack.Pop();
+                codeTextBox.Text = REDO_STACK.Pop();
                 codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
 
             // no more things to redo
-            if (this.redoStack.Count == 0)
+            if (REDO_STACK.Count == 0)
             {
                 redoToolStripMenuItem.Enabled = false;
             }
@@ -746,17 +790,17 @@ namespace pseudocodeIde
         // FIND/REPLACE
         // ---------------------------------------------
 
-        private void findMenuItem_Click(object sender, EventArgs e)
+        private void FindMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplace.ShowFind();
+            FIND_REPLACE.ShowFind();
         }
 
-        private void replaceMenuItem_Click(object sender, EventArgs e)
+        private void ReplaceMenuItem_Click(object sender, EventArgs e)
         {
-            this.findReplace.ShowReplace();
+            FIND_REPLACE.ShowReplace();
         }
 
-        private void goToMenuItem_Click(object sender, EventArgs e)
+        private void GoToMenuItem_Click(object sender, EventArgs e)
         {
             new GoTo(codeTextBox).ShowGoToDialog();
         }
@@ -765,21 +809,21 @@ namespace pseudocodeIde
         // RUN PROGRAM
         // ---------------------------------------------
 
-        private void runProgramMenuItem_Click(object sender, EventArgs e)
+        private void RunProgramMenuItem_Click(object sender, EventArgs e)
         {
-            this.outputForm.ShowAndRun();
+            OUTPUT_FORM.ShowAndRun();
         }
 
-        private void openOutputFormMenuItem_Click(object sender, EventArgs e)
+        private void OpenOutputFormMenuItem_Click(object sender, EventArgs e)
         {
-            this.outputForm.Show();
+            OUTPUT_FORM.Show();
         }
 
         // ---------------------------------------------
         // SHOW HELP
         // ---------------------------------------------
 
-        private void showHelpMenuItem_Click(object sender, EventArgs e)
+        private void ShowHelpMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Grundlegende Verwendung:\n" +
                             "Dieses Programm ermöglicht die Ausführung von Pseudocode nach der \"Formelsammlung 1.5.2 TG Informationstechnik\" für das Abitur 2024 in Baden Württemberg.\n\n" +
@@ -801,13 +845,18 @@ namespace pseudocodeIde
         // (AUTO) UPDATE
         // ---------------------------------------------
 
-        private void updateMenuItem_Click(object sender, EventArgs e)
+        private void UpdateMenuItem_Click(object sender, EventArgs e)
         {
             // dont show remind later
-            this.checkForUpdate(false, false);
+            CheckForUpdate(false, false);
         }
 
-        private void checkForUpdate(bool firstRun, bool beta)
+        /// <summary>
+        /// Checks for updates to the application.
+        /// </summary>
+        /// <param name="firstRun">Indicates if this is the first run of the application.</param>
+        /// <param name="beta">Indicates if beta updates should be checked.</param>
+        private void CheckForUpdate(bool firstRun, bool beta)
         {
             string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string tempExeDir = Path.Combine(Path.GetTempPath(), "pseudocode-ide\\updater");
@@ -824,9 +873,9 @@ namespace pseudocodeIde
             }
         }
 
-        private void updateBetaMenuItem_Click(object sender, EventArgs e)
+        private void UpdateBetaMenuItem_Click(object sender, EventArgs e)
         {
-            this.checkForUpdate(false, true);
+            CheckForUpdate(false, true);
         }
     }
 }
