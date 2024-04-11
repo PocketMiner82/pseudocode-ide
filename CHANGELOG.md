@@ -1,3 +1,10 @@
+## [1.3.1-dev.3](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.2...1.3.1-dev.3) (2024-04-11)
+
+
+### Bug Fixes
+
+* beta releases didn't check for beta updates on start ([d5aa805](https://github.com/PocketMiner82/pseudocode-ide/commit/d5aa8055e79eb2470cd0ff83b940ee404106577b))
+
 ## [1.3.1-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.1...1.3.1-dev.2) (2024-04-11)
 
 
