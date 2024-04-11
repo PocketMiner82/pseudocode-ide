@@ -1,3 +1,10 @@
+## [1.3.1-dev.4](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.3...1.3.1-dev.4) (2024-04-11)
+
+
+### Bug Fixes
+
+* on some devices, the changelog website wasn't displayed correctly ([0e216cc](https://github.com/PocketMiner82/pseudocode-ide/commit/0e216cce0d37972cf367bb8860290cead5263761))
+
 ## [1.3.1-dev.3](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.2...1.3.1-dev.3) (2024-04-11)
 
 
