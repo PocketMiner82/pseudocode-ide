@@ -1,3 +1,17 @@
+# [1.4.0-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.4.0-dev.1...1.4.0-dev.2) (2024-04-12)
+
+
+### Bug Fixes
+
+* updating from release to beta didn't work ([1166645](https://github.com/PocketMiner82/pseudocode-ide/commit/1166645a9131ce4edb3425ffb6063dbbeb022e6c))
+
+# [1.4.0-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1...1.4.0-dev.1) (2024-04-12)
+
+
+### Features
+
+* add snippet blocks to autocomplete menu ([42cd6a8](https://github.com/PocketMiner82/pseudocode-ide/commit/42cd6a8c49ee457c4c32c05c1e846c75f2247fa1))
+
 ## [1.3.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0...1.3.1) (2024-04-11)
 
 

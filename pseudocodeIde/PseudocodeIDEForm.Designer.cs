@@ -61,7 +61,6 @@
             // 
             // menuStrip
             // 
-            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenuItem,
@@ -71,7 +70,7 @@
             this.helpMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(1176, 33);
+            this.menuStrip.Size = new System.Drawing.Size(1176, 36);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -285,12 +284,12 @@
             this.codeTextBox.IndentationGuides = ScintillaNET.IndentView.Real;
             this.codeTextBox.IndentWidth = 4;
             this.codeTextBox.LexerName = null;
-            this.codeTextBox.Location = new System.Drawing.Point(0, 33);
+            this.codeTextBox.Location = new System.Drawing.Point(0, 36);
             this.codeTextBox.MultiPaste = ScintillaNET.MultiPaste.Each;
             this.codeTextBox.MultipleSelection = true;
             this.codeTextBox.Name = "codeTextBox";
             this.codeTextBox.ScrollWidth = 39;
-            this.codeTextBox.Size = new System.Drawing.Size(1176, 676);
+            this.codeTextBox.Size = new System.Drawing.Size(1176, 673);
             this.codeTextBox.TabIndents = true;
             this.codeTextBox.TabIndex = 1;
             this.codeTextBox.UseRightToLeftReadingLayout = false;
@@ -308,9 +307,11 @@
             this.autoCompleteMenu.AllowsTabKey = true;
             this.autoCompleteMenu.AppearInterval = 50;
             this.autoCompleteMenu.Colors = ((AutocompleteMenuNS.Colors)(resources.GetObject("autoCompleteMenu.Colors")));
-            this.autoCompleteMenu.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.autoCompleteMenu.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.autoCompleteMenu.ImageList = null;
             this.autoCompleteMenu.Items = new string[0];
+            this.autoCompleteMenu.MaximumSize = new System.Drawing.Size(250, 200);
+            this.autoCompleteMenu.MinFragmentLength = 1;
             this.autoCompleteMenu.TargetControlWrapper = null;
             // 
             // PseudocodeIDEForm

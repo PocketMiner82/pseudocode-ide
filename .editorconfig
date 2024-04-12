@@ -207,10 +207,6 @@ dotnet_naming_rule.constant_should_be_capslock.severity = warning
 dotnet_naming_rule.constant_should_be_capslock.symbols = constant
 dotnet_naming_rule.constant_should_be_capslock.style = capslock
 
-dotnet_naming_rule.readonly_should_be_capslock.severity = warning
-dotnet_naming_rule.readonly_should_be_capslock.symbols = readonly
-dotnet_naming_rule.readonly_should_be_capslock.style = capslock
-
 dotnet_naming_rule.private_or_internal_field_should_be_camelcase_with_underscore_prefix.severity = warning
 dotnet_naming_rule.private_or_internal_field_should_be_camelcase_with_underscore_prefix.symbols = private_or_internal_field
 dotnet_naming_rule.private_or_internal_field_should_be_camelcase_with_underscore_prefix.style = camelcase_with_underscore_prefix
@@ -244,10 +240,6 @@ dotnet_naming_symbols.non_field_members.required_modifiers =
 dotnet_naming_symbols.constant.applicable_kinds = namespace, property, field, event, parameter, local, class, struct, interface, enum, delegate, method, local_function
 dotnet_naming_symbols.constant.applicable_accessibilities = *
 dotnet_naming_symbols.constant.required_modifiers = const
-
-dotnet_naming_symbols.readonly.applicable_kinds = namespace, property, field, event, parameter, local, class, struct, interface, enum, delegate, method, local_function
-dotnet_naming_symbols.readonly.applicable_accessibilities = *
-dotnet_naming_symbols.readonly.required_modifiers = readonly
 
 # Benennungsstile
 

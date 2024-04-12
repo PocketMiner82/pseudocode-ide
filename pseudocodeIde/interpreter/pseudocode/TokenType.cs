@@ -9,7 +9,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace pseudocodeIde.interpreter
+namespace pseudocode_ide.interpreter.pseudocode
 {
     /// <summary>
     /// The type of a token that was lexed

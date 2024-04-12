@@ -9,7 +9,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using pseudocodeIde.interpreter;
+using pseudocode_ide.interpreter.pseudocode;
 using System;
 using System.Collections.Generic;
 using System.IO;

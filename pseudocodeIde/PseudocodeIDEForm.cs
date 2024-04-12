@@ -13,6 +13,7 @@ using AutocompleteMenuNS;
 using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using pseudocode_ide;
+using pseudocode_ide.interpreter.pseudocode;
 using pseudocode_ide.interpreter.scanner;
 using pseudocodeIde.interpreter;
 using ScintillaNET;
@@ -39,7 +40,7 @@ namespace pseudocodeIde
         /// <summary>
         /// do not update the undo stack when the last char is a letter from A-Z (case ignored), a number from 0-9 or a underscore
         /// </summary>
-        private readonly Regex NO_UPDATE_AFTER = new Regex(@"^[a-zA-Z0-9_äöüÄÖÜß]$", RegexOptions.Multiline);
+        private readonly Regex _noUpdateAfter = new Regex(@"^[a-zA-Z0-9_äöüÄÖÜß]$", RegexOptions.Multiline);
 
         /// <summary>
         /// the code currently in the textbox
@@ -72,7 +73,7 @@ namespace pseudocodeIde
 
         // undo and redo stacks
         private Stack<string> _undoStack = new Stack<string>();
-        private readonly Stack<string> REDO_STACK = new Stack<string>();
+        private readonly Stack<string> _redoStack = new Stack<string>();
 
         /// <summary>
         /// the path where this file is saved
@@ -87,12 +88,12 @@ namespace pseudocodeIde
         /// <summary>
         /// The find and replace forms for the code textbox.
         /// </summary>
-        private readonly FindReplace FIND_REPLACE;
+        private readonly FindReplace _findReplace;
 
         /// <summary>
         /// The output form where the pseudocode execution logs are displayed.
         /// </summary>
-        private readonly OutputForm OUTPUT_FORM;
+        private readonly OutputForm _outputForm;
 
         /// <summary>
         /// The maximum length of the line number characters.
@@ -103,9 +104,9 @@ namespace pseudocodeIde
         public PseudocodeIDEForm()
         {
             InitializeComponent();
-            OUTPUT_FORM = new OutputForm(this);
-            FIND_REPLACE = new FindReplace(codeTextBox);
-            FIND_REPLACE.KeyPressed += CodeTextBox_KeyDown;
+            _outputForm = new OutputForm(this);
+            _findReplace = new FindReplace(codeTextBox);
+            _findReplace.KeyPressed += CodeTextBox_KeyDown;
 
             ResetUndoRedo();
 
@@ -126,9 +127,9 @@ namespace pseudocodeIde
 
             List<AutocompleteItem> items = new List<AutocompleteItem>();
 
-            foreach (string item in Scanner.KEYWORDS.Keys)
+            foreach (List<PseudocodeAutocompleteItem> keywordItems in PseudocodeKeywords.KEYWORDS.Values)
             {
-                items.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
+                items.AddRange(keywordItems);
             }
 
             autoCompleteMenu.SetAutocompleteItems(items);
@@ -163,21 +164,21 @@ namespace pseudocodeIde
             codeTextBox.Styles[Style.Default].Font = "Courier New";
             codeTextBox.StyleClearAll();
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_DEFAULT].ForeColor = Color.DarkGray;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_DEFAULT].ForeColor = Color.DarkGray;
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].ForeColor = Color.Blue;
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_KEYWORD].Bold = true;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_KEYWORD].ForeColor = Color.Blue;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_KEYWORD].Bold = true;
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_IDENTIFIER].ForeColor = Color.Black;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_IDENTIFIER].ForeColor = Color.Black;
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_NUMBER].ForeColor = Color.Peru;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_NUMBER].ForeColor = Color.Peru;
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_STRING].ForeColor = Color.OrangeRed;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_STRING].ForeColor = Color.OrangeRed;
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_ESCAPE].ForeColor = Color.Orange;
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_ESCAPE].Bold = true;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_ESCAPE].ForeColor = Color.Orange;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_ESCAPE].Bold = true;
 
-            codeTextBox.Styles[SyntaxHighlightingLexer.STYLE_COMMENT].ForeColor = Color.Green;
+            codeTextBox.Styles[SyntaxHighlightingScanner.STYLE_COMMENT].ForeColor = Color.Green;
 
             codeTextBox.LexerName = "";
             codeTextBox.StyleNeeded += CodeTextBox_StyleNeeded;
@@ -188,7 +189,7 @@ namespace pseudocodeIde
             int startPos = codeTextBox.GetEndStyled();
             int endPos = e.Position;
 
-            SyntaxHighlightingLexer.Style(codeTextBox, startPos, endPos);
+            SyntaxHighlightingScanner.Style(codeTextBox, startPos, endPos);
         }
 
         private void WordWrapMenuItem_Click(object sender, EventArgs e)
@@ -206,9 +207,9 @@ namespace pseudocodeIde
         private void PseudocodeIDE_FormClosing(object sender, FormClosingEventArgs e)
         {
             // main form won't close if child form is not disposed
-            if (!OUTPUT_FORM.IsDisposed)
+            if (!_outputForm.IsDisposed)
             {
-                OUTPUT_FORM.Close();
+                _outputForm.Close();
                 Close();
                 return;
             }
@@ -297,12 +298,12 @@ namespace pseudocodeIde
             }
             else if (e.Shift && e.KeyCode == Keys.F3)
             {
-                FIND_REPLACE.Window.FindPrevious();
+                _findReplace.Window.FindPrevious();
                 e.SuppressKeyPress = true;
             }
             else if (e.KeyCode == Keys.F3)
             {
-                FIND_REPLACE.Window.FindNext();
+                _findReplace.Window.FindNext();
                 e.SuppressKeyPress = true;
             }
         }
@@ -418,7 +419,7 @@ namespace pseudocodeIde
         private void UserChangedSelection()
         {
             // ignore when we already undid something
-            if (REDO_STACK.Count != 0)
+            if (_redoStack.Count != 0)
             {
                 _lastCursorPosition = codeTextBox.SelectionStart;
                 return;
@@ -666,7 +667,7 @@ namespace pseudocodeIde
         private void ResetUndoRedo()
         {
             _undoStack.Clear();
-            REDO_STACK.Clear();
+            _redoStack.Clear();
             _undoStack.Push(codeTextBox.Text);
             undoToolStripMenuItem.Enabled = false;
             redoToolStripMenuItem.Enabled = false;
@@ -686,9 +687,9 @@ namespace pseudocodeIde
 
             // when user writes something new, the redo stack will be cleared
             undoToolStripMenuItem.Enabled = true;
-            if (REDO_STACK.Count != 0)
+            if (_redoStack.Count != 0)
             {
-                REDO_STACK.Clear();
+                _redoStack.Clear();
                 redoToolStripMenuItem.Enabled = false;
             }
 
@@ -710,14 +711,14 @@ namespace pseudocodeIde
 
             // don't update when the last char matches the NO_UPDATE_AFTER regex and the update is caused by text change.
             // also don't update, when the new undo text is already in the stack
-            if ((codeTextBox.SelectionStart > 1 && !forceUpdate && NO_UPDATE_AFTER.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
+            if ((codeTextBox.SelectionStart > 1 && !forceUpdate && _noUpdateAfter.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
                 || _undoStack.Peek().Equals(undoText))
             {
                 return;
             }
 
             // again, make sure that the redo stack is empty
-            REDO_STACK.Clear();
+            _redoStack.Clear();
 
             // and update the undo stack, limit max undo size
             _undoStack.Push(undoText);
@@ -727,9 +728,9 @@ namespace pseudocodeIde
         private void UndoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // put current text in redo if not already in there
-            if (REDO_STACK.Count == 0 || !REDO_STACK.Peek().Equals(codeTextBox.Text))
+            if (_redoStack.Count == 0 || !_redoStack.Peek().Equals(codeTextBox.Text))
             {
-                REDO_STACK.Push(codeTextBox.Text);
+                _redoStack.Push(codeTextBox.Text);
                 redoToolStripMenuItem.Enabled = true;
             }
 
@@ -771,16 +772,16 @@ namespace pseudocodeIde
             }
 
             // set the textbox text to the top item of the redo stack. also remove it from the stack
-            if (REDO_STACK.Count > 0)
+            if (_redoStack.Count > 0)
             {
                 IgnoreTextChange = true;
                 int oldSelectionStart = codeTextBox.SelectionStart;
-                codeTextBox.Text = REDO_STACK.Pop();
+                codeTextBox.Text = _redoStack.Pop();
                 codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
 
             // no more things to redo
-            if (REDO_STACK.Count == 0)
+            if (_redoStack.Count == 0)
             {
                 redoToolStripMenuItem.Enabled = false;
             }
@@ -792,12 +793,12 @@ namespace pseudocodeIde
 
         private void FindMenuItem_Click(object sender, EventArgs e)
         {
-            FIND_REPLACE.ShowFind();
+            _findReplace.ShowFind();
         }
 
         private void ReplaceMenuItem_Click(object sender, EventArgs e)
         {
-            FIND_REPLACE.ShowReplace();
+            _findReplace.ShowReplace();
         }
 
         private void GoToMenuItem_Click(object sender, EventArgs e)
@@ -811,12 +812,12 @@ namespace pseudocodeIde
 
         private void RunProgramMenuItem_Click(object sender, EventArgs e)
         {
-            OUTPUT_FORM.ShowAndRun();
+            _outputForm.ShowAndRun();
         }
 
         private void OpenOutputFormMenuItem_Click(object sender, EventArgs e)
         {
-            OUTPUT_FORM.Show();
+            _outputForm.Show();
         }
 
         // ---------------------------------------------
