@@ -1,3 +1,15 @@
+## [1.3.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.0...1.3.1) (2024-04-11)
+
+
+### Bug Fixes
+
+* beta releases didn't check for beta updates on start ([d5aa805](https://github.com/PocketMiner82/pseudocode-ide/commit/d5aa8055e79eb2470cd0ff83b940ee404106577b))
+* it was impossible to go back from beta to release ([3fd18b0](https://github.com/PocketMiner82/pseudocode-ide/commit/3fd18b0b13ea86d12706d10b6090bd595f89c342))
+* on some devices, the changelog website wasn't displayed correctly ([0e216cc](https://github.com/PocketMiner82/pseudocode-ide/commit/0e216cce0d37972cf367bb8860290cead5263761))
+* updating to beta release always downloaded the latest (non-beta) release and the changelog always was the changelog in the main branch and not dynamic ([fe05fb6](https://github.com/PocketMiner82/pseudocode-ide/commit/fe05fb6d15b9500dcbf8973902d78892625f0fd5))
+
+## [1.3.1-dev.5](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.4...1.3.1-dev.5) (2024-04-11)
+
 ## [1.3.1-dev.4](https://github.com/PocketMiner82/pseudocode-ide/compare/1.3.1-dev.3...1.3.1-dev.4) (2024-04-11)
 
 
