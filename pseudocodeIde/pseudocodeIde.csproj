@@ -37,6 +37,7 @@
   </PropertyGroup>
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1823.32\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1823.32\build\Microsoft.Web.WebView2.targets')" />
   <ItemGroup>
+    <Compile Remove="interpreter\csharpcode\TemplateCodeOutput.cs" />
     <Compile Remove="interpreter\parser\TemplateCodeOutput.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +118,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="interpreter\parser\TemplateCodeOutput.cs" />
+    <EmbeddedResource Include="interpreter\csharpcode\TemplateCodeOutput.cs" />
   </ItemGroup>
 </Project>

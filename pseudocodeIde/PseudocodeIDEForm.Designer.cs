@@ -308,9 +308,11 @@
             this.autoCompleteMenu.AllowsTabKey = true;
             this.autoCompleteMenu.AppearInterval = 50;
             this.autoCompleteMenu.Colors = ((AutocompleteMenuNS.Colors)(resources.GetObject("autoCompleteMenu.Colors")));
-            this.autoCompleteMenu.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.autoCompleteMenu.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.autoCompleteMenu.ImageList = null;
             this.autoCompleteMenu.Items = new string[0];
+            this.autoCompleteMenu.MaximumSize = new System.Drawing.Size(250, 200);
+            this.autoCompleteMenu.MinFragmentLength = 1;
             this.autoCompleteMenu.TargetControlWrapper = null;
             // 
             // PseudocodeIDEForm

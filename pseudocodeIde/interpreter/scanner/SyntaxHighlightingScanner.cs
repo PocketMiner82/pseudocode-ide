@@ -9,7 +9,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using pseudocodeIde.interpreter;
+using pseudocode_ide.interpreter.pseudocode;
 using ScintillaNET;
 using System;
 using System.Diagnostics;
@@ -17,7 +17,7 @@ using System.Diagnostics;
 namespace pseudocode_ide.interpreter.scanner
 {
     // mostly from https://github.com/jacobslusser/ScintillaNET/wiki/Custom-Syntax-Highlighting
-    public static class SyntaxHighlightingLexer
+    public static class SyntaxHighlightingScanner
     {
         // all possible text styles
         public const int STYLE_DEFAULT = 0;
@@ -164,7 +164,7 @@ namespace pseudocode_ide.interpreter.scanner
 
                             int style = STYLE_IDENTIFIER;
                             // if the identifier is in the keyword list, then it will has a differnt color 
-                            if (Scanner.KEYWORDS.ContainsKey(identifier))
+                            if (PseudocodeKeywords.KEYWORDS.ContainsKey(identifier))
                             {
                                 style = STYLE_KEYWORD;
                             }

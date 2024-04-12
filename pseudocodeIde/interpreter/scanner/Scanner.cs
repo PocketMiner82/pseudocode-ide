@@ -9,20 +9,17 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using pseudocode_ide.interpreter.pseudocode;
 using pseudocodeIde.interpreter.logging;
 using System;
 using System.Collections.Generic;
-using static pseudocodeIde.interpreter.TokenType;
+using static pseudocode_ide.interpreter.pseudocode.TokenType;
+using static pseudocode_ide.interpreter.pseudocode.PseudocodeKeywords;
 
 namespace pseudocodeIde.interpreter
 {
     public class Scanner
     {
-        /// <summary>
-        /// All the defined keywords in pseudocode and their corresponding token.
-        /// </summary>
-        public static readonly Dictionary<string, TokenType> KEYWORDS = new Dictionary<string, TokenType>();
-
         /// <summary>
         /// If '=' is used to compare values (e.g. 1=1 would be true)
         /// or if it is used to define variables (e.g. i:int = 1)
@@ -53,71 +50,6 @@ namespace pseudocodeIde.interpreter
         /// current line of the CODE
         /// </summary>
         private int _line = 1;
-
-        /// <summary>
-        /// Add the keywords contents to the readonly static list
-        /// </summary>
-        static Scanner()
-        {
-            KEYWORDS.Add("WENN", IF);
-            KEYWORDS.Add("SONST", ELSE);
-            KEYWORDS.Add("ENDE WENN", END_IF);
-
-            KEYWORDS.Add("FALLS", SWITCH_PREFIX);
-            KEYWORDS.Add("GLEICH", SWITCH_SUFFIX);
-            KEYWORDS.Add("ENDE FALLS", END_SWITCH);
-
-            KEYWORDS.Add("SOLANGE", WHILE);
-            KEYWORDS.Add("ENDE SOLANGE", END_WHILE);
-            KEYWORDS.Add("WIEDERHOLE", DO);
-
-            KEYWORDS.Add("FÜR", FOR);
-            KEYWORDS.Add("BIS", FOR_TO);
-            KEYWORDS.Add("SCHRITT", FOR_STEP);
-            KEYWORDS.Add("IN", FOR_IN);
-            KEYWORDS.Add("ENDE FÜR", END_FOR);
-
-            KEYWORDS.Add("ABBRUCH", BREAK);
-
-            KEYWORDS.Add("OPERATION", FUNCTION);
-            KEYWORDS.Add("RÜCKGABE", RETURN);
-
-            KEYWORDS.Add("wahr", TRUE);
-            KEYWORDS.Add("true", TRUE);
-            KEYWORDS.Add("falsch", FALSE);
-            KEYWORDS.Add("false", FALSE);
-
-            KEYWORDS.Add("UND", AND);
-            KEYWORDS.Add("ODER", OR);
-
-            KEYWORDS.Add("Boolean", TYPE_BOOL);
-            KEYWORDS.Add("boolean", TYPE_BOOL);
-            KEYWORDS.Add("bool", TYPE_BOOL);
-
-            KEYWORDS.Add("GZ", TYPE_INT);
-            KEYWORDS.Add("Integer", TYPE_INT);
-            KEYWORDS.Add("int", TYPE_INT);
-
-            KEYWORDS.Add("FKZ", TYPE_DOUBLE);
-            KEYWORDS.Add("Real", TYPE_DOUBLE);
-            KEYWORDS.Add("double", TYPE_DOUBLE);
-
-            KEYWORDS.Add("Zeichen", TYPE_CHAR);
-            KEYWORDS.Add("char", TYPE_CHAR);
-
-            KEYWORDS.Add("Text", TYPE_STRING);
-            KEYWORDS.Add("String", TYPE_STRING);
-            KEYWORDS.Add("string", TYPE_STRING);
-
-            KEYWORDS.Add("Liste", TYPE_LIST);
-            KEYWORDS.Add("NEU", NEW);
-
-            KEYWORDS.Add("NICHTS", NULL);
-
-            KEYWORDS.Add("schreibe", IDENTIFIER);
-            KEYWORDS.Add("warte", IDENTIFIER);
-            KEYWORDS.Add("benutzereingabe", IDENTIFIER);
-        }
 
         /// <summary>
         /// This class converts Pseudocode to Tokens

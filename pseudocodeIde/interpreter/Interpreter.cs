@@ -9,8 +9,9 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using pseudocode_ide.interpreter.csharpcode;
+using pseudocode_ide.interpreter.pseudocode;
 using pseudocodeIde.interpreter.logging;
-using pseudocodeIde.interpreter.parser;
 using System;
 using System.Collections.Generic;
 using System.Threading;

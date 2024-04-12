@@ -11,13 +11,15 @@
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using pseudocodeIde;
+using pseudocodeIde.interpreter;
 using pseudocodeIde.interpreter.logging;
 using System;
 using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Threading;
 
-namespace pseudocodeIde.interpreter.parser
+namespace pseudocode_ide.interpreter.csharpcode
 {
     public class CSharpCodeManager
     {
