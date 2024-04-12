@@ -57,7 +57,7 @@ namespace pseudocodeIdeUpdater
 
                 Version assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
-                bool beta = false;
+                bool beta = betaButton;
                 if (assemblyVersion.Revision > 0 && !betaButton && !firstRun)
                 {
                     // hack to allow to go back to stable release, as the last version tag (pre release count) will be missing
