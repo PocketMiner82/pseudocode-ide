@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-  <version>1.4.0</version>
-  <url>https://github.com/PocketMiner82/pseudocode-ide/releases/download/1.4.0/pseudocode-ide.zip</url>
-  <changelog>https://github.com/PocketMiner82/pseudocode-ide/blob/1.4.0/CHANGELOG.md</changelog>
+  <version>1.5.0.1</version>
+  <url>https://github.com/PocketMiner82/pseudocode-ide/releases/download/1.5.0-dev.1/pseudocode-ide.zip</url>
+  <changelog>https://github.com/PocketMiner82/pseudocode-ide/blob/1.5.0-dev.1/CHANGELOG.md</changelog>
   <mandatory>false</mandatory>
 </item>
