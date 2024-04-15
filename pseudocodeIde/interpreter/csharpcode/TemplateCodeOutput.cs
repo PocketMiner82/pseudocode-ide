@@ -74,14 +74,22 @@ namespace codeOutput
 
             try
             {
-                return prompt.ShowDialog() == DialogResult.OK && double.TryParse(textBox.Text, out double result)
-                    ? (T?)Convert.ChangeType(result, Nullable.GetUnderlyingType(typeof(T)))
-                    : (T?)Convert.ChangeType(textBox.Text, Nullable.GetUnderlyingType(typeof(T)));
+                DialogResult result = prompt.ShowDialog();
+                Type nullableType = Nullable.GetUnderlyingType(typeof(T));
+                Type type = typeof(T);
+                Type usedType = nullableType ?? type;
+
+                if (result == DialogResult.OK)
+                {
+                    return (usedType == typeof(double) || usedType == typeof(int))
+                        && double.TryParse(textBox.Text, out double parsed)
+                    ? (T)Convert.ChangeType(parsed, usedType)
+                    : (T)Convert.ChangeType(textBox.Text, usedType);
+                }
             }
-            catch
-            {
-                return default;
-            }
+            catch { }
+
+            return default;
         }
     }
 
