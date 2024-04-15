@@ -27,7 +27,11 @@ namespace pseudocode_ide.interpreter.pseudocode
         static PseudocodeKeywords()
         {
             // code block snippets
-            KEYWORDS.Add(new PseudocodeType("WENN", IF, "WENN ^\n\t\nENDE WENN"));
+            KEYWORDS.Add(new PseudocodeType("WENN", IF, new List<PseudocodeAutocompleteItem>()
+            {
+                new PseudocodeAutocompleteItem("WENN ^\n\t\nENDE WENN", "WENN Block"),
+                new PseudocodeAutocompleteItem("WENN ^\n\t\nSONST\n\t\nENDE WENN", "WENN-SONST Block")
+            }));
             KEYWORDS.Add(new PseudocodeType("FALLS", SWITCH_PREFIX, "FALLS ^ GLEICH\n\tbedingung1:\n\t\t\n\tSONST:\n\t\t\nENDE FALLS"));
             KEYWORDS.Add(new PseudocodeType("SOLANGE", WHILE, "SOLANGE ^\n\t\nENDE SOLANGE"));
             KEYWORDS.Add(new PseudocodeType("WIEDERHOLE", DO, "WIEDERHOLE\n\t\nSOLANGE ^"));
