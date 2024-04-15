@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/PocketMiner82/pseudocode-ide/compare/1.4.0...1.5.0) (2024-04-15)
+
+
+### Features
+
+* add WENN-SONST code block snippet ([014b671](https://github.com/PocketMiner82/pseudocode-ide/commit/014b67169f30827c39e5c2e42a6ef024f1896485))
+
 # [1.5.0-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.4.0...1.5.0-dev.1) (2024-04-15)
 
 

@@ -8,7 +8,7 @@
     <AssemblyTitle>pseudocode-ide</AssemblyTitle>
     <Company>PocketMiner82</Company>
     <Product>pseudocode-ide</Product>
-  <version>1.5.0.1</version>
+  <version>1.5.0</version>
   <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
