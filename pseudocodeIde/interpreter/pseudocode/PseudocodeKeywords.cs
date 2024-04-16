@@ -29,42 +29,25 @@ namespace pseudocode_ide.interpreter.pseudocode
             // code block snippets
             KEYWORDS.Add(new PseudocodeType("WENN", IF, new List<PseudocodeAutocompleteItem>()
             {
-                new PseudocodeAutocompleteItem("WENN ^\n\t\nENDE WENN", "WENN Block"),
-                new PseudocodeAutocompleteItem("WENN ^\n\t\nSONST\n\t\nENDE WENN", "WENN-SONST Block")
+                new PseudocodeAutocompleteItem("WENN ^bedingung^\n\t^code^\nENDE WENN", "WENN Block"),
+                new PseudocodeAutocompleteItem("WENN ^bedingung^\n\t^code^\nSONST\n\t^code^\nENDE WENN", "WENN-SONST Block")
             }));
-            KEYWORDS.Add(new PseudocodeType("FALLS", SWITCH_PREFIX, "FALLS ^ GLEICH\n\tbedingung1:\n\t\t\n\tSONST:\n\t\t\nENDE FALLS"));
-            KEYWORDS.Add(new PseudocodeType("SOLANGE", WHILE, "SOLANGE ^\n\t\nENDE SOLANGE"));
-            KEYWORDS.Add(new PseudocodeType("WIEDERHOLE", DO, "WIEDERHOLE\n\t\nSOLANGE ^"));
+            KEYWORDS.Add(new PseudocodeType("FALLS", SWITCH_PREFIX, "FALLS ^variable^ GLEICH\n\t^bedingung1^:\n\t\t^code^\n\tSONST:\n\t\t^code^\nENDE FALLS"));
+            KEYWORDS.Add(new PseudocodeType("SOLANGE", WHILE, "SOLANGE ^bedingung^\n\t^code^\nENDE SOLANGE"));
+            KEYWORDS.Add(new PseudocodeType("WIEDERHOLE", DO, "WIEDERHOLE\n\t^code^\nSOLANGE ^bedingung^"));
             KEYWORDS.Add(new PseudocodeType("FÜR", FOR, new List<PseudocodeAutocompleteItem>()
             {
-                new PseudocodeAutocompleteItem("FÜR ^ BIS  SCHRITT \n\t\nENDE FÜR", "FÜR-BIS Block"),
-                new PseudocodeAutocompleteItem("FÜR ^ IN \n\t\nENDE FÜR", "FÜR-IN Block")
+                new PseudocodeAutocompleteItem("FÜR ^variable^ BIS ^endwert^ SCHRITT ^erhöhung^\n\t^code^\nENDE FÜR", "FÜR-BIS Block"),
+                new PseudocodeAutocompleteItem("FÜR ^variable^ IN ^liste^\n\t^code^\nENDE FÜR", "FÜR-IN Block")
             }));
-            KEYWORDS.Add(new PseudocodeType("OPERATION", FUNCTION, "OPERATION ^()\n\t"));
-            KEYWORDS.Add(new PseudocodeType("Liste", TYPE_LIST, "Liste<^>"));
+            KEYWORDS.Add(new PseudocodeType("OPERATION", FUNCTION, "OPERATION ^name^()\n\t^code^"));
+            KEYWORDS.Add(new PseudocodeType("Liste", TYPE_LIST, "Liste<^Typ^>"));
 
             // built-in methods
-            KEYWORDS.Add(new PseudocodeType("schreibe", IDENTIFIER, "schreibe(^)"));
-            KEYWORDS.Add(new PseudocodeType("warte", IDENTIFIER, "warte(^)"));
-            KEYWORDS.Add(new PseudocodeType("benutzereingabe", IDENTIFIER, "benutzereingabe<^>(\"\", \"\")"));
+            KEYWORDS.Add(new PseudocodeType("schreibe", IDENTIFIER, "schreibe(^wert^)"));
+            KEYWORDS.Add(new PseudocodeType("warte", IDENTIFIER, "warte(^millisekunden^)"));
+            KEYWORDS.Add(new PseudocodeType("benutzereingabe", IDENTIFIER, "benutzereingabe<^Rückgabetyp^>(^nachricht^, ^titel^)"));
 
-            // if/else
-            KEYWORDS.Add(new PseudocodeType("SONST", ELSE));
-            KEYWORDS.Add(new PseudocodeType("ENDE WENN", END_IF));
-
-            
-            // switch/case
-            KEYWORDS.Add(new PseudocodeType("GLEICH", SWITCH_SUFFIX));
-            KEYWORDS.Add(new PseudocodeType("ENDE FALLS", END_SWITCH));
-
-            // (do) while
-            KEYWORDS.Add(new PseudocodeType("ENDE SOLANGE", END_WHILE));
-            
-            // for
-            KEYWORDS.Add(new PseudocodeType("BIS", FOR_TO));
-            KEYWORDS.Add(new PseudocodeType("SCHRITT", FOR_STEP));
-            KEYWORDS.Add(new PseudocodeType("IN", FOR_IN));
-            KEYWORDS.Add(new PseudocodeType("ENDE FÜR", END_FOR));
 
             // break
             KEYWORDS.Add(new PseudocodeType("ABBRUCH", BREAK));
@@ -83,19 +66,19 @@ namespace pseudocode_ide.interpreter.pseudocode
             KEYWORDS.Add(new PseudocodeType("ODER", OR));
 
             // boolean types
+            KEYWORDS.Add(new PseudocodeType("bool", TYPE_BOOL));
             KEYWORDS.Add(new PseudocodeType("Boolean", TYPE_BOOL));
             KEYWORDS.Add(new PseudocodeType("boolean", TYPE_BOOL));
-            KEYWORDS.Add(new PseudocodeType("bool", TYPE_BOOL));
 
             // int types
             KEYWORDS.Add(new PseudocodeType("GZ", TYPE_INT));
-            KEYWORDS.Add(new PseudocodeType("Integer", TYPE_INT));
             KEYWORDS.Add(new PseudocodeType("int", TYPE_INT));
+            KEYWORDS.Add(new PseudocodeType("Integer", TYPE_INT));
 
             // double types
             KEYWORDS.Add(new PseudocodeType("FKZ", TYPE_DOUBLE));
-            KEYWORDS.Add(new PseudocodeType("Real", TYPE_DOUBLE));
             KEYWORDS.Add(new PseudocodeType("double", TYPE_DOUBLE));
+            KEYWORDS.Add(new PseudocodeType("Real", TYPE_DOUBLE));
 
             // char types
             KEYWORDS.Add(new PseudocodeType("Zeichen", TYPE_CHAR));
@@ -103,14 +86,31 @@ namespace pseudocode_ide.interpreter.pseudocode
 
             // string types
             KEYWORDS.Add(new PseudocodeType("Text", TYPE_STRING));
-            KEYWORDS.Add(new PseudocodeType("String", TYPE_STRING));
             KEYWORDS.Add(new PseudocodeType("string", TYPE_STRING));
+            KEYWORDS.Add(new PseudocodeType("String", TYPE_STRING));
+
+            // null
+            KEYWORDS.Add(new PseudocodeType("NICHTS", NULL));
 
             // new keyword
             KEYWORDS.Add(new PseudocodeType("NEU", NEW));
 
-            // null
-            KEYWORDS.Add(new PseudocodeType("NICHTS", NULL));
+            // if/else
+            KEYWORDS.Add(new PseudocodeType("SONST", ELSE));
+            KEYWORDS.Add(new PseudocodeType("ENDE WENN", END_IF));
+
+            // switch/case
+            KEYWORDS.Add(new PseudocodeType("GLEICH", SWITCH_SUFFIX));
+            KEYWORDS.Add(new PseudocodeType("ENDE FALLS", END_SWITCH));
+
+            // (do) while
+            KEYWORDS.Add(new PseudocodeType("ENDE SOLANGE", END_WHILE));
+
+            // for
+            KEYWORDS.Add(new PseudocodeType("BIS", FOR_TO));
+            KEYWORDS.Add(new PseudocodeType("SCHRITT", FOR_STEP));
+            KEYWORDS.Add(new PseudocodeType("IN", FOR_IN));
+            KEYWORDS.Add(new PseudocodeType("ENDE FÜR", END_FOR));
         }
     }
 }

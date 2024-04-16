@@ -37,6 +37,17 @@ namespace pseudocodeIde
         /// </summary>
         private const int MAX_UNDO_SIZE = 250;
 
+        // Indicators 0-7 could be in use by a lexer so we'll use indicator 8
+        /// <summary>
+        /// Indicator ID for highlighting words.
+        /// </summary>
+        public const int WORD_HIGHLIGHT_INDICATOR_ID = 8;
+
+        /// <summary>
+        /// Indicator ID for selecting the next word via tab.
+        /// </summary>
+        public const int TAB_SELECTION_INDICATOR_ID = 9;
+
         /// <summary>
         /// do not update the undo stack when the last char is a letter from A-Z (case ignored), a number from 0-9 or a underscore
         /// </summary>
@@ -72,8 +83,8 @@ namespace pseudocodeIde
         private int _lastCursorPosition = 0;
 
         // undo and redo stacks
-        private Stack<string> _undoStack = new Stack<string>();
-        private readonly Stack<string> _redoStack = new Stack<string>();
+        private Stack<UndoPoint> _undoStack = new Stack<UndoPoint>();
+        private readonly Stack<UndoPoint> _redoStack = new Stack<UndoPoint>();
 
         /// <summary>
         /// the path where this file is saved
@@ -100,9 +111,15 @@ namespace pseudocodeIde
         /// </summary>
         private int _maxLineNumberCharLength;
 
+        /// <summary>
+        /// Contains the instance of this form
+        /// </summary>
+        public static PseudocodeIDEForm Instance;
 
         public PseudocodeIDEForm()
         {
+            Instance = this;
+
             InitializeComponent();
             _outputForm = new OutputForm(this);
             _findReplace = new FindReplace(codeTextBox);
@@ -224,9 +241,12 @@ namespace pseudocodeIde
         }
 
         // ---------------------------------------------
-        // CODE TEXTBOX EVENT LISTENERS
+        // CODE TEXTBOX (Scintilla)
         // ---------------------------------------------
 
+        /// <summary>
+        /// Updates the undo stack, when user updated the code
+        /// </summary>
         private void UserUpdatedText()
         {
             // only update undo stack if next event not ignored
@@ -238,6 +258,36 @@ namespace pseudocodeIde
             {
                 UpdateUndoStack(false);
             }
+        }
+
+        /// <summary>
+        /// User changed selection
+        /// </summary>
+        private void UserChangedSelection()
+        {
+            HighlightWord(codeTextBox.SelectedText);
+            RemovePreviousTabSelectionIndicators();
+
+            TryHandleSelectionChange();
+        }
+
+        /// <summary>
+        /// Forcefully updates the undoStack, when the cursor moved more than 1 since last check or the user selected something
+        /// </summary>
+        private void TryHandleSelectionChange()
+        {
+            // ignore when we already undid something
+            if (_redoStack.Count != 0)
+            {
+                _lastCursorPosition = codeTextBox.SelectionStart;
+                return;
+            }
+
+            if (codeTextBox.SelectionEnd - codeTextBox.SelectionStart != 0 || Math.Abs(_lastCursorPosition - codeTextBox.SelectionStart) > 1)
+            {
+                UpdateUndoStack(true);
+            }
+            _lastCursorPosition = codeTextBox.SelectionStart;
         }
 
         private void CodeTextBox_UpdateUI(object sender, UpdateUIEventArgs e)
@@ -257,6 +307,12 @@ namespace pseudocodeIde
         {
             // when the code is modified, the code is no longer saved in the file
             SetFileNotSaved();
+            
+            // only update undo stack if next event not ignored
+            if (!IgnoreTextChange)
+            {
+                TryHandleSelectionChange();
+            }
 
             // Did the number of characters in the line number display change?
             int maxLineNumberCharLength = codeTextBox.Lines.Count.ToString().Length;
@@ -274,6 +330,11 @@ namespace pseudocodeIde
 
         private void CodeTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.None)
+            {
+                e.SuppressKeyPress = TrySelectNextTabIndicator();
+            }
+
             // hack to allow enter to autocomplete even if down wasnt pressed before
             if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && e.Modifiers == Keys.None && autoCompleteMenu.SelectedItemIndex < 0)
             {
@@ -293,18 +354,132 @@ namespace pseudocodeIde
             {
                 IgnoreTextChange = true;
                 UpdateUndoStack(true);
+                TryHandleSelectionChange();
                 e.SuppressKeyPress = false;
                 return;
             }
+            // find replace: find previous
             else if (e.Shift && e.KeyCode == Keys.F3)
             {
                 _findReplace.Window.FindPrevious();
                 e.SuppressKeyPress = true;
             }
+            // find replace: find next
             else if (e.KeyCode == Keys.F3)
             {
                 _findReplace.Window.FindNext();
                 e.SuppressKeyPress = true;
+            }
+        }
+
+        /// <summary>
+        /// Add indicators to scintilla, where the variables are, so that the user can tab through them
+        /// </summary>
+        /// <param name="tabSelections"></param>
+        /// <param name="scintilla"></param>
+        public void AddTabSelectionIndicators(List<(int selectionStart, int selectionEnd)> tabSelections)
+        {
+            if (tabSelections.Count >= 1)
+            {
+                codeTextBox.SelectionStart = tabSelections.First().selectionStart;
+                codeTextBox.SelectionEnd = tabSelections.First().selectionEnd;
+                tabSelections.RemoveAt(0);
+            }
+
+            // remove all uses of our indicator
+            codeTextBox.IndicatorCurrent = TAB_SELECTION_INDICATOR_ID;
+            codeTextBox.IndicatorClearRange(0, codeTextBox.TextLength);
+
+            if (tabSelections.Count == 0)
+            {
+                return;
+            }
+
+            // update indicator appearance
+            codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].Style = IndicatorStyle.StraightBox;
+            codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].Under = true;
+            codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].ForeColor = Color.LightBlue;
+            codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].OutlineAlpha = 255;
+            codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].Alpha = 100;
+
+            foreach ((int selectionStart, int selectionEnd) in tabSelections)
+            {
+                codeTextBox.IndicatorFillRange(selectionStart, selectionEnd - selectionStart);
+            }
+
+            TryHandleSelectionChange();
+        }
+
+        /// <summary>
+        /// Try to select the next tab indicator on tab press
+        /// </summary>
+        /// <returns>true if the next indicator was selected</returns>
+        private bool TrySelectNextTabIndicator()
+        {
+            (int, int)? firstSelection = GetFirstTabSelectionTuple();
+            if (firstSelection != null)
+            {
+                (int selectionStart, int selectionEnd) = firstSelection.Value;
+
+                codeTextBox.IndicatorCurrent = TAB_SELECTION_INDICATOR_ID;
+                codeTextBox.IndicatorClearRange(selectionStart, selectionEnd - selectionStart);
+                codeTextBox.SelectionStart = selectionStart;
+                codeTextBox.SelectionEnd = selectionEnd;
+                UserChangedSelection();
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get the selection start and end of the first tab selection indicator
+        /// </summary>
+        /// <returns>null if there is no tab selection indicator</returns>
+        private (int selectionStart, int selectionEnd)? GetFirstTabSelectionTuple()
+        {
+            int textLength = codeTextBox.TextLength;
+            Indicator indicator = codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID];
+            int bitmapFlag = (1 << indicator.Index);
+
+            int endPos = 0;
+            do
+            {
+                int startPos = indicator.Start(endPos);
+                endPos = indicator.End(startPos);
+
+                // Is this range filled with our indicator (TAB_SELECTION_INDICATOR_ID)?
+                uint bitmap = codeTextBox.IndicatorAllOnFor(startPos);
+                bool filled = ((bitmapFlag & bitmap) == bitmapFlag);
+                if (filled)
+                {
+                    return (startPos, endPos);
+                }
+            } while (endPos != 0 && endPos < textLength);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Removes all tab completion that are present before the selection end
+        /// </summary>
+        private void RemovePreviousTabSelectionIndicators()
+        {
+            (int, int)? firstSelection = GetFirstTabSelectionTuple();
+            while (firstSelection != null)
+            {
+                (int selectionStart, int selectionEnd) = firstSelection.Value;
+
+                if (selectionEnd <= codeTextBox.SelectionEnd)
+                {
+                    codeTextBox.IndicatorCurrent = TAB_SELECTION_INDICATOR_ID;
+                    codeTextBox.IndicatorClearRange(selectionStart, selectionEnd - selectionStart);
+                }
+                else
+                {
+                    break;
+                }
+
+                firstSelection = GetFirstTabSelectionTuple();
             }
         }
 
@@ -330,27 +505,11 @@ namespace pseudocodeIde
         {
             int caretPos = codeTextBox.CurrentPosition;
             bool docStart = caretPos == 1;
-            bool docEnd = caretPos == codeTextBox.Text.Length;
 
-            int charPrev = docStart ? codeTextBox.GetCharAt(caretPos) : codeTextBox.GetCharAt(caretPos - 2);
-            int charNext = codeTextBox.GetCharAt(caretPos);
+            char charPrev = (char)(docStart ? codeTextBox.GetCharAt(caretPos) : codeTextBox.GetCharAt(caretPos - 2));
+            char charNext = (char)codeTextBox.GetCharAt(caretPos);
 
-            bool isCharPrevBlank = charPrev == ' ' || charPrev == '\t' ||
-                                    charPrev == '\n' || charPrev == '\r';
-
-            bool isCharNextBlank = charNext == ' ' || charNext == '\t' ||
-                                    charNext == '\n' || charNext == '\r' ||
-                                    docEnd;
-
-            bool isEnclosed = (charPrev == '(' && charNext == ')') ||
-                                    (charPrev == '{' && charNext == '}') ||
-                                    (charPrev == '[' && charNext == ']');
-
-            bool isSpaceEnclosed = (charPrev == '(' && isCharNextBlank) || (isCharPrevBlank && charNext == ')') ||
-                                    (charPrev == '{' && isCharNextBlank) || (isCharPrevBlank && charNext == '}') ||
-                                    (charPrev == '[' && isCharNextBlank) || (isCharPrevBlank && charNext == ']');
-
-            bool isCharOrString = docStart || (isCharPrevBlank && isCharNextBlank) || isEnclosed || isSpaceEnclosed;
+            bool addClosingQuotes = docStart || !Scanner.IsAlphaNumeric(charNext) && !Scanner.IsAlphaNumeric(charPrev);
 
             switch (e.Char)
             {
@@ -395,7 +554,7 @@ namespace pseudocodeIde
                         return;
                     }
 
-                    if (isCharOrString)
+                    if (addClosingQuotes)
                     {
                         codeTextBox.InsertText(caretPos, "\"");
                     }
@@ -408,7 +567,7 @@ namespace pseudocodeIde
                         return;
                     }
 
-                    if (isCharOrString)
+                    if (addClosingQuotes)
                     {
                         codeTextBox.InsertText(caretPos, "'");
                     }
@@ -416,34 +575,11 @@ namespace pseudocodeIde
             }
         }
 
-        private void UserChangedSelection()
-        {
-            // ignore when we already undid something
-            if (_redoStack.Count != 0)
-            {
-                _lastCursorPosition = codeTextBox.SelectionStart;
-                return;
-            }
-
-            // update undo stack when user selected something or cursor moved by more then one since last time
-            if (codeTextBox.SelectionEnd - codeTextBox.SelectionStart != 0 || Math.Abs(_lastCursorPosition - codeTextBox.SelectionStart) > 1)
-            {
-                UpdateUndoStack(true);
-            }
-            _lastCursorPosition = codeTextBox.SelectionStart;
-
-            HighlightWord(codeTextBox.SelectedText);
-        }
-
         // adapted from https://github.com/desjarlais/Scintilla.NET/wiki/Find-and-Highlight-Words
         private void HighlightWord(string text)
         {
-            // Indicators 0-7 could be in use by a lexer
-            // so we'll use indicator 8 to highlight words.
-            const int NUM = 8;
-
             // Remove all uses of our indicator
-            codeTextBox.IndicatorCurrent = NUM;
+            codeTextBox.IndicatorCurrent = WORD_HIGHLIGHT_INDICATOR_ID;
             codeTextBox.IndicatorClearRange(0, codeTextBox.TextLength);
 
             if (string.IsNullOrEmpty(text))
@@ -452,11 +588,11 @@ namespace pseudocodeIde
             }
 
             // Update indicator appearance
-            codeTextBox.Indicators[NUM].Style = IndicatorStyle.StraightBox;
-            codeTextBox.Indicators[NUM].Under = true;
-            codeTextBox.Indicators[NUM].ForeColor = Color.Lime;
-            codeTextBox.Indicators[NUM].OutlineAlpha = 127;
-            codeTextBox.Indicators[NUM].Alpha = 100;
+            codeTextBox.Indicators[WORD_HIGHLIGHT_INDICATOR_ID].Style = IndicatorStyle.StraightBox;
+            codeTextBox.Indicators[WORD_HIGHLIGHT_INDICATOR_ID].Under = true;
+            codeTextBox.Indicators[WORD_HIGHLIGHT_INDICATOR_ID].ForeColor = Color.Lime;
+            codeTextBox.Indicators[WORD_HIGHLIGHT_INDICATOR_ID].OutlineAlpha = 100;
+            codeTextBox.Indicators[WORD_HIGHLIGHT_INDICATOR_ID].Alpha = 100;
 
             // Search the document
             codeTextBox.TargetStart = 0;
@@ -668,7 +804,7 @@ namespace pseudocodeIde
         {
             _undoStack.Clear();
             _redoStack.Clear();
-            _undoStack.Push(codeTextBox.Text);
+            _undoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             undoToolStripMenuItem.Enabled = false;
             redoToolStripMenuItem.Enabled = false;
         }
@@ -712,7 +848,7 @@ namespace pseudocodeIde
             // don't update when the last char matches the NO_UPDATE_AFTER regex and the update is caused by text change.
             // also don't update, when the new undo text is already in the stack
             if ((codeTextBox.SelectionStart > 1 && !forceUpdate && _noUpdateAfter.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
-                || _undoStack.Peek().Equals(undoText))
+                || _undoStack.Peek().Code == undoText)
             {
                 return;
             }
@@ -721,7 +857,7 @@ namespace pseudocodeIde
             _redoStack.Clear();
 
             // and update the undo stack, limit max undo size
-            _undoStack.Push(undoText);
+            _undoStack.Push(new UndoPoint(undoText, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             _undoStack = _undoStack.Trim(MAX_UNDO_SIZE);
         }
 
@@ -730,7 +866,7 @@ namespace pseudocodeIde
             // put current text in redo if not already in there
             if (_redoStack.Count == 0 || !_redoStack.Peek().Equals(codeTextBox.Text))
             {
-                _redoStack.Push(codeTextBox.Text);
+                _redoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
                 redoToolStripMenuItem.Enabled = true;
             }
 
@@ -739,9 +875,7 @@ namespace pseudocodeIde
             {
                 // set the textbox text to the item without removing it from the stack
                 IgnoreTextChange = true;
-                int oldSelectionStart = codeTextBox.SelectionStart;
-                codeTextBox.Text = _undoStack.Peek();
-                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
+                UpdateCodeTextBox(_undoStack.Peek());
 
                 // no more things to undo
                 undoToolStripMenuItem.Enabled = false;
@@ -749,16 +883,13 @@ namespace pseudocodeIde
             else
             {
                 string currentText = codeTextBox.Text;
-                int oldSelectionStart = codeTextBox.SelectionStart;
 
                 // set the textbox text to the first item that doesn't match the current text. also remove them from the undo stack
                 do
                 {
                     IgnoreTextChange = true;
-                    codeTextBox.Text = _undoStack.Peek();
+                    UpdateCodeTextBox(_undoStack.Peek());
                 } while (_undoStack.Count > 1 && currentText.Equals(_undoStack.Pop()));
-
-                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
             }
         }
 
@@ -768,16 +899,14 @@ namespace pseudocodeIde
             // put current text in undo if not already in there
             if (!_undoStack.Peek().Equals(codeTextBox.Text))
             {
-                _undoStack.Push(codeTextBox.Text);
+                _undoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             }
 
             // set the textbox text to the top item of the redo stack. also remove it from the stack
             if (_redoStack.Count > 0)
             {
                 IgnoreTextChange = true;
-                int oldSelectionStart = codeTextBox.SelectionStart;
-                codeTextBox.Text = _redoStack.Pop();
-                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
+                UpdateCodeTextBox(_redoStack.Pop());
             }
 
             // no more things to redo
@@ -785,6 +914,14 @@ namespace pseudocodeIde
             {
                 redoToolStripMenuItem.Enabled = false;
             }
+        }
+
+        private void UpdateCodeTextBox(UndoPoint point)
+        {
+            codeTextBox.Text = point.Code;
+            codeTextBox.SelectionStart = point.SelectionStart;
+            codeTextBox.SelectionEnd = point.SelectionEnd;
+            UserChangedSelection();
         }
 
         // ---------------------------------------------

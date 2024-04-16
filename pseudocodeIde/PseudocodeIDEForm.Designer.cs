@@ -61,6 +61,7 @@
             // 
             // menuStrip
             // 
+            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenuItem,
@@ -81,7 +82,7 @@
             this.openMenuItem,
             this.saveMenuItem});
             this.fileMenuItem.Name = "fileMenuItem";
-            this.fileMenuItem.Size = new System.Drawing.Size(69, 29);
+            this.fileMenuItem.Size = new System.Drawing.Size(69, 32);
             this.fileMenuItem.Text = "Datei";
             // 
             // newMenuItem
@@ -120,7 +121,7 @@
             this.toolStripSeparator4,
             this.goToMenuItem});
             this.editMenuItem.Name = "editMenuItem";
-            this.editMenuItem.Size = new System.Drawing.Size(111, 29);
+            this.editMenuItem.Size = new System.Drawing.Size(111, 32);
             this.editMenuItem.Text = "Bearbeiten";
             // 
             // undoToolStripMenuItem
@@ -180,7 +181,7 @@
             this.viewMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.wordWrapMenuItem});
             this.viewMenuItem.Name = "viewMenuItem";
-            this.viewMenuItem.Size = new System.Drawing.Size(86, 29);
+            this.viewMenuItem.Size = new System.Drawing.Size(86, 32);
             this.viewMenuItem.Text = "Ansicht";
             // 
             // wordWrapMenuItem
@@ -199,7 +200,7 @@
             this.toolStripSeparator2,
             this.singleEqualIsCompareOperatorMenuItem});
             this.runMenuItem.Name = "runMenuItem";
-            this.runMenuItem.Size = new System.Drawing.Size(109, 29);
+            this.runMenuItem.Size = new System.Drawing.Size(109, 32);
             this.runMenuItem.Text = "Ausführen";
             // 
             // runProgramMenuItem
@@ -242,7 +243,7 @@
             this.updateMenuItem,
             this.updateBetaMenuItem});
             this.helpMenuItem.Name = "helpMenuItem";
-            this.helpMenuItem.Size = new System.Drawing.Size(64, 29);
+            this.helpMenuItem.Size = new System.Drawing.Size(64, 32);
             this.helpMenuItem.Text = "Hilfe";
             // 
             // showHelpMenuItem

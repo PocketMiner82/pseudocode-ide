@@ -1,3 +1,26 @@
+# [1.6.0-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.0-dev.1...1.6.0-dev.2) (2024-04-16)
+
+
+### Bug Fixes
+
+* add "code" tab stop variable to SOLANGE, WIEDERHOLE and OPERATION code block snippets ([a33eb41](https://github.com/PocketMiner82/pseudocode-ide/commit/a33eb415c51bc89f178cb99986cff5111d3ffb2c))
+* variable selection for code block snippets with ^ at the end didn't work ([1797435](https://github.com/PocketMiner82/pseudocode-ide/commit/179743575992273f0daecbac4c49be20379ceb55))
+
+# [1.6.0-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.5.1-dev.1...1.6.0-dev.1) (2024-04-16)
+
+
+### Features
+
+* add tab to go to the next variable on code snippets ([7048db7](https://github.com/PocketMiner82/pseudocode-ide/commit/7048db7ac1c33fab3954afb5f2d37aa8213ca223))
+* undo now remebers cursor position ([6091016](https://github.com/PocketMiner82/pseudocode-ide/commit/6091016b1495949c8fdf5aa96b627ac70bd41a21))
+
+## [1.5.1-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.5.0...1.5.1-dev.1) (2024-04-15)
+
+
+### Bug Fixes
+
+* benutzereingabe string always returned null ([36700b3](https://github.com/PocketMiner82/pseudocode-ide/commit/36700b30b35d214dc2d5a72e18e4053a035b6b52))
+
 # [1.5.0](https://github.com/PocketMiner82/pseudocode-ide/compare/1.4.0...1.5.0) (2024-04-15)
 
 

@@ -29,12 +29,12 @@ namespace pseudocodeIde.interpreter
         /// <summary>
         /// User-written Pseudocode
         /// </summary>
-        private readonly string CODE;
+        private readonly string _code;
 
         /// <summary>
         /// The list of tokens that will be generated from the CODE.
         /// </summary>
-        private readonly LinkedList<Token> TOKENS = new LinkedList<Token>();
+        private readonly LinkedList<Token> _tokens = new LinkedList<Token>();
 
         /// <summary>
         /// start position of the current lexeme
@@ -57,7 +57,7 @@ namespace pseudocodeIde.interpreter
         /// <param name="code">the Pseudocode text string</param>
         public Scanner(string code)
         {
-            this.CODE = code;
+            this._code = code;
         }
 
         /// <summary>
@@ -73,8 +73,8 @@ namespace pseudocodeIde.interpreter
                 ScanToken();
             }
 
-            TOKENS.AddLast(Token.CreateEofToken(_line));
-            return TOKENS;
+            _tokens.AddLast(Token.CreateEofToken(_line));
+            return _tokens;
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace pseudocodeIde.interpreter
                 Advance();
             }
 
-            string text = CODE.Substring(_start, _current - _start);
+            string text = _code.Substring(_start, _current - _start);
 
             // allow something like "ENDE WENN"; when text is ENDE and the next char is a space, allow the space in the identifier
             if (textEmpty && text.Equals("ENDE") && (IsAtEnd() || Peek() == ' ' || Peek() == '\t'))
@@ -297,7 +297,7 @@ namespace pseudocodeIde.interpreter
                     Advance();
                 }
                 // start + 2 because the '0x' must be removed
-                AddToken(NUMBER, Convert.ToInt32(CODE.Substring(_start + 2, _current - _start), 16));
+                AddToken(NUMBER, Convert.ToInt32(_code.Substring(_start + 2, _current - _start), 16));
                 return;
             }
             else if (Peek() == 'b' && IsBinaryDigit(PeekNext()))
@@ -310,11 +310,11 @@ namespace pseudocodeIde.interpreter
                     Advance();
                 }
                 // start + 2 because the '0b' must be removed
-                AddToken(NUMBER, Convert.ToInt32(CODE.Substring(_start, _current - _start).Substring(2), 2));
+                AddToken(NUMBER, Convert.ToInt32(_code.Substring(_start, _current - _start).Substring(2), 2));
                 return;
             }
 
-            AddToken(NUMBER, double.Parse(CODE.Substring(_start, _current - _start)));
+            AddToken(NUMBER, double.Parse(_code.Substring(_start, _current - _start)));
         }
 
         /// <summary>
@@ -357,7 +357,7 @@ namespace pseudocodeIde.interpreter
             Advance();
 
             // trim the surrounding quotes
-            string value = CODE.Substring(_start + 1, _current - _start - 2);
+            string value = _code.Substring(_start + 1, _current - _start - 2);
             AddToken(CHAR, value);
         }
 
@@ -386,7 +386,7 @@ namespace pseudocodeIde.interpreter
             Advance();
 
             // trim the surrounding quotes
-            string value = CODE.Substring(_start + 1, _current - _start - 2);
+            string value = _code.Substring(_start + 1, _current - _start - 2);
             AddToken(STRING, value);
         }
 
@@ -402,7 +402,7 @@ namespace pseudocodeIde.interpreter
                 return false;
             }
 
-            if (CODE[_current] != expected)
+            if (_code[_current] != expected)
             {
                 return false;
             }
@@ -418,7 +418,7 @@ namespace pseudocodeIde.interpreter
         /// <returns></returns>
         private char Peek()
         {
-            return IsAtEnd() ? '\0' : CODE[_current];
+            return IsAtEnd() ? '\0' : _code[_current];
         }
 
         /// <summary>
@@ -427,14 +427,14 @@ namespace pseudocodeIde.interpreter
         /// <returns></returns>
         private char PeekNext()
         {
-            return _current + 1 >= CODE.Length ? '\0' : CODE[_current + 1];
+            return _current + 1 >= _code.Length ? '\0' : _code[_current + 1];
         }
 
         /// <summary>
         /// check if a char is a digit
         /// </summary>
         /// <returns></returns>
-        private bool IsDigit(char c)
+        public static bool IsDigit(char c)
         {
             return c >= '0' && c <= '9';
         }
@@ -463,7 +463,7 @@ namespace pseudocodeIde.interpreter
         /// Check if a char is in the (German) alphabet
         /// </summary>
         /// <returns></returns>
-        private bool IsAlpha(char c)
+        public static bool IsAlpha(char c)
         {
             return (c >= 'a' && c <= 'z') ||
                    (c >= 'A' && c <= 'Z') ||
@@ -476,7 +476,7 @@ namespace pseudocodeIde.interpreter
         /// Check if a char is alphanumeric
         /// </summary>
         /// <returns></returns>
-        private bool IsAlphaNumeric(char c)
+        public static bool IsAlphaNumeric(char c)
         {
             return IsAlpha(c) || IsDigit(c);
         }
@@ -487,7 +487,7 @@ namespace pseudocodeIde.interpreter
         /// <returns></returns>
         private bool IsAtEnd()
         {
-            return _current >= CODE.Length;
+            return _current >= _code.Length;
         }
 
         /// <summary>
@@ -496,7 +496,7 @@ namespace pseudocodeIde.interpreter
         /// <returns></returns>
         private char Advance()
         {
-            return CODE[_current++];
+            return _code[_current++];
         }
 
         /// <summary>
@@ -506,8 +506,8 @@ namespace pseudocodeIde.interpreter
         /// <param name="literal">the literal object</param>
         private void AddToken(TokenType type, object literal = null)
         {
-            string text = CODE.Substring(_start, _current - _start);
-            TOKENS.AddLast(new Token(type, text, literal, _line));
+            string text = _code.Substring(_start, _current - _start);
+            _tokens.AddLast(new Token(type, text, literal, _line));
         }
     }
 }

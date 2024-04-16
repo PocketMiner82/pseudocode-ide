@@ -12,7 +12,6 @@
 using pseudocode_ide.interpreter.pseudocode;
 using ScintillaNET;
 using System;
-using System.Diagnostics;
 
 namespace pseudocode_ide.interpreter.scanner
 {
@@ -159,8 +158,6 @@ namespace pseudocode_ide.interpreter.scanner
                             {
                                 identifier = scintilla.GetTextRange(startPos - length, length);
                             }
-
-                            Debug.WriteLine($"'{identifier}'");
 
                             int style = STYLE_IDENTIFIER;
                             // if the identifier is in the keyword list, then it will has a differnt color 
