@@ -61,6 +61,7 @@ namespace pseudocode_ide.interpreter.pseudocode
 
             bool inSelection = false;
             int textLengthWithoutMarkers = Text.Replace("\\^", " ").Replace("^", "").Length;
+            textLengthWithoutMarkers += Text.EndsWith("^") ? 1 : 0;
             for (int i = Parent.Fragment.Start; ; i++)
             {
                 recheck:
