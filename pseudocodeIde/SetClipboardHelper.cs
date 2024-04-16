@@ -20,20 +20,20 @@ namespace pseudocode_ide
 
     public class SetClipboardHelper : StaHelper
     {
-        readonly string FORMAT;
-        readonly object DATA;
+        private readonly string _format;
+        private readonly object _data;
 
         public SetClipboardHelper(string format, object data)
         {
-            FORMAT = format;
-            DATA = data;
+            _format = format;
+            _data = data;
         }
 
         protected override void Work()
         {
             DataObject obj = new System.Windows.Forms.DataObject(
-                FORMAT,
-                DATA
+                _format,
+                _data
             );
 
             Clipboard.SetDataObject(obj, true);
@@ -42,7 +42,7 @@ namespace pseudocode_ide
 
     public abstract class StaHelper
     {
-        readonly ManualResetEvent COMPLETE = new ManualResetEvent(false);
+        readonly ManualResetEvent _complete = new ManualResetEvent(false);
 
         public void Go()
         {
@@ -59,7 +59,7 @@ namespace pseudocode_ide
         {
             try
             {
-                COMPLETE.Reset();
+                _complete.Reset();
                 Work();
             }
             catch (Exception ex)
@@ -78,13 +78,13 @@ namespace pseudocode_ide
                     catch
                     {
                         // ex from first exception
-                        Debug.WriteLine(ex);
+                        MessageBox.Show(ex.ToString(), "Error");
                     }
                 }
             }
             finally
             {
-                COMPLETE.Set();
+                _complete.Set();
             }
         }
 

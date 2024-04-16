@@ -12,6 +12,11 @@
 using AutocompleteMenuNS;
 using pseudocodeIde;
 using ScintillaNET;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace pseudocode_ide.interpreter.pseudocode
 {
@@ -43,8 +48,56 @@ namespace pseudocode_ide.interpreter.pseudocode
 
             string line = scintilla.Lines[scintilla.LineFromPosition(Parent.Fragment.Start)].Text;
             string indents = new string('\t', line.GetIndentationLevel());
+            Text = Text.Replace("\n", $"\n{indents}");
 
-            return Text.Replace("\n", $"\n{indents}");
+            return Text;
+        }
+
+        /// <summary>
+        /// After this item got selected (the text is already pasted in scintilla), put all the variable locations in a list
+        /// </summary>
+        /// <param name="e"></param>
+        public override void OnSelected(SelectedEventArgs e)
+        {
+            Scintilla scintilla = (Scintilla)Parent.TargetControlWrapper.TargetControl;
+            List<(int selectionStart, int selectionEnd)> tabSelections = new List<(int selectionStart, int selectionEnd)>();
+
+            bool inSelection = false;
+            int textLengthWithoutMarkers = Text.Replace("\\^", " ").Replace("^", "").Length;
+            for (int i = Parent.Fragment.Start; ; i++)
+            {
+                recheck:
+                if (i >= Parent.Fragment.Start + textLengthWithoutMarkers) {
+                    break;
+                }
+
+                if (scintilla.Text[i] == '^')
+                {
+                    if (i != 0 && scintilla.Text[i - 1] == '\\')
+                    {
+                        scintilla.Text = scintilla.Text.Remove(i - 1, 1);
+                        goto recheck;
+                    }
+
+                    scintilla.Text = scintilla.Text.Remove(i, 1);
+
+                    if (!inSelection) // && firstOccurrenceSelected
+                    {
+                        tabSelections.Add((selectionStart: i, selectionEnd: Parent.Fragment.Start + textLengthWithoutMarkers ));
+                        inSelection = true;
+                    }
+                    else // inSelection && firstOccurrenceSelected
+                    {
+                        (int selectionStart, int selectionEnd) lastSelection = tabSelections.Last();
+                        lastSelection.selectionEnd = i;
+                        tabSelections[tabSelections.Count - 1] = lastSelection;
+
+                        inSelection = false;
+                    }
+                }
+            }
+
+            PseudocodeIDEForm.Instance.AddTabSelectionIndicators(tabSelections);
         }
     }
 }

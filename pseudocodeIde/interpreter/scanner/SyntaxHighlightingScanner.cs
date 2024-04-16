@@ -160,8 +160,6 @@ namespace pseudocode_ide.interpreter.scanner
                                 identifier = scintilla.GetTextRange(startPos - length, length);
                             }
 
-                            Debug.WriteLine($"'{identifier}'");
-
                             int style = STYLE_IDENTIFIER;
                             // if the identifier is in the keyword list, then it will has a differnt color 
                             if (PseudocodeKeywords.KEYWORDS.ContainsKey(identifier))
