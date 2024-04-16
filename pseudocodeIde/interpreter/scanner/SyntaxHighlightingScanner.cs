@@ -12,7 +12,6 @@
 using pseudocode_ide.interpreter.pseudocode;
 using ScintillaNET;
 using System;
-using System.Diagnostics;
 
 namespace pseudocode_ide.interpreter.scanner
 {

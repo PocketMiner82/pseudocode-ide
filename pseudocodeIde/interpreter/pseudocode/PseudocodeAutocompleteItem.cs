@@ -12,11 +12,8 @@
 using AutocompleteMenuNS;
 using pseudocodeIde;
 using ScintillaNET;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace pseudocode_ide.interpreter.pseudocode
 {

@@ -24,7 +24,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -84,8 +83,8 @@ namespace pseudocodeIde
         private int _lastCursorPosition = 0;
 
         // undo and redo stacks
-        private Stack<string> _undoStack = new Stack<string>();
-        private readonly Stack<string> _redoStack = new Stack<string>();
+        private Stack<UndoPoint> _undoStack = new Stack<UndoPoint>();
+        private readonly Stack<UndoPoint> _redoStack = new Stack<UndoPoint>();
 
         /// <summary>
         /// the path where this file is saved
@@ -355,6 +354,7 @@ namespace pseudocodeIde
             {
                 IgnoreTextChange = true;
                 UpdateUndoStack(true);
+                TryHandleSelectionChange();
                 e.SuppressKeyPress = false;
                 return;
             }
@@ -407,7 +407,7 @@ namespace pseudocodeIde
                 codeTextBox.IndicatorFillRange(selectionStart, selectionEnd - selectionStart);
             }
 
-            UpdateUndoStack(true);
+            TryHandleSelectionChange();
         }
 
         /// <summary>
@@ -425,6 +425,7 @@ namespace pseudocodeIde
                 codeTextBox.IndicatorClearRange(selectionStart, selectionEnd - selectionStart);
                 codeTextBox.SelectionStart = selectionStart;
                 codeTextBox.SelectionEnd = selectionEnd;
+                UserChangedSelection();
                 return true;
             }
             return false;
@@ -803,7 +804,7 @@ namespace pseudocodeIde
         {
             _undoStack.Clear();
             _redoStack.Clear();
-            _undoStack.Push(codeTextBox.Text);
+            _undoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             undoToolStripMenuItem.Enabled = false;
             redoToolStripMenuItem.Enabled = false;
         }
@@ -847,7 +848,7 @@ namespace pseudocodeIde
             // don't update when the last char matches the NO_UPDATE_AFTER regex and the update is caused by text change.
             // also don't update, when the new undo text is already in the stack
             if ((codeTextBox.SelectionStart > 1 && !forceUpdate && _noUpdateAfter.IsMatch(undoText.ElementAt(codeTextBox.SelectionStart - 2).ToString()))
-                || _undoStack.Peek().Equals(undoText))
+                || _undoStack.Peek().Code == undoText)
             {
                 return;
             }
@@ -856,7 +857,7 @@ namespace pseudocodeIde
             _redoStack.Clear();
 
             // and update the undo stack, limit max undo size
-            _undoStack.Push(undoText);
+            _undoStack.Push(new UndoPoint(undoText, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             _undoStack = _undoStack.Trim(MAX_UNDO_SIZE);
         }
 
@@ -865,17 +866,16 @@ namespace pseudocodeIde
             // put current text in redo if not already in there
             if (_redoStack.Count == 0 || !_redoStack.Peek().Equals(codeTextBox.Text))
             {
-                _redoStack.Push(codeTextBox.Text);
+                _redoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
                 redoToolStripMenuItem.Enabled = true;
             }
 
-            int oldSelectionStart = codeTextBox.SelectionStart;
             // the undo stack always has at least one item in it
             if (_undoStack.Count <= 1)
             {
                 // set the textbox text to the item without removing it from the stack
                 IgnoreTextChange = true;
-                codeTextBox.Text = _undoStack.Peek();
+                UpdateCodeTextBox(_undoStack.Peek());
 
                 // no more things to undo
                 undoToolStripMenuItem.Enabled = false;
@@ -888,10 +888,9 @@ namespace pseudocodeIde
                 do
                 {
                     IgnoreTextChange = true;
-                    codeTextBox.Text = _undoStack.Peek();
+                    UpdateCodeTextBox(_undoStack.Peek());
                 } while (_undoStack.Count > 1 && currentText.Equals(_undoStack.Pop()));
             }
-            codeTextBox.SelectionStart = oldSelectionStart;
         }
 
         private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -900,16 +899,14 @@ namespace pseudocodeIde
             // put current text in undo if not already in there
             if (!_undoStack.Peek().Equals(codeTextBox.Text))
             {
-                _undoStack.Push(codeTextBox.Text);
+                _undoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             }
 
             // set the textbox text to the top item of the redo stack. also remove it from the stack
             if (_redoStack.Count > 0)
             {
                 IgnoreTextChange = true;
-                int oldSelectionStart = codeTextBox.SelectionStart;
-                codeTextBox.Text = _redoStack.Pop();
-                codeTextBox.SelectionStart = Math.Min(oldSelectionStart, codeTextBox.TextLength);
+                UpdateCodeTextBox(_redoStack.Pop());
             }
 
             // no more things to redo
@@ -917,6 +914,14 @@ namespace pseudocodeIde
             {
                 redoToolStripMenuItem.Enabled = false;
             }
+        }
+
+        private void UpdateCodeTextBox(UndoPoint point)
+        {
+            codeTextBox.Text = point.Code;
+            codeTextBox.SelectionStart = point.SelectionStart;
+            codeTextBox.SelectionEnd = point.SelectionEnd;
+            UserChangedSelection();
         }
 
         // ---------------------------------------------
