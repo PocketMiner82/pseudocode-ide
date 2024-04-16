@@ -33,14 +33,14 @@ namespace pseudocode_ide.interpreter.pseudocode
                 new PseudocodeAutocompleteItem("WENN ^bedingung^\n\t^code^\nSONST\n\t^code^\nENDE WENN", "WENN-SONST Block")
             }));
             KEYWORDS.Add(new PseudocodeType("FALLS", SWITCH_PREFIX, "FALLS ^variable^ GLEICH\n\t^bedingung1^:\n\t\t^code^\n\tSONST:\n\t\t^code^\nENDE FALLS"));
-            KEYWORDS.Add(new PseudocodeType("SOLANGE", WHILE, "SOLANGE ^bedingung^\n\t\nENDE SOLANGE"));
-            KEYWORDS.Add(new PseudocodeType("WIEDERHOLE", DO, "WIEDERHOLE\n\t\nSOLANGE ^bedingung^"));
+            KEYWORDS.Add(new PseudocodeType("SOLANGE", WHILE, "SOLANGE ^bedingung^\n\t^code^\nENDE SOLANGE"));
+            KEYWORDS.Add(new PseudocodeType("WIEDERHOLE", DO, "WIEDERHOLE\n\t^code^\nSOLANGE ^bedingung^"));
             KEYWORDS.Add(new PseudocodeType("FÜR", FOR, new List<PseudocodeAutocompleteItem>()
             {
                 new PseudocodeAutocompleteItem("FÜR ^variable^ BIS ^endwert^ SCHRITT ^erhöhung^\n\t^code^\nENDE FÜR", "FÜR-BIS Block"),
                 new PseudocodeAutocompleteItem("FÜR ^variable^ IN ^liste^\n\t^code^\nENDE FÜR", "FÜR-IN Block")
             }));
-            KEYWORDS.Add(new PseudocodeType("OPERATION", FUNCTION, "OPERATION ^name^()\n\t"));
+            KEYWORDS.Add(new PseudocodeType("OPERATION", FUNCTION, "OPERATION ^name^()\n\t^code^"));
             KEYWORDS.Add(new PseudocodeType("Liste", TYPE_LIST, "Liste<^Typ^>"));
 
             // built-in methods
