@@ -1,3 +1,10 @@
+## [1.5.1-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.5.0...1.5.1-dev.1) (2024-04-15)
+
+
+### Bug Fixes
+
+* benutzereingabe string always returned null ([36700b3](https://github.com/PocketMiner82/pseudocode-ide/commit/36700b30b35d214dc2d5a72e18e4053a035b6b52))
+
 # [1.5.0](https://github.com/PocketMiner82/pseudocode-ide/compare/1.4.0...1.5.0) (2024-04-15)
 
 

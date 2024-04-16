@@ -14,7 +14,7 @@ jobs:
    - name: Setup NuGet
      uses: NuGet/setup-nuget@v2.0.0  
    - name: setup-msbuild
-     uses: microsoft/setup-msbuild@v1.3
+     uses: microsoft/setup-msbuild@v2
    - name: Restore Packages and build solution
      run: ".\\build.cmd nozip"
    - name: Upload a Build Artifact
