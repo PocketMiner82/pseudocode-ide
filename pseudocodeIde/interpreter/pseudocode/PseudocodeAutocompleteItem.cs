@@ -45,9 +45,8 @@ namespace pseudocode_ide.interpreter.pseudocode
 
             string line = scintilla.Lines[scintilla.LineFromPosition(Parent.Fragment.Start)].Text;
             string indents = new string('\t', line.GetIndentationLevel());
-            Text = Text.Replace("\n", $"\n{indents}");
 
-            return Text;
+            return Text.Replace("\n", $"\n{indents}");
         }
 
         /// <summary>
@@ -60,8 +59,8 @@ namespace pseudocode_ide.interpreter.pseudocode
             List<(int selectionStart, int selectionEnd)> tabSelections = new List<(int selectionStart, int selectionEnd)>();
 
             bool inSelection = false;
-            int textLengthWithoutMarkers = Text.Replace("\\^", " ").Replace("^", "").Length;
-            textLengthWithoutMarkers += Text.EndsWith("^") ? 1 : 0;
+            int textLengthWithoutMarkers = GetTextForReplace().Replace("\\^", " ").Replace("^", "").Length;
+            textLengthWithoutMarkers += GetTextForReplace().EndsWith("^") ? 1 : 0;
             for (int i = Parent.Fragment.Start; ; i++)
             {
                 recheck:
