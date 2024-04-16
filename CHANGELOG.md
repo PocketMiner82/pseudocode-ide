@@ -1,3 +1,11 @@
+# [1.6.0-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.5.1-dev.1...1.6.0-dev.1) (2024-04-16)
+
+
+### Features
+
+* add tab to go to the next variable on code snippets ([7048db7](https://github.com/PocketMiner82/pseudocode-ide/commit/7048db7ac1c33fab3954afb5f2d37aa8213ca223))
+* undo now remebers cursor position ([6091016](https://github.com/PocketMiner82/pseudocode-ide/commit/6091016b1495949c8fdf5aa96b627ac70bd41a21))
+
 ## [1.5.1-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.5.0...1.5.1-dev.1) (2024-04-15)
 
 
