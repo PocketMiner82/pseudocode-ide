@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.0...1.6.1) (2024-04-16)
+
+
+### Bug Fixes
+
+* indentation was wrong for future usage of code block snippet after inserting a snippet on an indented position ([2960db8](https://github.com/PocketMiner82/pseudocode-ide/commit/2960db84cf16289b480e66defcb106e92305bd0d))
+
 ## [1.6.1-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.0...1.6.1-dev.1) (2024-04-16)
 
 
