@@ -12,6 +12,7 @@
 using AutocompleteMenuNS;
 using pseudocodeIde;
 using ScintillaNET;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +21,7 @@ namespace pseudocode_ide.interpreter.pseudocode
     /// <summary>
     /// Represents an autocomplete item for pseudocode with custom behavior for replacing text.
     /// </summary>
-    public class PseudocodeAutocompleteItem : SnippetAutocompleteItem
+    public class PseudocodeAutocompleteItem : AutocompleteItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PseudocodeAutocompleteItem"/> class with the specified snippet and optional menu text.
@@ -29,10 +30,10 @@ namespace pseudocode_ide.interpreter.pseudocode
         /// <param name="menuText">The text to be displayed in the autocomplete menu. If null, the snippet is used.</param>
         public PseudocodeAutocompleteItem(string snippet, string menuText = null) : base(snippet)
         {
-            if (menuText != null)
-            {
-                MenuText = menuText;
-            }
+            Text = snippet.Replace("\r", "");
+            MenuText = menuText;
+            ToolTipText = snippet.Replace("^", "");
+            ToolTipTitle = "Snippet:";
         }
 
         /// <summary>
@@ -95,6 +96,19 @@ namespace pseudocode_ide.interpreter.pseudocode
             }
 
             PseudocodeIDEForm.Instance.AddTabSelectionIndicators(tabSelections);
+        }
+
+        /// <summary>
+        /// Compares fragment text with this item
+        /// </summary>
+        public override CompareResult Compare(string fragmentText)
+        {
+            return Text.StartsWith(fragmentText, StringComparison.InvariantCultureIgnoreCase) ? CompareResult.VisibleAndSelected : CompareResult.Hidden;
+        }
+
+        public override string ToString()
+        {
+            return MenuText ?? Text.Replace("\n", " ").Replace("^", "");
         }
     }
 }
