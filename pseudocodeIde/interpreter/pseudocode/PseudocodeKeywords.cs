@@ -45,7 +45,8 @@ namespace pseudocode_ide.interpreter.pseudocode
 
             // built-in methods
             KEYWORDS.Add(new PseudocodeType("schreibe", IDENTIFIER, "schreibe(^wert^)"));
-            KEYWORDS.Add(new PseudocodeType("warte", IDENTIFIER, "warte(^millisekunden^)"));
+            KEYWORDS.Add(new PseudocodeType("print", IDENTIFIER, "print(^wert^)"));
+            KEYWORDS.Add(new PseudocodeType("warte", IDENTIFIER, "warte(^zeitMs^)"));
             KEYWORDS.Add(new PseudocodeType("benutzereingabe", IDENTIFIER, "benutzereingabe<^Rückgabetyp^>(^nachricht^, ^titel^)"));
 
 

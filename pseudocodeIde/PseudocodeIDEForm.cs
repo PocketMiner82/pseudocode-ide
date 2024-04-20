@@ -258,6 +258,8 @@ namespace pseudocodeIde
             {
                 UpdateUndoStack(false);
             }
+
+            TryHandleContentUpdate();
         }
 
         /// <summary>
@@ -268,18 +270,20 @@ namespace pseudocodeIde
             HighlightWord(codeTextBox.SelectedText);
             RemovePreviousTabSelectionIndicators();
 
-            TryHandleSelectionChange();
+            if (_lastCursorPosition != codeTextBox.SelectionStart && codeTextBox.Text != _undoStack.Peek().Code)
+            {
+                UpdateUndoStack(true);
+            }
         }
 
         /// <summary>
         /// Forcefully updates the undoStack, when the cursor moved more than 1 since last check or the user selected something
         /// </summary>
-        private void TryHandleSelectionChange()
+        private void TryHandleContentUpdate()
         {
             // ignore when we already undid something
             if (_redoStack.Count != 0)
             {
-                _lastCursorPosition = codeTextBox.SelectionStart;
                 return;
             }
 
@@ -287,7 +291,6 @@ namespace pseudocodeIde
             {
                 UpdateUndoStack(true);
             }
-            _lastCursorPosition = codeTextBox.SelectionStart;
         }
 
         private void CodeTextBox_UpdateUI(object sender, UpdateUIEventArgs e)
@@ -301,18 +304,13 @@ namespace pseudocodeIde
                     UserChangedSelection();
                     break;
             }
+            _lastCursorPosition = codeTextBox.SelectionStart;
         }
 
         private void CodeTextBox_TextChanged(object sender, EventArgs e)
         {
             // when the code is modified, the code is no longer saved in the file
             SetFileNotSaved();
-            
-            // only update undo stack if next event not ignored
-            if (!IgnoreTextChange)
-            {
-                TryHandleSelectionChange();
-            }
 
             // Did the number of characters in the line number display change?
             int maxLineNumberCharLength = codeTextBox.Lines.Count.ToString().Length;
@@ -346,17 +344,14 @@ namespace pseudocodeIde
                 && (Control.ModifierKeys == Keys.Control || Control.ModifierKeys == (Keys.Control | Keys.Shift)))
             {
                 e.SuppressKeyPress = true;
-                return;
             }
-
             // deleting always updates undo stack
-            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
+            else if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
             {
                 IgnoreTextChange = true;
                 UpdateUndoStack(true);
-                TryHandleSelectionChange();
+                CodeTextBox_UpdateUI(null, new UpdateUIEventArgs(UpdateChange.Content));
                 e.SuppressKeyPress = false;
-                return;
             }
             // find replace: find previous
             else if (e.Shift && e.KeyCode == Keys.F3)
@@ -407,7 +402,7 @@ namespace pseudocodeIde
                 codeTextBox.IndicatorFillRange(selectionStart, selectionEnd - selectionStart);
             }
 
-            TryHandleSelectionChange();
+            TryHandleContentUpdate();
         }
 
         /// <summary>
@@ -889,7 +884,10 @@ namespace pseudocodeIde
                 {
                     IgnoreTextChange = true;
                     UpdateCodeTextBox(_undoStack.Peek());
-                } while (_undoStack.Count > 1 && currentText.Equals(_undoStack.Pop()));
+                } while (_undoStack.Count > 1 && currentText == _undoStack.Pop().Code);
+
+                // the undo stack always has the current text in it
+                _undoStack.Push(new UndoPoint(codeTextBox.Text, codeTextBox.SelectionStart, codeTextBox.SelectionEnd));
             }
         }
 
@@ -921,7 +919,7 @@ namespace pseudocodeIde
             codeTextBox.Text = point.Code;
             codeTextBox.SelectionStart = point.SelectionStart;
             codeTextBox.SelectionEnd = point.SelectionEnd;
-            UserChangedSelection();
+            TryHandleContentUpdate();
         }
 
         // ---------------------------------------------
