@@ -54,6 +54,11 @@ namespace pseudocodeIde
         private readonly Regex _noUpdateAfter = new Regex(@"^[a-zA-Z0-9_äöüÄÖÜß]$", RegexOptions.Multiline);
 
         /// <summary>
+        /// The autocomplete tooltip
+        /// </summary>
+        private readonly ToolTip _toolTip = new ToolTip();
+
+        /// <summary>
         /// the code currently in the textbox
         /// </summary>
         public string Code
@@ -133,6 +138,9 @@ namespace pseudocodeIde
             CodeTextBox_TextChanged(null, null);
             // on first start, the code is always saved
             SetFileSaved();
+
+            _toolTip.OwnerDraw = false;
+            _toolTip.ShowAlways = true;
         }
 
         /// <summary>
@@ -238,11 +246,53 @@ namespace pseudocodeIde
                     SaveMenuItem_Click(null, null);
                 }
             }
+
+            _toolTip.Dispose();
         }
 
         // ---------------------------------------------
         // CODE TEXTBOX (Scintilla)
         // ---------------------------------------------
+
+        private void AutoCompleteMenu_Hovered(object sender, HoveredEventArgs e)
+        {
+            _toolTip.Hide(this);
+
+            if (e.Item == null)
+            {
+                return;
+            }
+
+            AutocompleteItem autocompleteItem = e.Item;
+
+            string title = "Code Snippet:";
+            string text = autocompleteItem.ToolTipText.Replace("\t", "    ");
+            Color? backColor = autocompleteItem.ToolTipBackColor;
+            Color? foreColor = autocompleteItem.ToolTipForeColor;
+
+            if (backColor != null)
+            {
+                _toolTip.BackColor = (Color)backColor;
+            }
+
+            if (foreColor != null)
+            {
+                _toolTip.ForeColor = (Color)foreColor;
+            }
+
+            Point locationOnForm = PointToClient(
+            ((AutocompleteListView)autoCompleteMenu.ListView).Parent.PointToScreen(((AutocompleteListView)autoCompleteMenu.ListView).Location));
+
+            _toolTip.ToolTipTitle = title;
+            _toolTip.Show(string.IsNullOrEmpty(text) ? title : text, this,
+                locationOnForm.X + ((AutocompleteListView)autoCompleteMenu.ListView).Width + 10,
+                locationOnForm.Y + 30);
+        }
+
+        private void AutoCompleteMenu_Selected(object sender, SelectedEventArgs e)
+        {
+            _toolTip.Hide(this);
+        }
 
         /// <summary>
         /// Updates the undo stack, when user updated the code
@@ -331,12 +381,6 @@ namespace pseudocodeIde
             if (e.KeyCode == Keys.Tab && e.Modifiers == Keys.None)
             {
                 e.SuppressKeyPress = TrySelectNextTabIndicator();
-            }
-
-            // hack to allow enter to autocomplete even if down wasnt pressed before
-            if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && e.Modifiers == Keys.None && autoCompleteMenu.SelectedItemIndex < 0)
-            {
-                autoCompleteMenu.ProcessKey((char)Keys.Down, e.Modifiers);
             }
 
             // ignore CTRL[+SHIFT]+(Z/Y/L/R/E/S)

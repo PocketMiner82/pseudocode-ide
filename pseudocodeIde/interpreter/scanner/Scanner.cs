@@ -214,13 +214,6 @@ namespace pseudocodeIde.interpreter
                         return;
                 }
             }
-
-            // currently, whitespaces often don't influence the behavior of the parser,
-            // we don't need to create a token for it
-            //if (!isNewLine)
-            //{
-            //    this.addToken(WHITESPACE);
-            //}
         }
 
         /// <summary>

@@ -1,3 +1,11 @@
+## [1.6.3-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.2...1.6.3-dev.1) (2024-04-20)
+
+
+### Bug Fixes
+
+* autocomplete menu selection hack removed ([556733c](https://github.com/PocketMiner82/pseudocode-ide/commit/556733c9ee11add41531ba082e43174423d824b4))
+* Autocomplete ToolTip didn't have line breaks ([6193a4f](https://github.com/PocketMiner82/pseudocode-ide/commit/6193a4fbdda492ac36cf93cdc5ffca03722e5ebb))
+
 ## [1.6.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.1...1.6.2) (2024-04-20)
 
 
