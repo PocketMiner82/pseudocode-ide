@@ -41,6 +41,11 @@ namespace codeOutput
             _printMethod = printMethod;
         }
 
+        protected virtual void _print(object msg, bool newLine = true)
+        {
+            _schreibe(msg, newLine);
+        }
+
         protected virtual void _schreibe(object msg, bool newLine = true)
         {
             _printMethod(msg == null ? "NICHTS" : msg.ToString(), newLine);
