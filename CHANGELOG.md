@@ -1,3 +1,11 @@
+## [1.6.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.1...1.6.2) (2024-04-20)
+
+
+### Bug Fixes
+
+* print often used for schreibe in pseudocode, so add print as an alias for schreibe ([43cb8f9](https://github.com/PocketMiner82/pseudocode-ide/commit/43cb8f9c64568f814bc2ac903a1aa65992d41907))
+* update undo system to fix multi-tab undo ([89ba8ef](https://github.com/PocketMiner82/pseudocode-ide/commit/89ba8eff20aad7ab9b10e93e7df5d2fe527a3eba))
+
 ## [1.6.2-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.1...1.6.2-dev.1) (2024-04-20)
 
 
