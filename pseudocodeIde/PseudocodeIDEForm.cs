@@ -260,7 +260,6 @@ namespace pseudocodeIde
 
             if (e.Item == null)
             {
-                Debug.WriteLine("null");
                 return;
             }
 
@@ -383,12 +382,6 @@ namespace pseudocodeIde
             {
                 e.SuppressKeyPress = TrySelectNextTabIndicator();
             }
-
-            //// hack to allow enter to autocomplete even if down wasnt pressed before
-            //if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && e.Modifiers == Keys.None && autoCompleteMenu.SelectedItemIndex < 0)
-            //{
-            //    autoCompleteMenu.ProcessKey((char)Keys.Down, e.Modifiers);
-            //}
 
             // ignore CTRL[+SHIFT]+(Z/Y/L/R/E/S)
             if ((e.KeyCode == Keys.Z || e.KeyCode == Keys.Y || e.KeyCode == Keys.L || e.KeyCode == Keys.R || e.KeyCode == Keys.E || e.KeyCode == Keys.S)
