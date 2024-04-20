@@ -33,7 +33,7 @@ namespace pseudocode_ide.interpreter.pseudocode
             Text = snippet.Replace("\r", "");
             MenuText = menuText;
             ToolTipText = snippet.Replace("^", "");
-            ToolTipTitle = "Snippet:";
+            ToolTipTitle = "";
         }
 
         /// <summary>
