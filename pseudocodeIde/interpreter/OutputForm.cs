@@ -47,13 +47,13 @@ namespace pseudocodeIde
             }
         }
 
-        private readonly Interpreter INTERPRETER;
+        private readonly Interpreter _interpreter;
 
 
         public OutputForm(PseudocodeIDEForm mainForm)
         {
             Owner = mainForm;
-            INTERPRETER = new Interpreter(this);
+            _interpreter = new Interpreter(this);
             Logger.OutputForm = this;
 
             InitializeComponent();
@@ -80,7 +80,7 @@ namespace pseudocodeIde
             }
             else
             {
-                INTERPRETER.Stop();
+                _interpreter.Stop();
             }
         }
 
@@ -104,7 +104,7 @@ namespace pseudocodeIde
             stopMenuItem.Enabled = true;
 
             OutputText = "";
-            INTERPRETER.Run();
+            _interpreter.Run();
         }
 
         public void StopMenuItem_Click(object sender, EventArgs e)
@@ -115,7 +115,7 @@ namespace pseudocodeIde
                 stopMenuItem.Enabled = false;
             }));
 
-            INTERPRETER.Stop();
+            _interpreter.Stop();
 
             Logger.Print("");
             Logger.Info(LogMessage.STOPPED_PROGRAM);
@@ -123,7 +123,7 @@ namespace pseudocodeIde
 
         private void CopyCSharpCodeMenuItem_Click(object sender, EventArgs e)
         {
-            new SetClipboardHelper(DataFormats.UnicodeText, INTERPRETER.CodeManager.CodeText).Go();
+            new SetClipboardHelper(DataFormats.UnicodeText, _interpreter.CodeManager.CodeText).Go();
             MessageBox.Show("C# Code in Zwischenablage gespeichert.", "Zwischenablage");
         }
 
