@@ -23,7 +23,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.6" />
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.9.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2535.41" />
   </ItemGroup>
   <ItemGroup>
