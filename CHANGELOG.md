@@ -1,3 +1,7 @@
+## [1.6.4-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.4-dev.1...1.6.4-dev.2) (2024-08-20)
+
+## [1.6.4-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.3...1.6.4-dev.1) (2024-08-05)
+
 ## [1.6.3](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.2...1.6.3) (2024-04-20)
 
 
