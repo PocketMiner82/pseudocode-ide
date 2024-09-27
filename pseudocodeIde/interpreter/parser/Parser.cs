@@ -24,19 +24,19 @@ namespace pseudocodeIde.interpreter
         private const string FUNCTION_HEADER_TEMPLATE = "%visibility% %type% %identifier%(%insideParens%) {";
 
         // Mapping of pseudocode tokens to C# code
-        private static readonly Dictionary<TokenType, string> TOKEN_TO_C_SHARP = new Dictionary<TokenType, string>();
+        private static readonly Dictionary<TokenType, string> _tokenToCSharp = new Dictionary<TokenType, string>();
 
         // Mapping of visibility tokens to C# visibility modifiers
-        private static readonly Dictionary<TokenType, string> VISIBILITY = new Dictionary<TokenType, string>();
+        private static readonly Dictionary<TokenType, string> _visibility = new Dictionary<TokenType, string>();
 
         // Characters that do not require a semicolon after them
-        private static readonly List<char> NO_SEMICOLON_AFTER = new List<char>();
+        private static readonly List<char> _noSemicolonAfter = new List<char>();
 
         // Linked list of tokens to be parsed
-        private readonly LinkedList<Token> TOKENS;
+        private readonly LinkedList<Token> _tokens;
 
         // Manager for generated C# code
-        private readonly CSharpCodeManager C_SHARP_CODE = new CSharpCodeManager();
+        private readonly CSharpCodeManager _cSharpCode = new CSharpCodeManager();
 
         // Current token being processed
         LinkedListNode<Token> _currentToken;
@@ -55,53 +55,53 @@ namespace pseudocodeIde.interpreter
         /// </summary>
         static Parser()
         {
-            TOKEN_TO_C_SHARP.Add(TYPE_BOOL, "bool?");
-            TOKEN_TO_C_SHARP.Add(TYPE_INT, "int?");
-            TOKEN_TO_C_SHARP.Add(TYPE_DOUBLE, "double?");
-            TOKEN_TO_C_SHARP.Add(TYPE_CHAR, "char?");
-            TOKEN_TO_C_SHARP.Add(TYPE_STRING, "string");
-            TOKEN_TO_C_SHARP.Add(TYPE_VOID, "void");
+            _tokenToCSharp.Add(TYPE_BOOL, "bool?");
+            _tokenToCSharp.Add(TYPE_INT, "int?");
+            _tokenToCSharp.Add(TYPE_DOUBLE, "double?");
+            _tokenToCSharp.Add(TYPE_CHAR, "char?");
+            _tokenToCSharp.Add(TYPE_STRING, "string");
+            _tokenToCSharp.Add(TYPE_VOID, "void");
 
-            TOKEN_TO_C_SHARP.Add(END_IF, "}");
-            TOKEN_TO_C_SHARP.Add(END_FOR, "}");
-            TOKEN_TO_C_SHARP.Add(END_WHILE, "}");
-            TOKEN_TO_C_SHARP.Add(END_SWITCH, "}");
+            _tokenToCSharp.Add(END_IF, "}");
+            _tokenToCSharp.Add(END_FOR, "}");
+            _tokenToCSharp.Add(END_WHILE, "}");
+            _tokenToCSharp.Add(END_SWITCH, "}");
 
-            TOKEN_TO_C_SHARP.Add(IF, "if");
-            TOKEN_TO_C_SHARP.Add(ELSE, "} else {");
+            _tokenToCSharp.Add(IF, "if");
+            _tokenToCSharp.Add(ELSE, "} else {");
 
-            TOKEN_TO_C_SHARP.Add(WHILE, "while");
+            _tokenToCSharp.Add(WHILE, "while");
 
-            TOKEN_TO_C_SHARP.Add(AND, "&&");
-            TOKEN_TO_C_SHARP.Add(OR, "||");
+            _tokenToCSharp.Add(AND, "&&");
+            _tokenToCSharp.Add(OR, "||");
 
-            TOKEN_TO_C_SHARP.Add(TRUE, "true");
-            TOKEN_TO_C_SHARP.Add(FALSE, "false");
+            _tokenToCSharp.Add(TRUE, "true");
+            _tokenToCSharp.Add(FALSE, "false");
 
-            TOKEN_TO_C_SHARP.Add(BREAK, "break");
+            _tokenToCSharp.Add(BREAK, "break");
 
-            TOKEN_TO_C_SHARP.Add(RETURN, "return ");
+            _tokenToCSharp.Add(RETURN, "return ");
 
-            TOKEN_TO_C_SHARP.Add(VAR_ASSIGN, "=");
+            _tokenToCSharp.Add(VAR_ASSIGN, "=");
 
-            TOKEN_TO_C_SHARP.Add(EQUAL, "==");
+            _tokenToCSharp.Add(EQUAL, "==");
 
-            TOKEN_TO_C_SHARP.Add(TYPE_LIST, "Liste");
-            TOKEN_TO_C_SHARP.Add(NEW, "new ");
-            TOKEN_TO_C_SHARP.Add(NULL, "null");
-
-
-            VISIBILITY.Add(PLUS, "public");
-            VISIBILITY.Add(MINUS, "private");
-            VISIBILITY.Add(HASH, "protected");
+            _tokenToCSharp.Add(TYPE_LIST, "Liste");
+            _tokenToCSharp.Add(NEW, "new ");
+            _tokenToCSharp.Add(NULL, "null");
 
 
-            NO_SEMICOLON_AFTER.Add('}');
-            NO_SEMICOLON_AFTER.Add('{');
-            NO_SEMICOLON_AFTER.Add('\n');
-            NO_SEMICOLON_AFTER.Add('\r');
-            NO_SEMICOLON_AFTER.Add(';');
-            NO_SEMICOLON_AFTER.Add(default);
+            _visibility.Add(PLUS, "public");
+            _visibility.Add(MINUS, "private");
+            _visibility.Add(HASH, "protected");
+
+
+            _noSemicolonAfter.Add('}');
+            _noSemicolonAfter.Add('{');
+            _noSemicolonAfter.Add('\n');
+            _noSemicolonAfter.Add('\r');
+            _noSemicolonAfter.Add(';');
+            _noSemicolonAfter.Add(default);
         }
 
         /// <summary>
@@ -110,11 +110,11 @@ namespace pseudocodeIde.interpreter
         /// <param name="tokens">The tokens to parse.</param>
         public Parser(LinkedList<Token> tokens)
         {
-            TOKENS = tokens;
+            _tokens = tokens;
 
             for (int i = 0; i < 3; i++)
             {
-                TOKENS.AddLast(Token.CreateEofToken(TOKENS.Last.Value.LINE));
+                _tokens.AddLast(Token.CreateEofToken(_tokens.Last.Value.LINE));
             }
         }
 
@@ -130,19 +130,19 @@ namespace pseudocodeIde.interpreter
                 Advance();
 
                 AddCode(ParseToken(_isInConstructor
-                                           ? C_SHARP_CODE.Constructor.LastOrDefault()
-                                           : C_SHARP_CODE.Methods.LastOrDefault()));
+                                           ? _cSharpCode.Constructor.LastOrDefault()
+                                           : _cSharpCode.Methods.LastOrDefault()));
             }
 
-            C_SHARP_CODE.Constructor += (NO_SEMICOLON_AFTER.Contains(C_SHARP_CODE.Constructor.LastOrDefault()) ? "" : ";");
+            _cSharpCode.Constructor += (_noSemicolonAfter.Contains(_cSharpCode.Constructor.LastOrDefault()) ? "" : ";");
 
             if (!_isInConstructor)
             {
                 // function end
-                AddCode((NO_SEMICOLON_AFTER.Contains(C_SHARP_CODE.Methods.LastOrDefault()) ? "" : ";") + "\n}\n");
+                AddCode((_noSemicolonAfter.Contains(_cSharpCode.Methods.LastOrDefault()) ? "" : ";") + "\n}\n");
             }
 
-            return C_SHARP_CODE;
+            return _cSharpCode;
         }
 
         /// <summary>
@@ -180,10 +180,10 @@ namespace pseudocodeIde.interpreter
                     return TryHandleVarDef(ignoreSpecialCases, isInForLoopVarDef);
 
                 case NEW_LINE:
-                    return (NO_SEMICOLON_AFTER.Contains(prevChar) ? "" : ";") + "\n";
+                    return (_noSemicolonAfter.Contains(prevChar) ? "" : ";") + "\n";
 
                 case VAR_ASSIGN:
-                    string output = TOKEN_TO_C_SHARP[token.TYPE];
+                    string output = _tokenToCSharp[token.TYPE];
                     Token possibleLeftBracket = Peek();
                     if (possibleLeftBracket.TYPE == LEFT_BRACKET)
                     {
@@ -199,8 +199,8 @@ namespace pseudocodeIde.interpreter
                     return output;
 
                 default:
-                    return TOKEN_TO_C_SHARP.ContainsKey(token.TYPE)
-                        ? TOKEN_TO_C_SHARP[token.TYPE]
+                    return _tokenToCSharp.ContainsKey(token.TYPE)
+                        ? _tokenToCSharp[token.TYPE]
                         : token.LEXEME;
             }
         }
@@ -351,7 +351,7 @@ namespace pseudocodeIde.interpreter
             string output = "";
 
             Token currentToken = _currentToken.Value;
-            string keyword = TOKEN_TO_C_SHARP[currentToken.TYPE];
+            string keyword = _tokenToCSharp[currentToken.TYPE];
 
             do
             {
@@ -518,7 +518,7 @@ namespace pseudocodeIde.interpreter
 
                 if (IsVarType(possibleVarType.TYPE))
                 {
-                    string type = TOKEN_TO_C_SHARP[possibleVarType.TYPE];
+                    string type = _tokenToCSharp[possibleVarType.TYPE];
                     if (possibleVarAssign.TYPE == LESS)
                     {
                         Advance();
@@ -528,7 +528,7 @@ namespace pseudocodeIde.interpreter
 
                     if (_isInConstructor && !insideFunctionParens)
                     {
-                        C_SHARP_CODE.Fields += $"private {type} _{identifier.LEXEME};\n";
+                        _cSharpCode.Fields += $"private {type} _{identifier.LEXEME};\n";
 
                         if (possibleVarAssign.TYPE == VAR_ASSIGN)
                         {
@@ -577,7 +577,7 @@ namespace pseudocodeIde.interpreter
 
             if (IsVarType(possibleVarType.TYPE))
             {
-                string type = TOKEN_TO_C_SHARP[possibleVarType.TYPE];
+                string type = _tokenToCSharp[possibleVarType.TYPE];
                 if (possibleLessSign.TYPE == LESS)
                 {
                     output += type + "<";
@@ -645,9 +645,9 @@ namespace pseudocodeIde.interpreter
 
             Token possibleVisibility = Advance();
             Token possibleIdentifier = possibleVisibility;
-            if (Parser.VISIBILITY.ContainsKey(possibleVisibility.TYPE))
+            if (Parser._visibility.ContainsKey(possibleVisibility.TYPE))
             {
-                visibility = Parser.VISIBILITY[possibleIdentifier.TYPE];
+                visibility = Parser._visibility[possibleIdentifier.TYPE];
                 possibleIdentifier = Advance();
             }
 
@@ -699,14 +699,14 @@ namespace pseudocodeIde.interpreter
 
             if (!_isInConstructor)
             {
-                output += (NO_SEMICOLON_AFTER.Contains(output.LastOrDefault()) ? "" : ";") + "}\n\n";
+                output += (_noSemicolonAfter.Contains(output.LastOrDefault()) ? "" : ";") + "}\n\n";
             }
 
             _isInConstructor = false;
 
             return output + FUNCTION_HEADER_TEMPLATE
                 .Replace("%visibility%", visibility)
-                .Replace("%type%", TOKEN_TO_C_SHARP[type])
+                .Replace("%type%", _tokenToCSharp[type])
                 .Replace("%identifier%", "_" + possibleIdentifier.LEXEME)
                 .Replace("%insideParens%", insideParens);
         }
@@ -754,7 +754,7 @@ namespace pseudocodeIde.interpreter
         private LinkedListNode<Token> PeekLinkedList()
         {
             return _currentToken == null
-                ? TOKENS.First
+                ? _tokens.First
                 : _currentToken.NextOrLast();
         }
 
@@ -775,11 +775,11 @@ namespace pseudocodeIde.interpreter
         {
             if (_isInConstructor)
             {
-                C_SHARP_CODE.Constructor += code;
+                _cSharpCode.Constructor += code;
             }
             else
             {
-                C_SHARP_CODE.Methods += code;
+                _cSharpCode.Methods += code;
             }
         }
     }
