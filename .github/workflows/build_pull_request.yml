@@ -12,7 +12,7 @@ jobs:
   steps:
    - uses: actions/checkout@v4
    - name: Setup NuGet
-     uses: NuGet/setup-nuget@v2.0.0  
+     uses: NuGet/setup-nuget@v2.0.1  
    - name: setup-msbuild
      uses: microsoft/setup-msbuild@v2
    - name: Restore Packages and build solution
