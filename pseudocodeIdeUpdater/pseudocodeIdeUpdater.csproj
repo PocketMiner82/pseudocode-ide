@@ -7,7 +7,7 @@
     <Product>pseudocodeIdeUpdater</Product>
     <Copyright>Copyright ©  2023</Copyright>
     <OutputPath>..\bin\$(Configuration)\updater\</OutputPath>
-  <version>1.6.5.2</version>
+  <version>1.6.5</version>
   <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

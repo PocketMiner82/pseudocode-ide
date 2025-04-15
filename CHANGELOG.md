@@ -1,3 +1,10 @@
+## [1.6.5](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.4...1.6.5) (2025-04-15)
+
+
+### Bug Fixes
+
+* Merge branch `dev` to `main` ([#53](https://github.com/PocketMiner82/pseudocode-ide/issues/53)) ([ffea63d](https://github.com/PocketMiner82/pseudocode-ide/commit/ffea63d5ec801be7958819169638a604e68a8c1a))
+
 ## [1.6.5-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.5-dev.1...1.6.5-dev.2) (2025-02-25)
 
 ## [1.6.5-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.4...1.6.5-dev.1) (2024-11-29)
