@@ -60,8 +60,7 @@ namespace pseudocode_ide.interpreter.pseudocode
             List<(int selectionStart, int selectionEnd)> tabSelections = new List<(int selectionStart, int selectionEnd)>();
 
             bool inSelection = false;
-            int textLengthWithoutMarkers = GetTextForReplace().Replace("\\^", " ").Replace("^", "").Length;
-            textLengthWithoutMarkers += GetTextForReplace().EndsWith("^") ? 1 : 0;
+            int textLengthWithoutMarkers = GetTextForReplace().Replace("\\^", " ").Replace("^", "").Length + (GetTextForReplace().EndsWith("^") ? 1 : 0);
             for (int i = Parent.Fragment.Start; ; i++)
             {
                 recheck:
@@ -73,11 +72,15 @@ namespace pseudocode_ide.interpreter.pseudocode
                 {
                     if (i != 0 && scintilla.Text[i - 1] == '\\')
                     {
-                        scintilla.Text = scintilla.Text.Remove(i - 1, 1);
+                        scintilla.TargetStart = i - 1;
+                        scintilla.TargetEnd = i;
+                        scintilla.ReplaceTarget("");
                         goto recheck;
                     }
 
-                    scintilla.Text = scintilla.Text.Remove(i, 1);
+                    scintilla.TargetStart = i;
+                    scintilla.TargetEnd = i + 1;
+                    scintilla.ReplaceTarget("");
 
                     if (!inSelection) // && firstOccurrenceSelected
                     {
