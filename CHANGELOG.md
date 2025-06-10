@@ -1,3 +1,10 @@
+## [1.6.6-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.6-dev.1...1.6.6-dev.2) (2025-06-10)
+
+
+### Bug Fixes
+
+* allow printMethod to be a variable in pseudocode ([9d924a1](https://github.com/PocketMiner82/pseudocode-ide/commit/9d924a17f2d33dd52dd26016690afead4f3baaaa))
+
 ## [1.6.6-dev.1](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.5...1.6.6-dev.1) (2025-06-10)
 
 
