@@ -317,7 +317,6 @@ namespace pseudocodeIde
         /// </summary>
         private void UserChangedSelection()
         {
-            HighlightWord(codeTextBox.SelectedText);
             RemovePreviousTabSelectionIndicators();
 
             if (_lastCursorPosition != codeTextBox.SelectionStart && codeTextBox.Text != _undoStack.Peek().Code)
@@ -345,6 +344,8 @@ namespace pseudocodeIde
 
         private void CodeTextBox_UpdateUI(object sender, UpdateUIEventArgs e)
         {
+            HighlightWord(codeTextBox.SelectedText);
+
             switch (e.Change)
             {
                 case UpdateChange.Content:
@@ -422,12 +423,10 @@ namespace pseudocodeIde
             {
                 codeTextBox.SelectionStart = tabSelections.First().selectionStart;
                 codeTextBox.SelectionEnd = tabSelections.First().selectionEnd;
+                UserChangedSelection();
+
                 tabSelections.RemoveAt(0);
             }
-
-            // remove all uses of our indicator
-            codeTextBox.IndicatorCurrent = TAB_SELECTION_INDICATOR_ID;
-            codeTextBox.IndicatorClearRange(0, codeTextBox.TextLength);
 
             if (tabSelections.Count == 0)
             {
@@ -435,6 +434,7 @@ namespace pseudocodeIde
             }
 
             // update indicator appearance
+            codeTextBox.IndicatorCurrent = TAB_SELECTION_INDICATOR_ID;
             codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].Style = IndicatorStyle.StraightBox;
             codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].Under = true;
             codeTextBox.Indicators[TAB_SELECTION_INDICATOR_ID].ForeColor = Color.LightBlue;
