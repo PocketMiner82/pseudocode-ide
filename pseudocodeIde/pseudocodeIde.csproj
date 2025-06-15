@@ -5,12 +5,13 @@
     <AssemblyName>pseudocode-ide</AssemblyName>
     <TargetFramework>net472</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <AssemblyTitle>pseudocode-ide</AssemblyTitle>
     <Company>PocketMiner82</Company>
     <Product>pseudocode-ide</Product>
-  <version>1.6.5</version>
-  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <version>1.6.5</version>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
