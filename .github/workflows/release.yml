@@ -19,7 +19,7 @@ jobs:
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v2
     - name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v4
+      uses: cycjimmy/semantic-release-action@v5
       with:
         tag_format: ${version}
         branches: |
