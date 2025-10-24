@@ -7,7 +7,7 @@
     <Product>pseudocodeIdeUpdater</Product>
     <Copyright>Copyright ©  2023</Copyright>
     <OutputPath>..\bin\$(Configuration)\updater\</OutputPath>
-  <version>1.6.5</version>
+  <version>1.6.6.3</version>
   <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -24,7 +24,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autoupdater.NET.Official" Version="1.9.2" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3537.50" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework" />

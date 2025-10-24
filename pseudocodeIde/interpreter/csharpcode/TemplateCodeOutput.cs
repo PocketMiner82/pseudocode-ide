@@ -34,11 +34,11 @@ namespace codeOutput
 
     public class BaseCodeOutput
     {
-        private readonly Action<string, bool> _printMethod;
+        private readonly Action<string, bool> PrintMethod;
 
         public BaseCodeOutput(Action<string, bool> printMethod)
         {
-            _printMethod = printMethod;
+            PrintMethod = printMethod;
         }
 
         protected virtual void _print(object msg, bool newLine = true)
@@ -48,7 +48,7 @@ namespace codeOutput
 
         protected virtual void _schreibe(object msg, bool newLine = true)
         {
-            _printMethod(msg == null ? "NICHTS" : msg.ToString(), newLine);
+            PrintMethod(msg == null ? "NICHTS" : msg.ToString(), newLine);
         }
 
         protected virtual void _warte(int millis)
