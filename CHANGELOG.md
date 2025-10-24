@@ -1,3 +1,10 @@
+## [1.6.6-dev.3](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.6-dev.2...1.6.6-dev.3) (2025-10-24)
+
+
+### Bug Fixes
+
+* GitHub actions ([#107](https://github.com/PocketMiner82/pseudocode-ide/issues/107)) ([ac499f3](https://github.com/PocketMiner82/pseudocode-ide/commit/ac499f361b5ebf64e990ba02e89e6813371741c8))
+
 ## [1.6.6-dev.2](https://github.com/PocketMiner82/pseudocode-ide/compare/1.6.6-dev.1...1.6.6-dev.2) (2025-06-10)
 
 
