@@ -17,3 +17,5 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "Scintilla5.NET"
+    commit-message:
+      prefix: "build(deps)"
