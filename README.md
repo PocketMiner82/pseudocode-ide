@@ -16,7 +16,7 @@ Dieses Programm ermöglicht die Ausführung von Pseudocode nach der [Formelsamml
 * `benutzereingabe<Typ>(nachricht, titel):Typ` - Öffnet ein Eingabefenster.
   - `nachricht`: Der im Eingabefenster angezeigte Infotext
   - `titel`: Der Titel des Eingabefensters
-  - Rückgabetyp: Der Rückgabetyp ist der in `<` und `>` angegebene `Typ`. Sollte die Konvertierung fehlschlagen, wird NICHTS zurückgegeben.
+  - Rückgabetyp: Der Rückgabetyp ist der in `<` und `>` angegebene `Typ`. Sollte die Konvertierung fehlschlagen, wird `NICHTS` zurückgegeben.
   - z.B. würde `benutzereingabe<GZ>("Gib eine Zahl ein", "Zahl")` ein Eingabefenster mit dem Titel "Zahl" und dem Infotext "Gib eine Zahl ein" öffnen, welches den eingebenen Text als ganze Zahl (Integer) zurückgibt.
 * Nicht implementiert:
   - Unterstützung für mehrere Dateien
